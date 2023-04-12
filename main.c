@@ -20,31 +20,78 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "game.h"
 
 #include "frontends/console.h"
 
 void
-print_usage() {
-    printf("Usage: %s [--api|-a API] [--size|-s size] [--mines|-m N of mines] [--help]\n");
+printUsage(const char *self) {
+    printf("Usage: %s [--frontend|-f API] [--size|-s size]\n"
+        "\t[--mines|-m N of mines] [--help]\n\n"
+        "\t--frontend | -f: Frontend to use, see compiled\n"
+        "\t--size | -s:     Board size (square side length)\n"
+        "\t--mines | -m:    Number of random mines to place\n", self);
+}
+
+void
+printFrontends() {
+    printf("This was built with the following frontends:\n");
+    printf("\tconsole\n");
+    printf("\n");
 }
 
 int
 main(int argc, char **argv) {
-    printf("arfminesweeper Copyright 2023 arf20 License GPLv3+ <http://gnu.org/licenses/gpl.html>\n");
+    printf("arfminesweeper by arf20\n"
+        "Copyright 2023 Ángel Ruiz Fernandez\n"
+        "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n\n");
 
+    printFrontends();
+
+    const char *frontend = NULL;
     int size = 0, mines = 0;
+
+    /* Parse command-line options */
     if (argc == 1) {
-        /* Defaults */
+        /* Default */
         printf("Starting default game in console, 8x8 with 10 mines\n");
-        size = 8;
-        mines = 10;
+    }
+    else if (argc == 2 || argc == 4 || argc == 6) {
+        /* Unpossible */
+        printUsage(argv[0]);
+        exit(1);
+    }
+    else {
+        for (int i = 1; i < argc; i += 2) {
+            if (!strcmp(argv[i], "--api") || !strcmp(argv[i], "-a"))
+                frontend = argv[i + 1];
+            if (!strcmp(argv[i], "--size") || !strcmp(argv[i], "-s"))
+                size = atoi(argv[i + 1]);
+            if (!strcmp(argv[i], "--mines") || !strcmp(argv[i], "-m"))
+                mines = atoi(argv[i + 1]);
+        }
     }
 
+    if (frontend == NULL) frontend = "console";
+    if (size == 0) size = 8;
+    if (mines == 0) mines = 10;
+
+    printf("Starting game with %s frontend, %dx%d in size with %d mines\n",
+        frontend, size, size, mines);
     initGame(size, mines);
 
-    conStart(getBoard(), size);
-    conPrintBoardClear();
+    if (!strcmp(frontend, "console")) {
+        conStart(getBoard(), size);
+        conPrintBoardClear();
+    }
+    else {
+        printf("Error: Frontend not recognised: %s", frontend);
+        printFrontends();
+    }
+
+    return 0;
 }
         
