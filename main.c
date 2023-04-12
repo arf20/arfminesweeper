@@ -31,6 +31,7 @@ void
 printUsage(const char *self) {
     printf("Usage: %s [--frontend|-f API] [--size|-s size]\n"
         "\t[--mines|-m N of mines] [--help]\n\n"
+        "\t--help | -h:     Get this message\n"
         "\t--frontend | -f: Frontend to use, see compiled\n"
         "\t--size | -s:     Board size (square side length)\n"
         "\t--mines | -m:    Number of random mines to place\n", self);
@@ -38,7 +39,7 @@ printUsage(const char *self) {
 
 void
 printFrontends() {
-    printf("This was built with the following frontends:\n");
+    printf("Built with the following frontends:\n");
     printf("\tconsole\n");
     printf("\n");
 }
@@ -57,7 +58,6 @@ main(int argc, char **argv) {
     /* Parse command-line options */
     if (argc == 1) {
         /* Default */
-        printf("Starting default game in console, 8x8 with 10 mines\n");
     }
     else if (argc == 2 || argc == 4 || argc == 6) {
         /* Unpossible */
@@ -81,11 +81,10 @@ main(int argc, char **argv) {
 
     printf("Starting game with %s frontend, %dx%d in size with %d mines\n",
         frontend, size, size, mines);
-    initGame(size, mines);
+    gameInit(size, mines);
 
     if (!strcmp(frontend, "console")) {
-        conStart(getBoard(), size);
-        conPrintBoardClear();
+        conStart(gameGetBoard(), size);
     }
     else {
         printf("Error: Frontend not recognised: %s", frontend);

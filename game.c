@@ -30,7 +30,7 @@ static int size = 0, mines = 0;
 
 /* Initialise the board */
 int
-initGame(int lsize, int lmines) {
+gameInit(int lsize, int lmines) {
     size = lsize;
     mines = lmines;
     
@@ -64,6 +64,26 @@ initGame(int lsize, int lmines) {
 }
 
 const int * 
-getBoard() {
+gameGetBoard() {
     return board;
 }
+
+int
+gameGetSurroundingMines(int x, int y) {
+    int n = 0;
+    if (CHECK_MINE(BOARDXY(x - 1, y - 1))) n++;
+    if (CHECK_MINE(BOARDXY(x    , y - 1))) n++;
+    if (CHECK_MINE(BOARDXY(x + 1, y - 1))) n++;
+    if (CHECK_MINE(BOARDXY(x - 1, y    ))) n++;
+    if (CHECK_MINE(BOARDXY(x + 1, y    ))) n++;
+    if (CHECK_MINE(BOARDXY(x - 1, y + 1))) n++;
+    if (CHECK_MINE(BOARDXY(x    , y + 1))) n++;
+    if (CHECK_MINE(BOARDXY(x + 1, y + 1))) n++;
+    return n;
+}
+
+void
+gameClearCell(int x, int y) {
+    
+}
+

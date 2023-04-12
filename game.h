@@ -26,19 +26,24 @@
 /* Cell bit field */
 #define CELL_BIT_MINE       0
 #define CELL_BIT_FLAG       1
-#define CELL_CLEAR          2
+#define CELL_BIT_CLEAR      2
 
 /* Permutations */
 #define CELL_EMPTY          0
-#define CELL_MINED          0b01
-#define CELL_NOMINE_FLAGGED 0b10
-#define CELL_MINED_FLAGGED  0b11
+#define CELL_MINED          0b001
+#define CELL_FLAGGED        0b010
+#define CELL_MINED_FLAGGED  0b011
+#define CELL_CLEARED        0b100
+/*  A cleared cell can neither be mined or flagged */
 
 /* Bit field check macros */
 #define CHECK_MINE(x)       (((x) << CELL_BIT_MINE) & 1)
 #define CHECK_FLAG(x)       (((x) << CELL_BIT_FLAG) & 1)
+#define CHECK_CLEAR(x)      (((x) << CELL_BIT_CLEAR) & 1)
 
-int initGame(int size, int mines);
-const int * getBoard();
+int gameInit(int size, int mines);
+const int * gameGetBoard();
+int gameGetSurroundingMines(int x, int y);
+void gameClearCell();
 
 #endif
