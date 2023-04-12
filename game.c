@@ -1,5 +1,22 @@
 /*
- * game.c: The game backend implementation
+
+  Copyright (C) 2023 Ángel Ruiz Fernandez
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, version 3.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/>
+
+  game.c: The game backend implementation
+
 */
 
 #include <stdlib.h>
@@ -25,7 +42,7 @@ initGame(int lsize, int lmines) {
         board[i] = CELL_EMPTY;
 
     /* Add mines at random locations */
-    /* Seed the rand(1) pseudorandom number generator with time(1), good enough entropy */
+    /* Seed the rand(7) pseudorandom number generator with time(7), good enough entropy */
     srand(time(NULL));
 
     int x = 0, y = 0, n = 0;
