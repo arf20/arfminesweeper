@@ -31,7 +31,7 @@
 int size = 0;
 const int *board = NULL;
 
-/* debug */
+/* debug wallhack xray thing */
 void
 conPrintBoardDebug() {
     printf("+");
@@ -41,8 +41,17 @@ conPrintBoardDebug() {
 
     for (int y = 0; y < size; y++) {
         printf("|");
-        for (int x = 0; x < size; x++)
-            CHECK_MINE(BOARDXY(x, y)) ? printf("O") : printf("#");
+        for (int x = 0; x < size; x++) {
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
+                printf(" ");
+            }
+            else {
+                if (CHECK_MINE(BOARDXY(x, y)) && CHECK_FLAG(BOARDXY(x, y))) printf("X");
+                else if (CHECK_MINE(BOARDXY(x, y))) printf("O");
+                else if (CHECK_FLAG(BOARDXY(x, y))) printf("F");
+                else printf("#");
+            }
+        }
         printf("|\n");
     }
 
@@ -67,13 +76,10 @@ conPrintBoard() {
                 int n = gameGetSurroundingMines(x, y);
                 n ? printf("%d", n) : printf(" ");
             }
-            else {
-                if (CHECK_FLAG(BOARDXY(x, y))) {
-                    printf("F");
-                }
-                else printf("#"); /* uncleared */
+            else if (CHECK_FLAG(BOARDXY(x, y))) {
+                printf("F");
             }
-            
+            else printf("#"); /* uncleared */
         }
         printf("|\n");
     }
@@ -91,14 +97,18 @@ printHelp() {
            "\tflag  | f <x, y>: Place flag\n");
 }
 
-void
+int
 parseXYCommand(char *buff, int *x, int *y) {
     char *cmd = strtok(buff, " ");
     char *xstr = strtok(NULL, " ");
     char *ystr = strtok(NULL, " ");
 
+    if (!xstr) { printf("?Missing operand\n"); return -1; }
+
     *x = atoi(xstr);
     *y = atoi(ystr);
+
+    return 0;
 }
 
 int
@@ -111,25 +121,30 @@ conStart(const int *lboard, int lsize) {
     printf("Type `help` to get help\n");
 
     /* Console game loop */
-    int x = 0, y = 0;
+    int x = 0, y = 0, r = 0;
     while (1) {
         /* Print state and prompt */
-        conPrintBoard();
+        conPrintBoardDebug();
         printf("> ");
         memset(buffin, 256, 0);
         fgets(buffin, 256, stdin); /* safe */
-
        
         if (!strncmp(buffin, "help", 4) || !strncmp(buffin, "h", 1)) {
             printHelp();
         }
         else if (!strncmp(buffin, "clear", 5) || !strncmp(buffin, "c", 1)) {
-            parseXYCommand(buffin, &x, &y);
+            if (parseXYCommand(buffin, &x, &y)) continue;
+            if (x < 0 || y < 0 || x >= size || y >= size) {
+                printf("?Out of board bounds\n"); continue;
+            }
             printf("Cleared (%d, %d)\n", x, y);
             gameClearCell(x, y);
         }
         else if (!strncmp(buffin, "flag", 4) || !strncmp(buffin, "f", 1)) {
-            parseXYCommand(buffin, &x, &y);
+            if (parseXYCommand(buffin, &x, &y)) continue;
+            if (x < 0 || y < 0 || x >= size || y >= size) {
+                printf("?Out of board bounds\n"); continue;
+            }
             printf("Flagged (%d, %d)\n", x, y);
             gameFlagCell(x, y);
         }

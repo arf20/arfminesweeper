@@ -37,9 +37,9 @@
 /*  A cleared cell can neither be mined or flagged */
 
 /* Bit field check macros */
-#define CHECK_MINE(x)       (((x) << CELL_BIT_MINE) & 1)
-#define CHECK_FLAG(x)       (((x) << CELL_BIT_FLAG) & 1)
-#define CHECK_CLEAR(x)      (((x) << CELL_BIT_CLEAR) & 1)
+#define CHECK_MINE(x)       (((x) >> CELL_BIT_MINE) & 1)
+#define CHECK_FLAG(x)       (((x) >> CELL_BIT_FLAG) & 1)
+#define CHECK_CLEAR(x)      (((x) >> CELL_BIT_CLEAR) & 1)
 
 /* Game state */
 #define STATE_GOING         0
