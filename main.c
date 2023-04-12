@@ -66,7 +66,7 @@ main(int argc, char **argv) {
     }
     else {
         for (int i = 1; i < argc; i += 2) {
-            if (!strcmp(argv[i], "--api") || !strcmp(argv[i], "-a"))
+            if (!strcmp(argv[i], "--frontend") || !strcmp(argv[i], "-f"))
                 frontend = argv[i + 1];
             if (!strcmp(argv[i], "--size") || !strcmp(argv[i], "-s"))
                 size = atoi(argv[i + 1]);
@@ -90,6 +90,8 @@ main(int argc, char **argv) {
         printf("Error: Frontend not recognised: %s", frontend);
         printFrontends();
     }
+
+    gameDestroy();
 
     return 0;
 }

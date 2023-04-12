@@ -38,24 +38,6 @@ static int size = 0, mines = 0, flagsLeft = 0, state = 0;
     if (                y < size - 1 && CHECK_MINE(BOARDXY(x    , y + 1))) a; \
     if (x < size - 1 && y < size - 1 && CHECK_MINE(BOARDXY(x + 1, y + 1))) a;
 
-#define FOREACH_SURROUNDING_FXY(x, y, a) \
-    if (x > 0        && y > 0        && CHECK_MINE(BOARDXY(x - 1, y - 1))) \
-        a(x - 1, y - 1); \
-    if (                y > 0        && CHECK_MINE(BOARDXY(x    , y - 1))) \
-        a(x    , y - 1); \
-    if (x < size - 1 && y > 0        && CHECK_MINE(BOARDXY(x + 1, y - 1))) \
-        a(x + 1, y - 1); \
-    if (x > 0                        && CHECK_MINE(BOARDXY(x - 1, y    ))) \
-        a(x - 1, y    ); \
-    if (x < size - 1                 && CHECK_MINE(BOARDXY(x + 1, y    ))) \
-        a(x + 1, y    ); \
-    if (x > 0        && y < size - 1 && CHECK_MINE(BOARDXY(x - 1, y + 1))) \
-        a(x - 1, y + 1); \
-    if (                y < size - 1 && CHECK_MINE(BOARDXY(x    , y + 1))) \
-        a(x    , y + 1); \
-    if (x < size - 1 && y < size - 1 && CHECK_MINE(BOARDXY(x + 1, y + 1))) \
-        a(x + 1, y + 1);
-
 /* Initialise the board */
 int
 gameInit(int lsize, int lmines) {
@@ -93,16 +75,35 @@ gameInit(int lsize, int lmines) {
     return 0;
 }
 
+void
+gameDestroy() {
+    free(board);
+}
+
 const int * 
 gameGetBoard() {
     return board;
 }
 
 int
+gameGetState() {
+    return state;
+}
+
+
+int
 gameGetSurroundingMines(int x, int y) {
     int n = 0;
     FOREACH_SURROUNDING(x, y, n++)
     return n;
+}
+
+int
+checkWin() {
+    for (int i = 0; i < size * size; i++)
+        if ((!CHECK_CLEAR(board[i]) && !CHECK_MINE(board[i]))
+            || (!CHECK_FLAG(board[i]) && CHECK_MINE(board[i]))) return 0;
+    return 1;
 }
 
 /* Cell clearing recursive algorithm */
@@ -149,6 +150,8 @@ gameClearCell(int x, int y) {
                 !CHECK_MINE(BOARDXY(x + 1, y + 1)))
                     gameClearCell(x + 1, y + 1);
         }
+
+        if (checkWin()) state = STATE_WON;
     }
 }
 
