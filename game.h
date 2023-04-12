@@ -41,9 +41,15 @@
 #define CHECK_FLAG(x)       (((x) << CELL_BIT_FLAG) & 1)
 #define CHECK_CLEAR(x)      (((x) << CELL_BIT_CLEAR) & 1)
 
+/* Game state */
+#define STATE_GOING         0
+#define STATE_LOST          1
+#define STATE_WON           2
+
 int gameInit(int size, int mines);
 const int * gameGetBoard();
 int gameGetSurroundingMines(int x, int y);
-void gameClearCell();
+void gameClearCell(int x, int y);
+void gameFlagCell(int x, int y);
 
 #endif

@@ -126,12 +126,12 @@ conStart(const int *lboard, int lsize) {
         else if (!strncmp(buffin, "clear", 5) || !strncmp(buffin, "c", 1)) {
             parseXYCommand(buffin, &x, &y);
             printf("Cleared (%d, %d)\n", x, y);
-            //gameClearCell(x, y);
+            gameClearCell(x, y);
         }
         else if (!strncmp(buffin, "flag", 4) || !strncmp(buffin, "f", 1)) {
             parseXYCommand(buffin, &x, &y);
             printf("Flagged (%d, %d)\n", x, y);
-            //gameFlagCell(x, y);
+            gameFlagCell(x, y);
         }
         else printf("?\n");
     }
