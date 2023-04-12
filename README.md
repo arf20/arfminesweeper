@@ -5,7 +5,9 @@ You know the game, but in every graphical API I know as well as console
 ```
 Console (no graphics)
 
-Xlib
+fbdev
+
+X11 Xlib
 Xforms
 Motif (nice)
 Tcl/Tk

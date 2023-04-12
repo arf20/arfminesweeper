@@ -94,7 +94,8 @@ void
 printHelp() {
     printf("\thelp:             Get this message\n"
            "\tclear | c <x, y>: Clear cell\n"
-           "\tflag  | f <x, y>: Place flag\n");
+           "\tflag  | f <x, y>: Place flag\n"
+           "\tquit  | q:        Quit\n");
 }
 
 int
@@ -124,7 +125,7 @@ conStart(const int *lboard, int lsize) {
     int x = 0, y = 0, r = 0;
     while (1) {
         /* Print state and prompt */
-        conPrintBoardDebug();
+        conPrintBoard();
         printf("> ");
         memset(buffin, 256, 0);
         fgets(buffin, 256, stdin); /* safe */
@@ -147,6 +148,9 @@ conStart(const int *lboard, int lsize) {
             }
             printf("Flagged (%d, %d)\n", x, y);
             gameFlagCell(x, y);
+        }
+        else if (!strncmp(buffin, "quit", 4) || !strncmp(buffin, "q", 1)) {
+            return 0;
         }
         else printf("?\n");
 

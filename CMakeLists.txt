@@ -6,8 +6,26 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 file (GLOB SRC
-    "*.c"
-    "frontends/*.c"
+    "main.c"
+    "game.c"
 )
 
+# frontends
+
+file (GLOB SRC ${SRC} "frontends/console.c")
+add_compile_definitions(FRONTEND_CONSOLE)
+
+find_package(X11)
+if (X11_FOUND)
+    file (GLOB SRC ${SRC} "frontends/x11.c")
+    add_compile_definitions(FRONTEND_X11)
+endif()
+
+# executable
 add_executable(arfminesweeper ${SRC})
+
+# libraries
+
+if (X11_FOUND)
+    target_link_libraries(arfminesweeper X11)
+endif()

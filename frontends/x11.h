@@ -17,9 +17,10 @@
 
 */
 
-#ifndef _CONSOLE_H
-#define _CONSOLE_H
+#ifndef _X11_H
+#define _X11_H
 
-int conStart(const int *lboard, int size);
+int X11Start(const int *lboard, int size);
+void X11Destroy();
 
 #endif
