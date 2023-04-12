@@ -111,9 +111,44 @@ gameClearCell(int x, int y) {
     if (CHECK_MINE(BOARDXY(x, y))) {
         state = STATE_LOST;
     } else {
-        /* Set clear bit and propagate surrounding cells */
+        /* Set clear bit */
         BOARDXY(x, y) |= 1 << CELL_BIT_CLEAR;
-        FOREACH_SURROUNDING_FXY(x, y, gameClearCell)
+
+        /* If no mine near, propagate surrounding cells */
+        if (gameGetSurroundingMines(x, y) == 0) {
+            if (x > 0 && y > 0 &&
+                !CHECK_CLEAR(BOARDXY(x - 1, y - 1)) &&
+                !CHECK_MINE(BOARDXY(x - 1, y - 1)))
+                    gameClearCell(x - 1, y - 1);
+            if (y > 0 &&
+                !CHECK_CLEAR(BOARDXY(x    , y - 1)) &&
+                !CHECK_MINE(BOARDXY(x    , y - 1)))
+                    gameClearCell(x    , y - 1);
+            if (x < size - 1 && y > 0        &&
+                !CHECK_CLEAR(BOARDXY(x + 1, y - 1)) &&
+                !CHECK_MINE(BOARDXY(x + 1, y - 1)))
+                    gameClearCell(x + 1, y - 1);
+            if (x > 0                        &&
+                !CHECK_CLEAR(BOARDXY(x - 1, y    )) &&
+                !CHECK_MINE(BOARDXY(x - 1, y    )))
+                    gameClearCell(x - 1, y    );
+            if (x < size - 1                 &&
+                !CHECK_CLEAR(BOARDXY(x + 1, y    )) &&
+                !CHECK_MINE(BOARDXY(x + 1, y    )))
+                    gameClearCell(x + 1, y    );
+            if (x > 0        && y < size - 1 &&
+                !CHECK_CLEAR(BOARDXY(x - 1, y + 1)) &&
+                !CHECK_MINE(BOARDXY(x - 1, y + 1)))
+                    gameClearCell(x - 1, y + 1);
+            if (                y < size - 1 &&
+                !CHECK_CLEAR(BOARDXY(x    , y + 1)) &&
+                !CHECK_MINE(BOARDXY(x    , y + 1)))
+                    gameClearCell(x    , y + 1);
+            if (x < size - 1 && y < size - 1 &&
+                !CHECK_CLEAR(BOARDXY(x + 1, y + 1)) &&
+                !CHECK_MINE(BOARDXY(x + 1, y + 1)))
+                    gameClearCell(x + 1, y + 1);
+        }
     }
 }
 
