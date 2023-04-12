@@ -160,4 +160,5 @@ void
 gameFlagCell(int x, int y) {
     BOARDXY(x, y) ^= 1 << CELL_BIT_FLAG;
     CHECK_FLAG(BOARDXY(x, y)) ? flagsLeft-- : flagsLeft++;
+    if (checkWin()) state = STATE_WON;
 }
