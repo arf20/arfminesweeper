@@ -62,6 +62,7 @@ drawFlag(int x, int y) {
 
 void
 render() {
+    XClearWindow(d, w);
     XSetForeground(d, gc, WhitePixel(d, s));
     XSetFont(d, gc, f);
 
@@ -124,15 +125,12 @@ X11Start(const int *lboard, int lsize) {
     w = XCreateSimpleWindow(d, XRootWindow(d, s), 50, 50, wWidth, wHeight,
         0, BlackPixel(d, s), BlackPixel(d, s));
 
-    XSelectInput(d, w, ExposureMask | KeyPressMask);
+    XSelectInput(d, w, ExposureMask | KeyPressMask | ButtonPressMask);
     XMapWindow(d, w);
 
     gc = XCreateGC(d, w, 0, NULL);
 
     f = XLoadFont(d, "9x15");
-
-    gameFlagCell(0, 0);
-    gameClearCell(1, 1);
 
     XEvent e;
     while (1) {
@@ -143,17 +141,26 @@ X11Start(const int *lboard, int lsize) {
                 XFlush(d);
             } break;
             case KeyPress: {
-            
+                render();
+                XFlush(d);
             } break;
             case ButtonPress: {
+                int ix = (e.xbutton.x - W_MARGIN) /
+                    (CELL_SIZE + CELL_MARGIN);
+                int iy = (e.xbutton.y - HEADER_HEIGHT) /
+                    (CELL_SIZE + CELL_MARGIN);
+                if (ix < 0 || ix >= size || iy < 0 || iy >= size) continue;
+
                 switch (e.xbutton.button) {
                     case 1: { /* Left */
-                    
+                        gameClearCell(ix, iy);
                     } break;
                     case 3: { /* Right */
-                    
+                        gameFlagCell(ix, iy);
                     } break;
                 }
+                render();
+                XFlush(d);
             } break;
         }
     }
