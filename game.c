@@ -90,6 +90,10 @@ gameGetState() {
     return state;
 }
 
+int
+gameGetFlagsLeft() {
+    return flagsLeft;
+}
 
 int
 gameGetSurroundingMines(int x, int y) {

@@ -45,7 +45,7 @@ printFrontends() {
         printf("\tconsole ");
     #endif
     #ifdef FRONTEND_X11
-        printf("\tx11 ");
+        printf("x11 ");
     #endif
 
     printf("\n");

@@ -28,8 +28,8 @@
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
-int size = 0;
-const int *board = NULL;
+static int size = 0;
+static const int *board = NULL;
 
 /* debug wallhack xray thing */
 void

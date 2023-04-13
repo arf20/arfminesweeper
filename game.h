@@ -51,6 +51,7 @@ void gameDestroy();
 const int * gameGetBoard();
 int gameGetState();
 int gameGetSurroundingMines(int x, int y);
+int gameGetFlagsLeft();
 void gameClearCell(int x, int y);
 void gameFlagCell(int x, int y);
 
