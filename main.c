@@ -26,6 +26,7 @@
 #include "game.h"
 
 #include "frontends/console.h"
+#include "frontends/fbdev.h"
 #include "frontends/x11.h"
 
 void
@@ -44,9 +45,13 @@ printFrontends() {
     #ifdef FRONTEND_CONSOLE
         printf("\tconsole ");
     #endif
+    #ifdef FRONTEND_FBDEV
+        printf("fbdev ");
+    #endif
     #ifdef FRONTEND_X11
         printf("x11 ");
     #endif
+    
 
     printf("\n");
 }
@@ -96,6 +101,10 @@ main(int argc, char **argv) {
     else if (!strcmp(frontend, "x11")) {
         X11Start(gameGetBoard(), size);
         X11Destroy();
+    }
+    else if (!strcmp(frontend, "fbdev")) {
+        fbdevStart(gameGetBoard(), size);
+        fbdevDestroy();
     }
     else {
         printf("Error: Frontend not recognised: %s", frontend);

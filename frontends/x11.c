@@ -15,7 +15,7 @@
   License along with this program.  If not, see
   <http://www.gnu.org/licenses/>
 
-  console.c: X11 Xlib frontend
+  x11.c: X11 Xlib frontend
 
 */
 
@@ -75,7 +75,7 @@ drawTextMultiline(int x, int y, const char *str) {
     }
 }
 
-void
+static void
 render() {
     static char buff[256];
 
@@ -148,6 +148,7 @@ X11Start(const int *lboard, int lsize) {
     wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
         ((size - 1) * CELL_MARGIN);
     
+    /* Xlib is pretty self explanatory */
     d = XOpenDisplay(NULL);
     if (d == NULL) {
         printf("Cannot open display\n");
