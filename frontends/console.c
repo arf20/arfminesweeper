@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common.h"
 #include "console.h"
 #include "../game.h"
 
@@ -155,14 +156,7 @@ conStart(const int *lboard, int lsize) {
         else printf("?\n");
 
         if (gameGetState() == STATE_LOST) {
-            printf("\nYou died in a terrible explosion\n"
-                "Killed from a german S-Mine in Denmark\n"
-                "Your expontaneously dissasembled remains won't be recovered\n"
-                "and you have no family left to cry for you,\n"
-                "as they all died in the war.\n"
-                "Among you, there were 2600 german POWs employed by the danish\n"
-                "to clear mines between 1945 and 1947. As much as 500 died.\n"
-                "The game is over.\n");
+            printf(TXT_LOST);
             return 0;
         }
 

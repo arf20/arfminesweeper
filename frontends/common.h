@@ -25,6 +25,24 @@
 #define CELL_MARGIN   2
 #define W_MARGIN      5
 
-#define TITLE "arfminesweeper"
+#define TXT_TITLE "arfminesweeper"
+
+#define TXT_LOST "\nYou died in a terrible explosion\n" \
+    "Killed from a german S-Mine in Denmark\n" \
+    "Your expontaneously dissasembled remains won't be recovered\n" \
+    "and you have no family left to cry for you,\n" \
+    "as they all died in the war.\n" \
+    "Among you, there were 2600 german POWs employed by the danish\n" \
+    "to clear mines between 1945 and 1947. As much as 500 died.\n" \
+    "The game is over.\n"
+
+#define TXT_WON "\nYou have finished your task.\n" \
+    "You have accopished the objective of clearing the 1.4M mines\n" \
+    "laid off by the germans during the occupation of Denmark.\n" \
+    "You won't be rewarded for your actions, and you will still be a POW\n" \
+    "until 1949.\n" \
+    "You have no family to return to, they all died in the war,\n" \
+    "There is no good ending in a war.\n" \
+    "But the game is now over.\n"
 
 #endif

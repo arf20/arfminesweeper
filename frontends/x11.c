@@ -61,12 +61,42 @@ drawFlag(int x, int y) {
 }
 
 void
+drawTextMultiline(int x, int y, const char *str) {
+    const char *line = str, *next = NULL;
+    int len = strlen(str), i = 0;
+    while (line < str + len) {
+        next = strchr(line, '\n');
+        XDrawString(d, w, gc, x, y + (i * TXT_OFFY), line, next - line);
+        line = next + 1;
+        i++;
+    }
+}
+
+void
 render() {
+    static char buff[256];
+
     XClearWindow(d, w);
     XSetForeground(d, gc, WhitePixel(d, s));
     XSetFont(d, gc, f);
 
-    static char buff[256];
+    XDrawString(d, w, gc, 5, 15, TXT_TITLE, strlen(TXT_TITLE));
+
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            //XDrawString(d, w, gc, 5, 45, TXT_LOST, strlen(TXT_LOST));
+            drawTextMultiline(5, 45, TXT_LOST);
+            return;
+        } break;
+        case STATE_WON: {
+            //XDrawString(d, w, gc, 5, 45, TXT_WON, strlen(TXT_WON));
+            drawTextMultiline(5, 45, TXT_WON);
+            return;
+        } break;
+    }
+
+    snprintf(buff, 256, "%d", gameGetFlagsLeft());
+    XDrawString(d, w, gc, wWidth - 25, 35, buff, strlen(buff));
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
@@ -78,7 +108,8 @@ render() {
                 if (n) {
                     snprintf(buff, 256, "%d", n);
                     XSetForeground(d, gc, WhitePixel(d, s));
-                    XDrawString(d, w, gc, cX + TXT_OFFX, cY + TXT_OFFY, buff, strlen(buff));
+                    XDrawString(d, w, gc, cX + TXT_OFFX, cY + TXT_OFFY,
+                        buff, strlen(buff));
                 }
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
@@ -99,12 +130,6 @@ render() {
             }
         }
     }
-
-    XSetForeground(d, gc, WhitePixel(d, s));
-    XDrawString(d, w, gc, 5, 15, TITLE, strlen(TITLE));
-
-    snprintf(buff, 256, "%d", gameGetFlagsLeft());
-    XDrawString(d, w, gc, wWidth - 25, 35, buff, strlen(buff));
 }
 
 int
@@ -113,7 +138,8 @@ X11Start(const int *lboard, int lsize) {
     size = lsize;
 
     wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
-    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
+    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
+        ((size - 1) * CELL_MARGIN);
     
     d = XOpenDisplay(NULL);
     if (d == NULL) {
