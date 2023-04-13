@@ -41,7 +41,10 @@ static Display *d = NULL;
 static int s = 0;
 static Window w = 0;
 static GC gc;
+static Colormap cm;
 static Font f;
+
+static XColor blue, green, red, darkblue, darkred, darkcyan, /*black*/ darkgrey;
 
 void
 drawFlag(int x, int y) {
@@ -49,8 +52,8 @@ drawFlag(int x, int y) {
         {CELL_SIZE/4, 2},
         {CELL_SIZE/4, CELL_SIZE-2},
         {(CELL_SIZE/4) + 2, CELL_SIZE-2},
-        {(CELL_SIZE/4) + 2, CELL_SIZE/3},
-        {(3*CELL_SIZE/4) + 2, CELL_SIZE/3},  
+        {(CELL_SIZE/4) + 2, CELL_SIZE/2},
+        {(3*CELL_SIZE/4) + 2, (CELL_SIZE/2)-3},
     };
     static XPoint flagTrans[5];
     for (int i = 0; i < 5; i++) {
@@ -107,7 +110,16 @@ render() {
                 int n = gameGetSurroundingMines(x, y);
                 if (n) {
                     snprintf(buff, 256, "%d", n);
-                    XSetForeground(d, gc, WhitePixel(d, s));
+                    switch (n) {
+                        case 1: XSetForeground(d, gc, blue.pixel); break;
+                        case 2: XSetForeground(d, gc, green.pixel); break;
+                        case 3: XSetForeground(d, gc, red.pixel); break;
+                        case 4: XSetForeground(d, gc, darkblue.pixel); break;
+                        case 5: XSetForeground(d, gc, darkred.pixel); break;
+                        case 6: XSetForeground(d, gc, darkcyan.pixel); break;
+                        case 7: XSetForeground(d, gc, BlackPixel(d, s)); break;
+                        case 8: XSetForeground(d, gc, darkgrey.pixel); break;
+                    }
                     XDrawString(d, w, gc, cX + TXT_OFFX, cY + TXT_OFFY,
                         buff, strlen(buff));
                 }
@@ -115,12 +127,7 @@ render() {
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 XSetForeground(d, gc, WhitePixel(d, s));
                 XFillRectangle(d, w, gc, cX, cY, CELL_SIZE, CELL_SIZE);
-                XColor c;
-                c.flags = DoRed | DoGreen | DoBlue;
-                c.red = 0;
-                c.green = 255;
-                c.blue = 0;
-                XSetForeground(d, gc, c.pixel);
+                XSetForeground(d, gc, red.pixel);
                 drawFlag(cX, cY);
             }
             /* uncleared */
@@ -156,7 +163,17 @@ X11Start(const int *lboard, int lsize) {
 
     gc = XCreateGC(d, w, 0, NULL);
 
+    cm = DefaultColormap(d, s);
+
     f = XLoadFont(d, "9x15");
+
+    XAllocNamedColor(d, cm, "blue", &blue, &blue);
+    XAllocNamedColor(d, cm, "green", &green, &green);
+    XAllocNamedColor(d, cm, "red", &red, &red);
+    XAllocNamedColor(d, cm, "darkblue", &darkblue, &darkblue);
+    XAllocNamedColor(d, cm, "darkred", &darkred, &darkred);
+    XAllocNamedColor(d, cm, "darkcyan", &darkcyan, &darkcyan);
+    XAllocNamedColor(d, cm, "darkgrey", &darkgrey, &darkgrey);
 
     XEvent e;
     while (1) {

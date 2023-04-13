@@ -8,6 +8,7 @@ Console (no graphics)
 fbdev
 
 X11 Xlib
+X11 XCB
 Xforms
 Motif (nice)
 Tcl/Tk
@@ -16,6 +17,7 @@ SDL2
 SDL1.2 (lolz)
 OpenGL 1.x
 OpenGL 4.6 (yikes)
+ImGui
 Vulkan (yes.)
 
 Gtk3 (pain)

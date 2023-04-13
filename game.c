@@ -113,7 +113,10 @@ checkWin() {
 /* Cell clearing recursive algorithm */
 void
 gameClearCell(int x, int y) {
-    if (CHECK_MINE(BOARDXY(x, y))) {
+    if (CHECK_CLEAR(BOARDXY(x, y)) || CHECK_FLAG(BOARDXY(x, y))) {
+        return;
+    }
+    else if (CHECK_MINE(BOARDXY(x, y))) {
         state = STATE_LOST;
     } else {
         /* Set clear bit */
@@ -162,6 +165,7 @@ gameClearCell(int x, int y) {
 /* Toggle flag bit */
 void
 gameFlagCell(int x, int y) {
+    if (CHECK_CLEAR(BOARDXY(x, y))) return;
     BOARDXY(x, y) ^= 1 << CELL_BIT_FLAG;
     CHECK_FLAG(BOARDXY(x, y)) ? flagsLeft-- : flagsLeft++;
     if (checkWin()) state = STATE_WON;

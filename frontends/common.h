@@ -29,12 +29,12 @@
 
 #define TXT_LOST "\nYou died in a terrible explosion\n" \
     "Killed from a german S-Mine in Denmark\n" \
-    "Your expontaneously dissasembled remains won't be recovered\n" \
+    "Your spontaneously dissasembled remains won't be recovered\n" \
     "and you have no family left to cry for you,\n" \
     "as they all died in the war.\n" \
     "Among you, there were 2600 german POWs employed by the danish\n" \
     "to clear mines between 1945 and 1947. As much as 500 died.\n" \
-    "The game is over.\n"
+    "The game is now over.\n"
 
 #define TXT_WON "\nYou have finished your task.\n" \
     "You have accopished the objective of clearing the 1.4M mines\n" \
