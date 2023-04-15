@@ -101,7 +101,7 @@ fbdevStart(const int *lboard, int lsize) {
     }
 
     sWidth = vinfo.xres; sHeight = vinfo.yres;
-    fbWidth = finfo.line_length;
+    fbWidth = finfo.line_length / sizeof(int);
     screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
     const int PADDING = 4096;
     int mmapsize = (screensize + PADDING - 1) & ~(PADDING-1);
