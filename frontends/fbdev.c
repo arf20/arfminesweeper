@@ -38,13 +38,40 @@ static int size = 0;
 
 static int fbfd = 0, screensize = 0;
 
-static int sWidth = 0, sHeight = 0;
-static int *fbp = NULL; /* assume 32bpp */
-#define FBXY(x, y)  fbp[(y * sWidth) + x]
+typedef struct fbpix_s {
+    char r, g, b, a;
+} fbpix_t;
+
+static int sWidth = 0, fbWidth = 0, sHeight = 0;
+static fbpix_t *fbp = NULL; /* assume 32bpp */
+#define FB_XY(x, y)  fbp[(y * fbWidth) + x]
+
+/* assume 32bpp */
+fbpix_t fbColor(char r, char g, char b, char a) {
+    fbpix_t c;
+    c.r = r; c.g = g; c.b = b; c.a = a;
+    return c;
+}
+
+#define FB_WHITE    fbColor(0xff, 0xff, 0xff, 0xff)
+
+void
+fbClear() {
+    memset(fbp, 0, sWidth * sHeight);
+}
+
+void
+fbFillRect(int ix, int iy, int w, int h, fbpix_t c) {
+    if (ix < 0 || iy < 0 || ix + w >= sWidth || iy + h >= sHeight) return;
+    for (int y = iy; y < iy + h; y++)
+        for (int x = ix; x < ix + w; x++)
+            FB_XY(x, y) = c;
+}
 
 static void
 render() {
-    FBXY(500, 500) = 0xffffffff;
+    fbClear();
+    fbFillRect(50, 50, 200, 200, FB_WHITE);
 }
 
 int
@@ -61,23 +88,32 @@ fbdevStart(const int *lboard, int lsize) {
     }
 
     struct fb_var_screeninfo vinfo;
+    struct fb_fix_screeninfo finfo;
+
     if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
         printf("Error reading fb variable information: %s\n", strerror(errno));
         return -1;
     }
 
-    printf("fb0: %dx%d, %dbpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+    if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
+        printf("Error reading fb variable information: %s\n", strerror(errno));
+        return -1;
+    }
 
     sWidth = vinfo.xres; sHeight = vinfo.yres;
+    fbWidth = finfo.line_length;
     screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
     const int PADDING = 4096;
     int mmapsize = (screensize + PADDING - 1) & ~(PADDING-1);
 
-    fbp = (int*)mmap(0, mmapsize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
+    fbp = (fbpix_t*)mmap(0, mmapsize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
     if (fbp == MAP_FAILED) {
         printf("Error mapping fbdev to memory: %s\n", strerror(errno));
         return -1;
     }
+
+    printf("fb0: %d(%d)x%d, %dbpp\n", vinfo.xres, fbWidth, vinfo.yres,
+        vinfo.bits_per_pixel);
 
     render();
 }
