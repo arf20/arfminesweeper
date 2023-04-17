@@ -46,7 +46,7 @@ static Font f;
 
 static XColor blue, green, red, darkblue, darkred, darkcyan, /*black*/ darkgrey;
 
-void
+static void
 drawFlag(int x, int y) {
     static XPoint flag[5] = {
         {CELL_SIZE/4, 2},
@@ -63,7 +63,7 @@ drawFlag(int x, int y) {
     XFillPolygon(d, w, gc, flagTrans, 5, Complex, CoordModeOrigin);
 }
 
-void
+static void
 drawTextMultiline(int x, int y, const char *str) {
     const char *line = str, *next = NULL;
     int len = strlen(str), i = 0;
@@ -105,8 +105,8 @@ render() {
         for (int x = 0; x < size; x++) {
             int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
             int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
+            /* If clear, count surrounding cells and print n of mines */
             if (CHECK_CLEAR(BOARDXY(x, y))) {
-                /* If clear, count surrounding cells and print n of mines */
                 int n = gameGetSurroundingMines(x, y);
                 if (n) {
                     snprintf(buff, 256, "%d", n);
@@ -124,13 +124,14 @@ render() {
                         buff, strlen(buff));
                 }
             }
+            /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 XSetForeground(d, gc, WhitePixel(d, s));
                 XFillRectangle(d, w, gc, cX, cY, CELL_SIZE, CELL_SIZE);
                 XSetForeground(d, gc, red.pixel);
                 drawFlag(cX, cY);
             }
-            /* uncleared */
+            /* Otherwise just a tile */
             else {
                 XSetForeground(d, gc, WhitePixel(d, s));
                 XFillRectangle(d, w, gc, cX, cY, CELL_SIZE, CELL_SIZE);

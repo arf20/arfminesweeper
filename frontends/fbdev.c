@@ -55,6 +55,7 @@ fbpix_t fbColor(char r, char g, char b, char a) {
 
 #define FB_WHITE    fbColor(0xff, 0xff, 0xff, 0xff)
 
+/* fb utils */
 void
 fbClear() {
     memset(fbp, 0, sWidth * sHeight);
@@ -69,9 +70,43 @@ fbFillRect(int ix, int iy, int w, int h, fbpix_t c) {
 }
 
 static void
+drawFlag(int x, int y) {
+    
+}
+
+static void
 render() {
+    static char buff[256];
+
     fbClear();
-    fbFillRect(50, 50, 200, 200, FB_WHITE);
+
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
+            int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
+            /* If clear, count surrounding cells and print n of mines */
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
+                int n = gameGetSurroundingMines(x, y);
+                if (n) {
+                    snprintf(buff, 256, "%d", n);
+                    switch (n) {
+                        
+                    }
+                    //XDrawString(d, w, gc, cX + TXT_OFFX, cY + TXT_OFFY,
+                    //    buff, strlen(buff));
+                }
+            }
+            /* If not clear, check flag and draw it */
+            else if (CHECK_FLAG(BOARDXY(x, y))) {
+                fbFillRect(cX, cY, CELL_SIZE, CELL_SIZE, FB_WHITE);
+                drawFlag(cX, cY);
+            }
+            /* Otherwise just a tile */
+            else {
+                fbFillRect(cX, cY, CELL_SIZE, CELL_SIZE, FB_WHITE);
+            }
+        }
+    }
 }
 
 int
