@@ -20,7 +20,7 @@ add_compile_definitions(FRONTEND_FBDEV)
 
 find_package(X11)
 if (X11_FOUND)
-    file (GLOB SRC ${SRC} "frontends/x11.c")
+    file (GLOB SRC ${SRC} "frontends/x11.c" "frontends/bmp.c")
     add_compile_definitions(FRONTEND_X11)
 endif()
 

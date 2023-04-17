@@ -161,14 +161,7 @@ conStart(const int *lboard, int lsize) {
         }
 
         if (gameGetState() == STATE_WON) {
-            printf("\nYou have finished your task.\n"
-            "You have accopished the objective of clearing the 1.4M mines\n"
-            "laid off by the germans during the occupation of Denmark.\n"
-            "You won't be rewarded for your actions, and you will still be a POW\n"
-            "until 1949.\n"
-            "You have no family to return to, they all died in the war,\n"
-            "There is no good ending in a war.\n"
-            "But the game is now over.\n");
+            printf(TXT_LOST);
             return 0;
         }
     }
