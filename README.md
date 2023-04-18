@@ -6,6 +6,7 @@ Dependencies required: `build-essential cmake`
 Dependencies for frontends:
 ```
 Console: none
+ncurses: libncurses-dev
 fbdev: none
 Xlib: libx11-dev
 XCB: libxcb1-dev
@@ -31,6 +32,7 @@ make
 ## TODO APIs and Toolkits
 ```
 Console (no graphics) DONE
+ncurses
 fbdev
 X11 Xlib DONE
 X11 XCB

@@ -99,12 +99,20 @@ main(int argc, char **argv) {
         conStart(gameGetBoard(), size);
     }
     else if (!strcmp(frontend, "x11")) {
+        #ifdef FRONTEND_X11
         X11Start(gameGetBoard(), size);
         X11Destroy();
+        #else
+        printf("Error: Frontend x11 not built");
+        #endif
     }
     else if (!strcmp(frontend, "fbdev")) {
+        #ifdef FRONTEND_FBDEV
         fbdevStart(gameGetBoard(), size);
         fbdevDestroy();
+        #else
+        printf("Error: Frontend fbdev not built");
+        #endif
     }
     else {
         printf("Error: Frontend not recognised: %s", frontend);
