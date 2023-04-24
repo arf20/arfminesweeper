@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/fb.h>
@@ -63,7 +64,10 @@ rgba_t fbColor(char r, char g, char b, char a) {
 /* fb utils */
 void
 fbClear() {
-    memset(fbp, 0, sWidth * sHeight);
+    //for (int y = 0; y < sHeight; y++)
+    //    for (int x = 0; x < sWidth; x++)
+    //        FB_XY(x, y) = FB_BLACK;
+    memset(fbp, 0x00, sizeof(int) * sWidth * sHeight);
 }
 
 void
@@ -104,7 +108,7 @@ render() {
 
     fbClear();
     fbDrawString(5, 0, FB_WHITE, FB_BLACK, TXT_TITLE);
-    fbCopy(100, 100, 0, 0, 100, 15, fontimg);
+    fbCopy(100, 100, 0, 0, 200, 15, fontimg);
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
@@ -181,7 +185,10 @@ fbdevStart(const int *lboard, int lsize) {
     printf("fb0: %d(%d)x%d, %dbpp\n", vinfo.xres, fbWidth, vinfo.yres,
         vinfo.bits_per_pixel);
 
-    render();
+    while (1) {
+        render();
+        sleep(1);
+    }
 }
 
 void

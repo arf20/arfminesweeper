@@ -22,6 +22,12 @@ find_package(X11)
 if (X11_FOUND)
     file (GLOB SRC ${SRC} "frontends/x11.c")
     add_compile_definitions(FRONTEND_X11)
+
+    find_package(Motif)
+    if (MOTIF_FOUND)
+        file (GLOB SRC ${SRC} "frontends/motif.c")
+        add_compile_definitions(FRONTEND_MOTIF)
+    endif()
 endif()
 
 # executable
@@ -30,5 +36,9 @@ add_executable(arfminesweeper ${SRC})
 # libraries
 
 if (X11_FOUND)
-    target_link_libraries(arfminesweeper X11)
+    target_link_libraries(arfminesweeper ${X11_LIBRARIES})
+
+    if (MOTIF_FOUND)
+        target_link_libraries(arfminesweeper ${MOTIF_LIBRARIES} Xt)
+    endif()
 endif()

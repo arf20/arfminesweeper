@@ -28,6 +28,7 @@
 #include "frontends/console.h"
 #include "frontends/fbdev.h"
 #include "frontends/x11.h"
+#include "frontends/motif.h"
 
 void
 printUsage(const char *self) {
@@ -51,7 +52,9 @@ printFrontends() {
     #ifdef FRONTEND_X11
         printf("x11 ");
     #endif
-    
+    #ifdef FRONTEND_MOTIF
+        printf("motif ");
+    #endif
 
     printf("\n");
 }
@@ -112,6 +115,14 @@ main(int argc, char **argv) {
         fbdevDestroy();
         #else
         printf("Error: Frontend fbdev not built");
+        #endif
+    }
+    else if (!strcmp(frontend, "motif")) {
+        #ifdef FRONTEND_MOTIF
+        motifStart(gameGetBoard(), size);
+        motifDestroy();
+        #else
+        printf("Error: Frontend motif not built");
         #endif
     }
     else {
