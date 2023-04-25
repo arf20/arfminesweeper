@@ -160,6 +160,8 @@ X11Start(const int *lboard, int lsize) {
     w = XCreateSimpleWindow(d, XRootWindow(d, s), 50, 50, wWidth, wHeight,
         0, BlackPixel(d, s), BlackPixel(d, s));
 
+    XStoreName(d, w, TXT_TITLE);
+
     XSelectInput(d, w, ExposureMask | KeyPressMask | ButtonPressMask);
     XMapWindow(d, w);
 
