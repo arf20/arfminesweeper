@@ -29,6 +29,7 @@
 #include "frontends/fbdev.h"
 #include "frontends/x11.h"
 #include "frontends/motif.h"
+#include "frontends/xforms.h"
 
 void
 printUsage(const char *self) {
@@ -54,6 +55,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_MOTIF
         printf("motif ");
+    #endif
+    #ifdef FRONTEND_XFORMS
+        printf("xforms ");
     #endif
 
     printf("\n");
@@ -123,6 +127,14 @@ main(int argc, char **argv) {
         motifDestroy();
         #else
         printf("Error: Frontend motif not built");
+        #endif
+    }
+    else if (!strcmp(frontend, "xforms")) {
+        #ifdef FRONTEND_XFORMS
+        xformsStart(gameGetBoard(), size);
+        xformsDestroy();
+        #else
+        printf("Error: Frontend xforms not built");
         #endif
     }
     else {

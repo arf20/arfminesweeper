@@ -19,8 +19,14 @@
 
 */
 
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include <Xm/Xm.h>
 #include <Xm/Label.h>
+#include <Xm/PushB.h>
+#include <Xm/RowColumn.h>
 
 #include "common.h"
 
@@ -35,18 +41,42 @@ motifStart(const int *lboard, int lsize) {
     char *argv[] = { TXT_TITLE, 0 };
     int argc = 1;
 
-    Widget root, msg;
+    XtAppContext app;
+    Widget root, title, rowcol, buttons[size * size];
     Arg al[10];
-    int ai;
+    int ac = 0;
 
-    root = XtInitialize(argv[0], "", NULL, 0, &argc, argv);
+    XtSetLanguageProc(NULL, NULL, NULL);
 
-    XtSetArg(al[ai], XmNlabelString,
-        XmStringCreate(TXT_TITLE, XmSTRING_DEFAULT_CHARSET)); ai++;
-    msg = XtCreateManagedWidget("title", xmLabelWidgetClass, root, al, ai);
+    root = XtVaAppInitialize(&app, TXT_TITLE, NULL, 0, &argc, argv, NULL, NULL);
 
+    XtSetArg(al[ac], XmNlabelString,
+        XmStringCreate(TXT_TITLE, XmSTRING_DEFAULT_CHARSET)); ac++;
+    title = XtCreateManagedWidget("title", xmLabelWidgetClass, root, al, ac);
+
+    rowcol = XtVaCreateWidget("rowcol", xmRowColumnWidgetClass, root,
+        XmNnumColumns,  size,
+        XmNpacking,     XmPACK_COLUMN,
+        NULL);
+
+    char butname[64];
+    int buti = 0;
+    XmString btntxt;
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            buti = (y * size) + x;
+            snprintf(butname, 64, "button%d", buti);
+            btntxt = XmStringCreateLocalized (butname);
+            buttons[buti] = XtVaCreateManagedWidget(butname,
+                xmPushButtonWidgetClass, rowcol, 
+                XmNlabelString, btntxt, NULL);
+            //printf("Created %s\n", butname);
+        }
+    }
+
+    XtManageChild(rowcol);
     XtRealizeWidget(root);
-    XtMainLoop();
+    XtAppMainLoop(app);
 }
 
 void
