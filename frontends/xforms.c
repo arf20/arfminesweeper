@@ -34,6 +34,7 @@ static int size = 0;
 static int wWidth = 0, wHeight = 0;
 
 FL_FORM *form = NULL;
+FL_OBJECT *flagsLeftLabel = NULL;
 FL_OBJECT **buttons = NULL;
 FL_OBJECT **numbers = NULL;
 
@@ -41,12 +42,17 @@ static void
 updateButtons() {
     static char buff[256];
 
+    /* Show flags left */
+    snprintf(buff, 256, "%d", gameGetFlagsLeft());
+    fl_set_object_label(flagsLeftLabel, buff);
+
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
             /* Variables stuff */
             int btni = (x * size) + y;
             int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
             int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
+
             /* If clear, hide the button, count surrounding cells and print
                 n of mines */
             if (CHECK_CLEAR(BOARDXY(x, y))) {
@@ -55,20 +61,32 @@ updateButtons() {
 
                 if (n) {
                     snprintf(buff, 256, "%d", n);
-        
-                    numbers[btni] = fl_add_text(FL_NORMAL_TEXT,
-                        cX, cY, CELL_SIZE, CELL_SIZE, buff);
 
+                    /* Set text */
+                    fl_set_object_label(numbers[btni], buff);
+
+                    /* Set color */
                     switch (n) {
-                        case 1: fl_set_object_lcolor(buttons[btni], FL_BLUE); break;
-                        case 2: fl_set_object_lcolor(buttons[btni], FL_GREEN); break;
-                        case 3: fl_set_object_lcolor(buttons[btni], FL_RED); break;
-                        case 4: fl_set_object_lcolor(buttons[btni], FL_DARKCYAN); break;
-                        case 5: fl_set_object_lcolor(buttons[btni], FL_INDIANRED); break;
-                        case 6: fl_set_object_lcolor(buttons[btni], FL_CYAN); break;
-                        case 7: fl_set_object_lcolor(buttons[btni], FL_BLACK); break;
-                        case 8: fl_set_object_lcolor(buttons[btni], FL_INACTIVE); break;
+                        case 1: fl_set_object_lcolor(numbers[btni],
+                            FL_BLUE); break;
+                        case 2: fl_set_object_lcolor(numbers[btni],
+                            FL_GREEN);break;
+                        case 3: fl_set_object_lcolor(numbers[btni],
+                            FL_RED); break;
+                        case 4: fl_set_object_lcolor(numbers[btni],
+                            FL_DARKCYAN); break;
+                        case 5: fl_set_object_lcolor(numbers[btni],
+                            FL_INDIANRED); break;
+                        case 6: fl_set_object_lcolor(numbers[btni],
+                            FL_CYAN); break;
+                        case 7: fl_set_object_lcolor(numbers[btni],
+                            FL_BLACK); break;
+                        case 8: fl_set_object_lcolor(numbers[btni],
+                            FL_INACTIVE); break;
                     }
+
+                    /* Show text */
+                    fl_show_object(numbers[btni]);
                 }
             }
             /* If not clear, check flag and draw it */
@@ -85,6 +103,7 @@ updateButtons() {
 
 static void
 buttonCallback(FL_OBJECT *btn, long btni) {
+    /* Mouse press on button */
     const XEvent *e = fl_last_event();
     if (e->type != ButtonRelease) return;
 
@@ -97,7 +116,6 @@ buttonCallback(FL_OBJECT *btn, long btni) {
         } break;
     }
 
-    //gameClearCell(btni / size, btni % size);
     updateButtons();
 }
 
@@ -120,29 +138,41 @@ xformsStart(const int *lboard, int lsize) {
     form = fl_bgn_form(FL_UP_BOX, wWidth, wHeight);
 
     /* Add title */
-    FL_OBJECT *title = fl_add_text(FL_NORMAL_TEXT, 1, 1, 120, 20, TXT_TITLE);
+    FL_OBJECT *title = fl_add_text(FL_NORMAL_TEXT, 2, 2, 120, 20, TXT_TITLE);
+    /* Add flags left */
+    flagsLeftLabel = fl_add_text(FL_NORMAL_TEXT, wWidth - 30, 25, 25, 20, "");
 
     /* Allocate object arrays */
     buttons = malloc(sizeof(FL_OBJECT*) * size * size);
     numbers = malloc(sizeof(FL_OBJECT*) * size * size);
 
-    /* Add buttons */
+    /* Add UI matrix */
     int btni = 0;
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
+            /* Variables stuff */
             btni = (size * y) + x;
             int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
             int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
+
+            /* Button */
             buttons[btni] = fl_add_button(FL_NORMAL_BUTTON,
                 cX, cY, CELL_SIZE, CELL_SIZE, "");
             fl_set_object_callback(buttons[btni],
                 buttonCallback, btni);
+
+            /* Text hidden by default */
+            numbers[btni] = fl_add_text(FL_NORMAL_TEXT,
+                cX, cY, CELL_SIZE, CELL_SIZE, "");
+            fl_hide_object(numbers[btni]);
         }
     }
 
     /* End form, then show it and run the loop */
     fl_end_form();
  
+    updateButtons();
+
     fl_show_form(form, FL_PLACE_MOUSE, FL_FULLBORDER, TXT_TITLE);
     fl_do_forms();
     return 0;
