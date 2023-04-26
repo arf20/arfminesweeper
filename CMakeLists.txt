@@ -5,6 +5,8 @@ project(arfminesweeper)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+find_package(PkgConfig REQUIRED)
+
 file (GLOB SRC
     "main.c"
     "game.c"
@@ -39,6 +41,13 @@ if (X11_FOUND)
     endif()
 endif()
 
+pkg_check_modules(GTK3 gtk+-3.0) 
+if (GTK3_FOUND)
+    file (GLOB SRC ${SRC} "frontends/gtk3.c")
+    add_compile_definitions(FRONTEND_GTK3)
+    message(STATUS "Building with gtk3")
+endif()
+
 # executable
 add_executable(arfminesweeper ${SRC})
 
@@ -54,4 +63,9 @@ if (X11_FOUND)
     if (XFORMS_FOUND)
         target_link_libraries(arfminesweeper forms)
     endif()
+endif()
+
+if (GTK3_FOUND)
+    target_include_directories(arfminesweeper PUBLIC ${GTK3_INCLUDE_DIRS})
+    target_link_libraries(arfminesweeper ${GTK3_LIBRARIES})
 endif()

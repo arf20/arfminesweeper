@@ -31,13 +31,13 @@ make
 
 ## TODO APIs and Toolkits
 ```
-Console (no graphics) DONE
+Console (no graphics)   DONE
 ncurses
-fbdev
-X11 Xlib DONE
+fbdev                   ON DEVELOPMENT
+X11 Xlib                DONE
 X11 XCB
-XForms
-Motif (nice)
+XForms (nice)           DONE
+Motif                   ON DEVELOPMENT
 Tcl/Tk
 SDL2
 SDL1.2 (lolz)
@@ -48,4 +48,5 @@ Vulkan (yes.)
 Gtk3 (pain)
 Qt5
 WinAPI (oh no)
+Win32 GDI+
 ```

@@ -30,6 +30,7 @@
 #include "frontends/x11.h"
 #include "frontends/motif.h"
 #include "frontends/xforms.h"
+#include "frontends/gtk3.h"
 
 void
 printUsage(const char *self) {
@@ -58,6 +59,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_XFORMS
         printf("xforms ");
+    #endif
+    #ifdef FRONTEND_GTK3
+        printf("gtk3 ");
     #endif
 
     printf("\n");
@@ -133,6 +137,14 @@ main(int argc, char **argv) {
         #ifdef FRONTEND_XFORMS
         xformsStart(gameGetBoard(), size);
         xformsDestroy();
+        #else
+        printf("Error: Frontend xforms not built");
+        #endif
+    }
+    else if (!strcmp(frontend, "gtk3")) {
+        #ifdef FRONTEND_GTK3
+        gtk3Start(gameGetBoard(), size);
+        gtk3Destroy();
         #else
         printf("Error: Frontend xforms not built");
         #endif
