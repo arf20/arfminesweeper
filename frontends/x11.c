@@ -83,24 +83,26 @@ render() {
     XSetForeground(d, gc, WhitePixel(d, s));
     XSetFont(d, gc, f);
 
+    /* Draw title */
     XDrawString(d, w, gc, 5, 15, TXT_TITLE, strlen(TXT_TITLE));
 
+    /* Check game state*/
     switch (gameGetState()) {
         case STATE_LOST: {
-            //XDrawString(d, w, gc, 5, 45, TXT_LOST, strlen(TXT_LOST));
             drawTextMultiline(5, 45, TXT_LOST);
             return;
         } break;
         case STATE_WON: {
-            //XDrawString(d, w, gc, 5, 45, TXT_WON, strlen(TXT_WON));
             drawTextMultiline(5, 45, TXT_WON);
             return;
         } break;
     }
 
+    /* Print flags left */
     snprintf(buff, 256, "%d", gameGetFlagsLeft());
     XDrawString(d, w, gc, wWidth - 25, 35, buff, strlen(buff));
 
+    /* Render cell matrix */
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
             int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));

@@ -91,13 +91,32 @@ updateButtons() {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                
+                fl_set_object_lcolor(buttons[btni], FL_RED);
             }
             /* Otherwise just a tile */
             else {
-                /* Do nothing, tiles are shown by default */
+                /* Clear flag if applicable */
+                fl_set_object_lcolor(buttons[btni], FL_COL1);
             }
         }
+    }
+
+    /* Check state */
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            FL_POPUP *popup = fl_popup_add(fl_root, "game over");
+            fl_popup_add_entries(popup, TXT_LOST);
+            fl_popup_do(popup);
+            fl_finish();
+            exit(0);
+        } break;
+        case STATE_WON: {
+            FL_POPUP *popup = fl_popup_add(fl_root, "game over");
+            fl_popup_add_entries(popup, TXT_WON);
+            fl_popup_do(popup);
+            fl_finish();
+            exit(0);
+        } break;
     }
 }
 
@@ -156,8 +175,11 @@ xformsStart(const int *lboard, int lsize) {
             int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
 
             /* Button */
-            buttons[btni] = fl_add_button(FL_NORMAL_BUTTON,
+            buttons[btni] = fl_add_bitmapbutton(FL_NORMAL_BUTTON,
                 cX, cY, CELL_SIZE, CELL_SIZE, "");
+            fl_set_bitmapbutton_file(buttons[btni], "../flag.xbm");
+            fl_set_object_color(buttons[btni], FL_COL1, FL_COL1);
+            fl_set_object_lcolor(buttons[btni], FL_COL1);
             fl_set_object_callback(buttons[btni],
                 buttonCallback, btni);
 
