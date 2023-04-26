@@ -33,10 +33,10 @@ static int size = 0;
 
 static int wWidth = 0, wHeight = 0;
 
-FL_FORM *form = NULL;
-FL_OBJECT *flagsLeftLabel = NULL;
-FL_OBJECT **buttons = NULL;
-FL_OBJECT **numbers = NULL;
+static FL_FORM *form = NULL;
+static FL_OBJECT *flagsLeftLabel = NULL;
+static FL_OBJECT **buttons = NULL;
+static FL_OBJECT **numbers = NULL;
 
 static void
 updateButtons() {

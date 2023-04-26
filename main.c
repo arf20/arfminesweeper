@@ -146,7 +146,7 @@ main(int argc, char **argv) {
         gtk3Start(gameGetBoard(), size);
         gtk3Destroy();
         #else
-        printf("Error: Frontend xforms not built");
+        printf("Error: Frontend gtk not built");
         #endif
     }
     else {
