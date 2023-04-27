@@ -26,6 +26,8 @@
 #include <QtWidgets>
 #include <QMainWindow>
 
+#include <iostream>
+
 class QPushButton;
 class QTextBrowser;
 
@@ -33,31 +35,86 @@ class Minesweeper : public QWidget {
     Q_OBJECT
 
 public:
-    explicit Minesweeper(QWidget *parent = nullptr);
+    explicit Minesweeper(QWidget *parent, const int *lboard, int lsize);
     ~Minesweeper();
 
 private:
-    QPushButton* button_;
-    QTextBrowser* textBrowser_;
+    int findButton(QPushButton *btn);
+    void buttonHandler();
+
+    const int *board = nullptr;
+    int size = 0;
+
+    QLabel *titlelabel;
+    QLabel *flagslabel;
+
+    QPushButton **buttons;
 };
 
+#include "qt5.moc"  // Cursed
 
-Minesweeper::Minesweeper(QWidget *parent) :
-    QWidget(parent)
-{
-   button_ = new QPushButton(tr("Push Me!"));
-   textBrowser_ = new QTextBrowser();
+Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidget(parent) {
+    board = lboard;
+    size = lsize;
 
-   QGridLayout *mainLayout = new QGridLayout;
-   mainLayout->addWidget(button_,0,0);
-   mainLayout->addWidget(textBrowser_,1,0);
-   setLayout(mainLayout);
-   setWindowTitle(tr("Connecting buttons to processes.."));
+    // Create labels
+    titlelabel = new QLabel(tr(TXT_TITLE));
+    flagslabel = new QLabel(tr("test"));
+
+    // Create button grid
+    QGridLayout *buttonGridLayout = new QGridLayout;
+    buttons = new QPushButton*[size*size];
+
+    QPixmap flagpixmap("../flag.png");
+    QIcon flagicon(flagpixmap);
+
+    // Add buttons to grid
+    int btni = 0;
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            // Variables stuff
+            btni = (size * y) + x;
+
+            buttons[btni] = new QPushButton();
+            buttons[btni]->setIcon(flagicon);
+            //buttons[btni]->setIconSize(buttons[btni]->rect().size());
+            buttonGridLayout->addWidget(buttons[btni], x, y);
+
+            connect(buttons[btni], &QPushButton::released, this, &Minesweeper::buttonHandler);
+        }
+    }
+
+    // Create main layout and add labels
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(titlelabel, 0, 0);
+    mainLayout->addWidget(flagslabel, 1, 0);
+    mainLayout->addLayout(buttonGridLayout, 2, 0);
+
+    setLayout(mainLayout);
+    setWindowTitle(tr(TXT_TITLE));
+}
+
+int Minesweeper::findButton(QPushButton *btn) {
+    for (int i = 0; i < size*size; i++)
+        if (btn == buttons[i]) return i;
+    return -1;
+}
+
+void Minesweeper::buttonHandler() {
+    std::cout << "button clicked" << std::endl;
+
+    QPushButton* senderButton = qobject_cast<QPushButton*>(sender());
+    int btni = findButton(senderButton);
+    
+    buttons[btni]->hide();
 }
 
 Minesweeper::~Minesweeper() {
-   delete button_;
-   delete textBrowser_;
+    delete titlelabel;
+    delete flagslabel;
+    for (int i = 0; i < size*size; i++)
+        delete buttons[i];
+    delete buttons;
 }
 
 
@@ -68,7 +125,7 @@ Qt5Start(const int *lboard, int size) {
 
     QApplication app(argc, (char**)argv);
 
-    Minesweeper m;
+    Minesweeper m(nullptr, lboard, size);
     m.show();
 
     return app.exec();
