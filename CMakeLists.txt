@@ -48,6 +48,18 @@ if (GTK3_FOUND)
     message(STATUS "Building with gtk3")
 endif()
 
+find_package(Qt5Widgets)
+if (Qt5Widgets_FOUND)
+    file (GLOB SRC ${SRC} "frontends/qt5.cpp" "frontends/qt5.hpp")
+    include_directories(${Qt5Widgets_INCLUDES})
+    add_definitions(${Qt5Widgets_DEFINITIONS})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+    #set(CMAKE_AUTOUIC ON)
+    set(CMAKE_AUTOMOC ON)
+    add_compile_definitions(FRONTEND_QT5)
+    message(STATUS "Building with Qt5")
+endif()
+
 # executable
 add_executable(arfminesweeper ${SRC})
 
@@ -68,4 +80,8 @@ endif()
 if (GTK3_FOUND)
     target_include_directories(arfminesweeper PUBLIC ${GTK3_INCLUDE_DIRS})
     target_link_libraries(arfminesweeper ${GTK3_LIBRARIES})
+endif()
+
+if (Qt5Widgets_FOUND)
+    target_link_libraries(arfminesweeper Qt5::Widgets)
 endif()

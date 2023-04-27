@@ -45,8 +45,9 @@ OpenGL 1.x
 OpenGL 4.6 (yikes)
 ImGui
 Vulkan (yes.)
-Gtk3 (pain)
+Gtk3 (pain)             ON DEVELOPMENT
 Qt5
+WxWidgets (?)
 WinAPI (oh no)
 Win32 GDI+
 ```

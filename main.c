@@ -1,21 +1,22 @@
 /*
 
-  Copyright (C) 2023 Ángel Ruiz Fernandez
+    arfminesweeper: Cross-plataform multi-frontend game
+    Copyright (C) 2023 arf20 (Ángel Ruiz Fernandez)
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, version 3.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/>
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-  main.c: Program entry point
+    main.c: Program entry point
 
 */
 
@@ -31,6 +32,7 @@
 #include "frontends/motif.h"
 #include "frontends/xforms.h"
 #include "frontends/gtk3.h"
+#include "frontends/qt5.hpp"
 
 void
 printUsage(const char *self) {
@@ -62,6 +64,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_GTK3
         printf("gtk3 ");
+    #endif
+    #ifdef FRONTEND_QT5
+        printf("qt5 ");
     #endif
 
     printf("\n");
@@ -143,8 +148,16 @@ main(int argc, char **argv) {
     }
     else if (!strcmp(frontend, "gtk3")) {
         #ifdef FRONTEND_GTK3
-        gtk3Start(gameGetBoard(), size);
-        gtk3Destroy();
+        Gtk3Start(gameGetBoard(), size);
+        Gtk3Destroy();
+        #else
+        printf("Error: Frontend gtk not built");
+        #endif
+    }
+    else if (!strcmp(frontend, "qt5")) {
+        #ifdef FRONTEND_QT5
+        Qt5Start(gameGetBoard(), size);
+        Qt5Destroy();
         #else
         printf("Error: Frontend gtk not built");
         #endif

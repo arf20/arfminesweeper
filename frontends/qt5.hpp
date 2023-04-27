@@ -18,10 +18,18 @@
 
 */
 
-#ifndef _MOTIF_H
-#define _MOTIF_H
+#ifndef _QT5_H
+#define _QT5_H
 
-int motifStart(const int *lboard, int size);
-void motifDestroy();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int Qt5Start(const int *lboard, int size);
+void Qt5Destroy();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

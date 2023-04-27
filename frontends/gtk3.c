@@ -1,21 +1,22 @@
 /*
 
-  Copyright (C) 2023 Ángel Ruiz Fernandez
+    arfminesweeper: Cross-plataform multi-frontend game
+    Copyright (C) 2023 arf20 (Ángel Ruiz Fernandez)
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, version 3.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/>
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-  x11.c: X11 Xlib frontend
+    gtk3.c: Gtk3 frontend
 
 */
 
@@ -166,7 +167,7 @@ activate(GtkApplication* app, gpointer user_data) {
 }
 
 int
-gtk3Start(const int *lboard, int lsize) {
+Gtk3Start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -184,7 +185,7 @@ gtk3Start(const int *lboard, int lsize) {
 }
 
 void
-gtk3Destroy() {
+Gtk3Destroy() {
 
 }
 
