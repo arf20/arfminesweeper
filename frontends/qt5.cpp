@@ -23,13 +23,36 @@
 #include "common.h"
 #include "qt5.hpp"
 
+extern "C" {
+#include "game.h"
+}
+
 #include <QtWidgets>
 #include <QMainWindow>
 
 #include <iostream>
+#include <functional>
 
-class QPushButton;
-class QTextBrowser;
+class Cell : public QPushButton {
+public:
+    Cell(int lx, int ly);
+
+private:
+    int x, y;
+
+    void mouseReleaseEvent(QMouseEvent *e);
+};
+
+Cell::Cell(int lx, int ly) {
+    x = lx; y = ly;
+}
+
+void Cell::mouseReleaseEvent(QMouseEvent *e) {
+    if (e->button() == Qt::LeftButton)
+        gameClearCell(x, y);
+    else if (e->button() == Qt::RightButton)
+        gameFlagCell(x, y);
+}
 
 class Minesweeper : public QWidget {
     Q_OBJECT
@@ -41,6 +64,7 @@ public:
 private:
     int findButton(QPushButton *btn);
     void buttonHandler();
+    void update();
 
     const int *board = nullptr;
     int size = 0;
@@ -48,7 +72,9 @@ private:
     QLabel *titlelabel;
     QLabel *flagslabel;
 
-    QPushButton **buttons;
+    QIcon flagicon;
+
+    Cell **buttons;
 };
 
 #include "qt5.moc"  // Cursed
@@ -63,10 +89,10 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
 
     // Create button grid
     QGridLayout *buttonGridLayout = new QGridLayout;
-    buttons = new QPushButton*[size*size];
+    buttons = new Cell*[size*size];
 
     QPixmap flagpixmap("../flag.png");
-    QIcon flagicon(flagpixmap);
+    flagicon = QIcon(flagpixmap);
 
     // Add buttons to grid
     int btni = 0;
@@ -75,12 +101,12 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
             // Variables stuff
             btni = (size * y) + x;
 
-            buttons[btni] = new QPushButton();
-            buttons[btni]->setIcon(flagicon);
+            buttons[btni] = new Cell(x, y);
+            //buttons[btni]->setIcon(flagicon);
             //buttons[btni]->setIconSize(buttons[btni]->rect().size());
             buttonGridLayout->addWidget(buttons[btni], x, y);
 
-            connect(buttons[btni], &QPushButton::released, this, &Minesweeper::buttonHandler);
+            connect(buttons[btni], &QPushButton::clicked, this, &Minesweeper::buttonHandler);
         }
     }
 
@@ -100,13 +126,29 @@ int Minesweeper::findButton(QPushButton *btn) {
     return -1;
 }
 
-void Minesweeper::buttonHandler() {
-    std::cout << "button clicked" << std::endl;
+void Minesweeper::update() {
+    flagslabel->setText(QString(std::to_string(gameGetFlagsLeft()).c_str()));
 
-    QPushButton* senderButton = qobject_cast<QPushButton*>(sender());
-    int btni = findButton(senderButton);
-    
-    buttons[btni]->hide();
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            int btni = (x * size) + y;
+
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
+                buttons[btni]->hide();
+            }
+            else if (CHECK_FLAG(BOARDXY(x, y))) {
+                buttons[btni]->setIcon(flagicon);
+            }
+            else {
+
+            }
+        }
+    }
+}
+
+void Minesweeper::buttonHandler() {
+    std::cout << "asodhji" << std::endl;
+    update();
 }
 
 Minesweeper::~Minesweeper() {
