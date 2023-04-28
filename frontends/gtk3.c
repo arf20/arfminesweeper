@@ -28,7 +28,7 @@
 static const int *board = NULL;
 static int size = 0;
 
-static GtkWidget *flaglabel = NULL, **flagimages = NULL, **buttons = NULL, **numbers = NULL;
+static GtkWidget *window, *flaglabel = NULL, **flagimages = NULL, **buttons = NULL, **numbers = NULL;
 
 static void
 updateButtons() {
@@ -87,6 +87,25 @@ updateButtons() {
             }
         }
     }
+
+    /* Check state */
+    GtkWidget *dialog;
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, TXT_LOST);
+            gtk_dialog_run(GTK_DIALOG (dialog));
+            gtk_widget_destroy(dialog);
+            gtk_window_close(GTK_WINDOW(window));
+        } break;
+        case STATE_WON: {
+            dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+                GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, TXT_WON);
+            gtk_dialog_run(GTK_DIALOG(dialog));
+            gtk_widget_destroy(dialog);
+            gtk_window_close(GTK_WINDOW(window));
+        } break;
+    }
 }
 
 static gboolean
@@ -111,7 +130,7 @@ buttonCallback(GtkWidget *btn, GdkEventButton *event, gpointer data) {
 
 static void
 activate(GtkApplication* app, gpointer user_data) {
-    GtkWidget *window, *grid, *titlelabel, *buttongrid;
+    GtkWidget *grid, *titlelabel, *buttongrid;
 
     buttons = malloc(sizeof(GtkWidget*) * size * size);
     numbers = malloc(sizeof(GtkWidget*) * size * size);
@@ -121,7 +140,7 @@ activate(GtkApplication* app, gpointer user_data) {
     /* Window*/
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), TXT_TITLE);
-    gtk_window_set_default_size(GTK_WINDOW(window), 200, 200);
+    gtk_window_set_default_size(GTK_WINDOW(window), 100, 100);
 
     /* Grid layout */
     grid = gtk_grid_new();
@@ -167,7 +186,7 @@ activate(GtkApplication* app, gpointer user_data) {
         }
     }
 
-    updateButtons();
+    updateButtons(window);
 
     gtk_widget_show_all(window);
 }
@@ -187,6 +206,7 @@ Gtk3Start(const int *lboard, int lsize) {
         G_APPLICATION_FLAGS_NONE);
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
     status = g_application_run(G_APPLICATION(app), argc, argv);
+
     g_object_unref(app);
 }
 
