@@ -113,14 +113,13 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
 
             buttons[btni] = new Cell(x, y);
             buttons[btni]->setFixedSize(QSize(CELL_SIZE, CELL_SIZE));
-            //buttons[btni]->setIcon(flagicon);
-            //buttons[btni]->setIconSize(buttons[btni]->rect().size());
             numbers[btni] = new QLabel();
 
             numbers[btni]->hide();
 
             buttonGridLayout->addWidget(buttons[btni], y, x);
             buttonGridLayout->addWidget(numbers[btni], y, x);
+            buttonGridLayout->setAlignment(numbers[btni], Qt::AlignCenter);
 
             connect(buttons[btni], &Cell::updateSignal, this, &Minesweeper::update);
         }
@@ -173,6 +172,22 @@ void Minesweeper::update() {
                 buttons[btni]->setIcon(QIcon());
             }
         }
+    }
+
+    // Check state
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            QMessageBox m;
+            m.setText(TXT_LOST);
+            m.exec();
+            close();
+        } break;
+        case STATE_WON: {
+            QMessageBox m;
+            m.setText(TXT_WON);
+            m.exec();
+            close();
+        } break;
     }
 }
 
