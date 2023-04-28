@@ -28,8 +28,7 @@
 static const int *board = NULL;
 static int size = 0;
 
-static GtkWidget *flaglabel = NULL, *flagimage = NULL;
-static GtkWidget **buttons = NULL;
+static GtkWidget *flaglabel = NULL, **flagimages = NULL, **buttons = NULL, **numbers = NULL;
 
 static void
 updateButtons() {
@@ -54,40 +53,36 @@ updateButtons() {
                     snprintf(buff, 256, "%d", n);
 
                     /* Set text */
-                    //fl_set_object_label(numbers[btni], buff);
+                    gtk_label_set_text(GTK_LABEL(numbers[btni]), buff);
+                    
+                    /* Set color - names the same has X11 */
+                    GdkRGBA c;
+                    switch (n) {
+                        case 1: gdk_rgba_parse(&c, "blue"); break;
+                        case 2: gdk_rgba_parse(&c, "green"); break;
+                        case 3: gdk_rgba_parse(&c, "red"); break;
+                        case 4: gdk_rgba_parse(&c, "darkblue"); break;
+                        case 5: gdk_rgba_parse(&c, "darkred"); break;
+                        case 6: gdk_rgba_parse(&c, "darkcyan"); break;
+                        case 7: gdk_rgba_parse(&c, "black"); break;
+                        case 8: gdk_rgba_parse(&c, "darkgrey"); break;
+                    }
 
-                    /* Set color */
-                    /*switch (n) {
-                        case 1: fl_set_object_lcolor(numbers[btni],
-                            FL_BLUE); break;
-                        case 2: fl_set_object_lcolor(numbers[btni],
-                            FL_GREEN);break;
-                        case 3: fl_set_object_lcolor(numbers[btni],
-                            FL_RED); break;
-                        case 4: fl_set_object_lcolor(numbers[btni],
-                            FL_DARKCYAN); break;
-                        case 5: fl_set_object_lcolor(numbers[btni],
-                            FL_INDIANRED); break;
-                        case 6: fl_set_object_lcolor(numbers[btni],
-                            FL_CYAN); break;
-                        case 7: fl_set_object_lcolor(numbers[btni],
-                            FL_BLACK); break;
-                        case 8: fl_set_object_lcolor(numbers[btni],
-                            FL_INACTIVE); break;
-                    }*/
+                    gtk_widget_override_color(numbers[btni], GTK_STATE_FLAG_NORMAL, &c);
 
                     /* Show text */
-                    //fl_show_object(numbers[btni]);
+                    gtk_widget_show(numbers[btni]);
                 }
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 //gtk_button_set_label(GTK_BUTTON(buttons[btni]), NULL);
+                gtk_button_set_image(GTK_BUTTON(buttons[btni]), flagimages[btni]);
             }
             /* Otherwise just a tile */
             else {
                 /* Clear flag if applicable */
-                //gtk_button_set_image(GTK_BUTTON(buttons[btni]), NULL);
+                gtk_button_set_image(GTK_BUTTON(buttons[btni]), NULL);
                 //gtk_button_set_label(GTK_BUTTON(buttons[btni]), " ");
             }
         }
@@ -97,14 +92,16 @@ updateButtons() {
 static gboolean
 buttonCallback(GtkWidget *btn, GdkEventButton *event, gpointer data) {
     int btni = *(int*)data;
+    int x = btni % size;
+    int y = btni / size;
 
     if (event->type == GDK_BUTTON_PRESS  &&  event->button == 3) {
         /* 3 is right mouse btn */
-        gameFlagCell(btni / size, btni % size);
+        gameFlagCell(x, y);
     }
     if (event->type == GDK_BUTTON_PRESS  &&  event->button == 1) {
         /* 1 is left mouse btn */
-        gameClearCell(btni / size, btni % size);
+        gameClearCell(x, y);
     }
 
     updateButtons();
@@ -117,6 +114,8 @@ activate(GtkApplication* app, gpointer user_data) {
     GtkWidget *window, *grid, *titlelabel, *buttongrid;
 
     buttons = malloc(sizeof(GtkWidget*) * size * size);
+    numbers = malloc(sizeof(GtkWidget*) * size * size);
+    flagimages = malloc(sizeof(GtkWidget*) * size * size);
     int *btnids = malloc(sizeof(int) * size * size); /* Stupid */
 
     /* Window*/
@@ -130,18 +129,16 @@ activate(GtkApplication* app, gpointer user_data) {
 
     /* Title label */
     titlelabel = gtk_label_new(TXT_TITLE);
-    gtk_grid_attach(GTK_GRID(grid), titlelabel, 0, 0, 2, 1);
+    gtk_grid_attach(GTK_GRID(grid), titlelabel, 0, 0, 1, 1);
 
     /* Flag label */
     flaglabel = gtk_label_new("test");
-    gtk_grid_attach(GTK_GRID(grid), flaglabel, 1, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), flaglabel, 0, 1, 1, 1);
 
     /* Button grid */
     buttongrid = gtk_grid_new();
-    gtk_grid_attach(GTK_GRID(grid), buttongrid, 0, 2, 2, 1);
+    gtk_grid_attach(GTK_GRID(grid), buttongrid, 0, 2, 1, 1);
 
-    /* Flag image */
-    flagimage = gtk_image_new_from_file("../flag.png");
 
     /* Add buttons to grid */
     int btni = 0;
@@ -157,7 +154,16 @@ activate(GtkApplication* app, gpointer user_data) {
             gtk_grid_attach(GTK_GRID(buttongrid), buttons[btni], x, y, 1, 1);
             g_signal_connect(G_OBJECT(buttons[btni]), "button-press-event",
                 G_CALLBACK(buttonCallback), btnids + btni);
-            gtk_button_set_image(GTK_BUTTON(buttons[btni]), flagimage);
+            gtk_widget_set_size_request(buttons[btni], CELL_SIZE, CELL_SIZE);
+
+            /* Flag images - i hate Gtk  */
+            flagimages[btni] = gtk_image_new_from_file("../flag.png");
+            g_object_ref_sink(flagimages[btni]);
+
+            /* Number label */
+            numbers[btni] = gtk_label_new("");
+            gtk_widget_hide(numbers[btni]);
+            gtk_grid_attach(GTK_GRID(buttongrid), numbers[btni], x, y, 1, 1);
         }
     }
 

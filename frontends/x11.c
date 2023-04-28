@@ -174,6 +174,7 @@ X11Start(const int *lboard, int lsize) {
 
     f = XLoadFont(d, "9x15");
 
+    /* Generate colors - names defined in X11's rgb.txt */
     XAllocNamedColor(d, cm, "blue", &blue, &blue);
     XAllocNamedColor(d, cm, "green", &green, &green);
     XAllocNamedColor(d, cm, "red", &red, &red);
@@ -182,6 +183,7 @@ X11Start(const int *lboard, int lsize) {
     XAllocNamedColor(d, cm, "darkcyan", &darkcyan, &darkcyan);
     XAllocNamedColor(d, cm, "darkgrey", &darkgrey, &darkgrey);
 
+    /* Event loop */
     XEvent e;
     while (1) {
         XNextEvent(d, &e);

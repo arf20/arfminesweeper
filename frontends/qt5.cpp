@@ -92,7 +92,7 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
 
     // Create labels
     titlelabel = new QLabel(tr(TXT_TITLE));
-    flagslabel = new QLabel(tr("test"));
+    flagslabel = new QLabel(tr(""));
 
     // Create button grid
     QGridLayout *buttonGridLayout = new QGridLayout;
@@ -129,10 +129,13 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(titlelabel, 0, 0);
     mainLayout->addWidget(flagslabel, 1, 0);
+    mainLayout->setAlignment(flagslabel, Qt::AlignRight);
     mainLayout->addLayout(buttonGridLayout, 2, 0);
 
     setLayout(mainLayout);
     setWindowTitle(tr(TXT_TITLE));
+
+    update();
 }
 
 void Minesweeper::update() {
