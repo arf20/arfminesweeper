@@ -42,14 +42,14 @@ updateButtons() {
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
             /* Variables stuff */
-            int btni = (x * size) + y;
+            int btni = (y * size) + x;
 
             /* If clear, hide the button, count surrounding cells and print
                 n of mines */
             if (CHECK_CLEAR(BOARDXY(x, y))) {
                 gtk_widget_hide(buttons[btni]);
-                int n = gameGetSurroundingMines(x, y);
 
+                int n = gameGetSurroundingMines(x, y);
                 if (n) {
                     snprintf(buff, 256, "%d", n);
 
@@ -151,7 +151,7 @@ activate(GtkApplication* app, gpointer user_data) {
             btni = (size * y) + x;
 
             /* Create button, attach it to the grind,
-                and connect click signal to callback*/
+                and connect click signal to callback */
             btnids[btni] = btni;
             buttons[btni] = gtk_button_new();
             gtk_grid_attach(GTK_GRID(buttongrid), buttons[btni], x, y, 1, 1);
@@ -188,4 +188,3 @@ void
 Gtk3Destroy() {
 
 }
-

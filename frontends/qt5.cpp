@@ -24,7 +24,7 @@
 #include "qt5.hpp"
 
 extern "C" {
-#include "game.h"
+#include "../game.h"
 }
 
 #include <QtWidgets>
@@ -34,14 +34,44 @@ extern "C" {
 #include <functional>
 
 class Cell : public QPushButton {
+    Q_OBJECT
+
 public:
     Cell(int lx, int ly);
+
+signals:
+    void updateSignal();
 
 private:
     int x, y;
 
     void mouseReleaseEvent(QMouseEvent *e);
 };
+
+class Minesweeper : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit Minesweeper(QWidget *parent, const int *lboard, int lsize);
+    ~Minesweeper();
+
+public slots:
+    void update();
+
+private:
+    const int *board = nullptr;
+    int size = 0;
+
+    QLabel *titlelabel;
+    QLabel *flagslabel;
+
+    QIcon flagicon;
+
+    Cell **buttons;
+    QLabel **numbers;
+};
+
+#include "qt5.moc"  // Cursed
 
 Cell::Cell(int lx, int ly) {
     x = lx; y = ly;
@@ -52,32 +82,9 @@ void Cell::mouseReleaseEvent(QMouseEvent *e) {
         gameClearCell(x, y);
     else if (e->button() == Qt::RightButton)
         gameFlagCell(x, y);
+
+    emit updateSignal();
 }
-
-class Minesweeper : public QWidget {
-    Q_OBJECT
-
-public:
-    explicit Minesweeper(QWidget *parent, const int *lboard, int lsize);
-    ~Minesweeper();
-
-private:
-    int findButton(QPushButton *btn);
-    void buttonHandler();
-    void update();
-
-    const int *board = nullptr;
-    int size = 0;
-
-    QLabel *titlelabel;
-    QLabel *flagslabel;
-
-    QIcon flagicon;
-
-    Cell **buttons;
-};
-
-#include "qt5.moc"  // Cursed
 
 Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidget(parent) {
     board = lboard;
@@ -89,7 +96,10 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
 
     // Create button grid
     QGridLayout *buttonGridLayout = new QGridLayout;
+    buttonGridLayout->setHorizontalSpacing(CELL_MARGIN);
+    buttonGridLayout->setVerticalSpacing(CELL_MARGIN);
     buttons = new Cell*[size*size];
+    numbers = new QLabel*[size*size];
 
     QPixmap flagpixmap("../flag.png");
     flagicon = QIcon(flagpixmap);
@@ -102,11 +112,17 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
             btni = (size * y) + x;
 
             buttons[btni] = new Cell(x, y);
+            buttons[btni]->setFixedSize(QSize(CELL_SIZE, CELL_SIZE));
             //buttons[btni]->setIcon(flagicon);
             //buttons[btni]->setIconSize(buttons[btni]->rect().size());
-            buttonGridLayout->addWidget(buttons[btni], x, y);
+            numbers[btni] = new QLabel();
 
-            connect(buttons[btni], &QPushButton::clicked, this, &Minesweeper::buttonHandler);
+            numbers[btni]->hide();
+
+            buttonGridLayout->addWidget(buttons[btni], y, x);
+            buttonGridLayout->addWidget(numbers[btni], y, x);
+
+            connect(buttons[btni], &Cell::updateSignal, this, &Minesweeper::update);
         }
     }
 
@@ -120,35 +136,44 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
     setWindowTitle(tr(TXT_TITLE));
 }
 
-int Minesweeper::findButton(QPushButton *btn) {
-    for (int i = 0; i < size*size; i++)
-        if (btn == buttons[i]) return i;
-    return -1;
-}
-
 void Minesweeper::update() {
     flagslabel->setText(QString(std::to_string(gameGetFlagsLeft()).c_str()));
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
-            int btni = (x * size) + y;
+            int btni = (y * size) + x;
 
             if (CHECK_CLEAR(BOARDXY(x, y))) {
                 buttons[btni]->hide();
+
+                int n = gameGetSurroundingMines(x, y);
+                if (n) {
+                    numbers[btni]->setText(QString(std::to_string(n).c_str()));
+
+                    switch (n) {
+                        case 1: numbers[btni]->setStyleSheet("color: blue"); break;
+                        case 2: numbers[btni]->setStyleSheet("color: green"); break;
+                        case 3: numbers[btni]->setStyleSheet("color: red"); break;
+                        case 4: numbers[btni]->setStyleSheet("color: darkcyan"); break;
+                        case 5: numbers[btni]->setStyleSheet("color: darkred"); break;
+                        case 6: numbers[btni]->setStyleSheet("color: cyan"); break;
+                        case 7: numbers[btni]->setStyleSheet("color: black"); break;
+                        case 8: numbers[btni]->setStyleSheet("color: grey"); break;
+                    }
+
+                    numbers[btni]->show();
+                }
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
+                // Set flag
                 buttons[btni]->setIcon(flagicon);
             }
             else {
-
+                // Clear flag if applicable
+                buttons[btni]->setIcon(QIcon());
             }
         }
     }
-}
-
-void Minesweeper::buttonHandler() {
-    std::cout << "asodhji" << std::endl;
-    update();
 }
 
 Minesweeper::~Minesweeper() {
