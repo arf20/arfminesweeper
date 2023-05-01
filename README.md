@@ -1,7 +1,7 @@
 # minesweeper
 You know the game, but in every graphical API I know as well as console
 
-## Build
+## Build on Linux
 Dependencies required: `build-essential cmake`
 Dependencies for frontends:
 ```
@@ -40,7 +40,7 @@ X11 XCB                                 X     X
 XForms (nice)           DONE            X     X
 Motif                   ON DEVELOPMENT  X     X
 Tcl/Tk                                  X     X       X
-SDL2                                    X     X   X   X
+SDL2                    DONE            X     X   X   X
 SDL1.2 (lolz)                           X     X   X   X
 OpenGL 1.x                              X     X   X   X
 OpenGL 4.6 (yikes)                      X     X   X   X
@@ -55,5 +55,6 @@ Win32 GDI+                                            X
 Direct2D                                              X
 .NET WinForms (idk if its even possible)              X
 .NET WPF                                              X
+Java AWT                                X     X   X   X
 Java Swing (wtf)                        X     X   X   X
 ```
