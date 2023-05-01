@@ -178,7 +178,7 @@ xformsStart(const int *lboard, int lsize) {
             /* Button */
             buttons[btni] = fl_add_bitmapbutton(FL_NORMAL_BUTTON,
                 cX, cY, CELL_SIZE, CELL_SIZE, "");
-            fl_set_bitmapbutton_file(buttons[btni], "../flag.xbm");
+            fl_set_bitmapbutton_file(buttons[btni], FLAG_XBM_PATH);
             fl_set_object_color(buttons[btni], FL_COL1, FL_COL1);
             fl_set_object_lcolor(buttons[btni], FL_COL1);
             fl_set_object_callback(buttons[btni],

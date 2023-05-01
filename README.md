@@ -35,26 +35,29 @@ make
 Console (no graphics)   DONE            X     X   X   X
 ncurses                                 X     X   X   X 
 fbdev                   ON DEVELOPMENT  X
+SVGA buffer
 X11 Xlib                DONE            X     X
 X11 XCB                                 X     X
-XForms (nice)           DONE            X     X
+XForms                  DONE            X     X
 Motif                   ON DEVELOPMENT  X     X
 Tcl/Tk                                  X     X       X
 SDL2                    DONE            X     X   X   X
-SDL1.2 (lolz)                           X     X   X   X
-OpenGL 1.x                              X     X   X   X
-OpenGL 4.6 (yikes)                      X     X   X   X
+SDL1.2                                  X     X   X   X
+GLIDE                                   X     X       X (with 3dfx Voodoo)
+OpenGL 1.x/FreeGLUT                     X     X   X   X
+OpenGL 4.6/GLFW-GLEW                    X     X   X   X
 ImGui                                   X     X   X   X
-Vulkan (yes.)                           X     X   X   X
+Metal                                                 X
+Vulkan                                  X     X   X   X
 raylib                                  X     X   X   X
-Gtk3 (pain)             ON DEVELOPMENT  X     X
+Gtk3                    ON DEVELOPMENT  X     X
 Qt5                     DONE            X     X   X   X
-WxWidgets (?)                           X     X   X   X
-WinAPI (oh no)                                        X
+WxWidgets                               X     X   X   X
+WinAPI                                                X
 Win32 GDI+                                            X
 Direct2D                                              X
-.NET WinForms (idk if its even possible)              X
+.NET WinForms                                         X
 .NET WPF                                              X
 Java AWT                                X     X   X   X
-Java Swing (wtf)                        X     X   X   X
+Java Swing                              X     X   X   X
 ```

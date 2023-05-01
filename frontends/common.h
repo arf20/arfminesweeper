@@ -21,6 +21,11 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#define FLAG_PNG_PATH "../assets/flag.png"
+#define FLAG_XBM_PATH "../assets/flag.xbm"
+#define FONT_TTF_PATH "../assets/FSEX300.ttf"
+#define FONT_BMP_PATH "../assets/charstrip.bmp"
+
 #define HEADER_HEIGHT 60
 #define CELL_SIZE     20
 #define CELL_MARGIN   2

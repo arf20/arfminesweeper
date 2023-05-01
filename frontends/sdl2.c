@@ -199,10 +199,10 @@ SDL2Start(const int *lboard, int lsize) {
     if ((r = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED)) == NULL)
         printf("SDL_CreateRenderer failed: %s\n", SDL_GetError());
 
-    if (!(font = TTF_OpenFont("../FSEX300.ttf", 16)))
+    if (!(font = TTF_OpenFont(FONT_TTF_PATH, 16)))
         printf("Error opening font: %s\n", TTF_GetError());
 
-    if (!(flag = IMG_LoadTexture(r, "../flag.png")))
+    if (!(flag = IMG_LoadTexture(r, FLAG_PNG_PATH)))
         printf("Error loading texture: %s\n", IMG_GetError());
 
     /* SDL event loop */

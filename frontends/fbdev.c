@@ -146,7 +146,7 @@ fbdevStart(const int *lboard, int lsize) {
     size = lsize;
 
     /* Read bitmap font */
-    if (readBMP("../charstrip.bmp", &fontimg, &fontiw, &fontih) != 0) {
+    if (readBMP(FONT_BMP_PATH, &fontimg, &fontiw, &fontih) != 0) {
         return -1;
     }
 

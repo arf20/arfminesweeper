@@ -101,7 +101,7 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
     buttons = new Cell*[size*size];
     numbers = new QLabel*[size*size];
 
-    QPixmap flagpixmap("../flag.png");
+    QPixmap flagpixmap(FLAG_PNG_PATH);
     flagicon = QIcon(flagpixmap);
 
     // Add buttons to grid

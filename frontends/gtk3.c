@@ -151,7 +151,7 @@ activate(GtkApplication* app, gpointer user_data) {
     gtk_grid_attach(GTK_GRID(grid), titlelabel, 0, 0, 1, 1);
 
     /* Flag label */
-    flaglabel = gtk_label_new("test");
+    flaglabel = gtk_label_new("");
     gtk_grid_attach(GTK_GRID(grid), flaglabel, 0, 1, 1, 1);
 
     /* Button grid */
@@ -176,7 +176,7 @@ activate(GtkApplication* app, gpointer user_data) {
             gtk_widget_set_size_request(buttons[btni], CELL_SIZE, CELL_SIZE);
 
             /* Flag images - i hate Gtk  */
-            flagimages[btni] = gtk_image_new_from_file("../flag.png");
+            flagimages[btni] = gtk_image_new_from_file(FLAG_PNG_PATH);
             g_object_ref_sink(flagimages[btni]);
 
             /* Number label */
