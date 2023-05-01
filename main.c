@@ -33,6 +33,7 @@
 #include "frontends/xforms.h"
 #include "frontends/gtk3.h"
 #include "frontends/qt5.hpp"
+#include "frontends/sdl2.h"
 
 void
 printUsage(const char *self) {
@@ -67,6 +68,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_QT5
         printf("qt5 ");
+    #endif
+    #ifdef FRONTEND_SDL2
+        printf("sdl2 ");
     #endif
 
     printf("\n");
@@ -119,7 +123,7 @@ main(int argc, char **argv) {
         X11Start(gameGetBoard(), size);
         X11Destroy();
         #else
-        printf("Error: Frontend x11 not built");
+        printf("Error: Frontend x11 not built\n");
         #endif
     }
     else if (!strcmp(frontend, "fbdev")) {
@@ -127,7 +131,7 @@ main(int argc, char **argv) {
         fbdevStart(gameGetBoard(), size);
         fbdevDestroy();
         #else
-        printf("Error: Frontend fbdev not built");
+        printf("Error: Frontend fbdev not built\n");
         #endif
     }
     else if (!strcmp(frontend, "motif")) {
@@ -135,7 +139,7 @@ main(int argc, char **argv) {
         motifStart(gameGetBoard(), size);
         motifDestroy();
         #else
-        printf("Error: Frontend motif not built");
+        printf("Error: Frontend motif not built\n");
         #endif
     }
     else if (!strcmp(frontend, "xforms")) {
@@ -143,7 +147,7 @@ main(int argc, char **argv) {
         xformsStart(gameGetBoard(), size);
         xformsDestroy();
         #else
-        printf("Error: Frontend xforms not built");
+        printf("Error: Frontend xforms not built\n");
         #endif
     }
     else if (!strcmp(frontend, "gtk3")) {
@@ -151,7 +155,7 @@ main(int argc, char **argv) {
         Gtk3Start(gameGetBoard(), size);
         Gtk3Destroy();
         #else
-        printf("Error: Frontend gtk not built");
+        printf("Error: Frontend gtk not built\n");
         #endif
     }
     else if (!strcmp(frontend, "qt5")) {
@@ -159,11 +163,19 @@ main(int argc, char **argv) {
         Qt5Start(gameGetBoard(), size);
         Qt5Destroy();
         #else
-        printf("Error: Frontend gtk not built");
+        printf("Error: Frontend qt5 not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "sdl2")) {
+        #ifdef FRONTEND_SDL2
+        SDL2Start(gameGetBoard(), size);
+        SDL2Destroy();
+        #else
+        printf("Error: Frontend sdl2 not built\n");
         #endif
     }
     else {
-        printf("Error: Frontend not recognised: %s", frontend);
+        printf("Error: Frontend not recognised: %s\n", frontend);
         printFrontends();
     }
 

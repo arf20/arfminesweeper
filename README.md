@@ -29,25 +29,31 @@ cmake ..
 make
 ```
 
-## TODO APIs and Toolkits
+## TODO frontends
 ```
-Console (no graphics)   DONE
-ncurses
-fbdev                   ON DEVELOPMENT
-X11 Xlib                DONE
-X11 XCB
-XForms (nice)           DONE
-Motif                   ON DEVELOPMENT
-Tcl/Tk
-SDL2
-SDL1.2 (lolz)
-OpenGL 1.x
-OpenGL 4.6 (yikes)
-ImGui
-Vulkan (yes.)
-Gtk3 (pain)             ON DEVELOPMENT
-Qt5                     DONE
-WxWidgets (?)
-WinAPI (oh no)
-Win32 GDI+
+                                        Linux BSD Mac Win
+Console (no graphics)   DONE            X     X   X   X
+ncurses                                 X     X   X   X 
+fbdev                   ON DEVELOPMENT  X
+X11 Xlib                DONE            X     X
+X11 XCB                                 X     X
+XForms (nice)           DONE            X     X
+Motif                   ON DEVELOPMENT  X     X
+Tcl/Tk                                  X     X       X
+SDL2                                    X     X   X   X
+SDL1.2 (lolz)                           X     X   X   X
+OpenGL 1.x                              X     X   X   X
+OpenGL 4.6 (yikes)                      X     X   X   X
+ImGui                                   X     X   X   X
+Vulkan (yes.)                           X     X   X   X
+raylib                                  X     X   X   X
+Gtk3 (pain)             ON DEVELOPMENT  X     X
+Qt5                     DONE            X     X   X   X
+WxWidgets (?)                           X     X   X   X
+WinAPI (oh no)                                        X
+Win32 GDI+                                            X
+Direct2D                                              X
+.NET WinForms (idk if its even possible)              X
+.NET WPF                                              X
+Java Swing (wtf)                        X     X   X   X
 ```
