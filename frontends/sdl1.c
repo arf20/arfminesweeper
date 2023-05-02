@@ -22,7 +22,7 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
-#include <SDL/SDL_image.h>
+//#include <SDL/SDL_image.h>
 
 #include "common.h"
 #include "sdl1.h"
@@ -32,8 +32,10 @@
 static const int *board = NULL;
 static int size = 0;
 
+#define CI_WHITE  0xffffffff
+#define CI_BLACK  0x00000000
 #define C_WHITE  255, 255, 255, 255
-#define C_BLACK  0, 0, 0, 255
+#define C_BLACK  0, 0, 0, 0
 #define C_YELLOW 255, 255, 0, 255
 #define C_RED    255, 0, 0, 255
 #define C_GREEN  0, 255, 0, 255
@@ -46,62 +48,58 @@ static int size = 0;
 #define TEXT_CENTERX    (unsigned int)1
 #define TEXT_CENTERY    (unsigned int)2
 
-static SDL_Window *w;
-static SDL_Renderer *r;
+static SDL_Surface *screen;
+static SDL_Surface *flag;
 static TTF_Font *font;
-static SDL_Texture *flag;
 static int run = 1;
 
 static int wWidth = 0, wHeight = 0;
 
-SDL_Color SDLColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+static SDL_Color
+SDLColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     struct SDL_Color c;
     c.r = r;
     c.g = g;
     c.b = b;
-    c.a = a;
     return c;
 }
 
-
-void
+static void
 renderText(const char *str, TTF_Font* f, int x, int y, unsigned int flags,
     SDL_Color c)
 {
     SDL_Surface* surfaceText = TTF_RenderText_Blended(f, str, c);
-    SDL_Texture* textureText = SDL_CreateTextureFromSurface(r, surfaceText);
 
     SDL_Rect rectText;  // create a rect
     rectText.x = x;     // controls the rect's x coordinate 
     rectText.y = y;     // controls the rect's y coordinte
     rectText.w = 0;     // controls the width of the rect
     rectText.h = 0;     // controls the height of the rect
+    int w, h;
 
-    TTF_SizeText(f, str, &rectText.w, &rectText.h);
+    TTF_SizeText(f, str, &w, &h);
+    rectText.w = w; rectText.h = h;
 
     if (flags & TEXT_CENTERX) rectText.x -= rectText.w / 2;
     if (flags & TEXT_CENTERY) rectText.y -= rectText.h / 2;
 
-    SDL_RenderCopy(r, textureText, NULL, &rectText);
+    SDL_BlitSurface(surfaceText, NULL, screen, &rectText);
 
-    // I had to run valgrind to find this, I'm such a terrible programmer
     SDL_FreeSurface(surfaceText);
-    SDL_DestroyTexture(textureText);
 }
 
-void
-renderTexture(SDL_Texture *t, int w, int h, int x, int y) {
+static void
+renderSurface(SDL_Surface *s, int w, int h, int x, int y) {
     SDL_Rect rect;
     rect.h = h; rect.w = w; rect.x = x; rect.y = y;
-    SDL_RenderCopy(r, t, NULL, &rect);
+    SDL_BlitSurface(s, NULL, screen, &rect);
 }
 
 static void
 render() {
     static char buff[256];
 
-    SDL_SetRenderDrawColor(r, C_BLACK);
-    SDL_RenderClear(r);
+    SDL_FillRect(screen, NULL, 0x000000);
 
     /* Draw title */
     renderText(TXT_TITLE, font, 5, 5, 0, SDLColor(C_WHITE));
@@ -109,14 +107,14 @@ render() {
     /* Check game state*/
     switch (gameGetState()) {
         case STATE_LOST: {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                "Game Over", TXT_LOST, w);
+            //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
+            //    "Game Over", TXT_LOST, w);
             run = 0;
             return;
         } break;
         case STATE_WON: {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                "Game Over", TXT_WON, w);
+            //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
+            //    "Game Over", TXT_WON, w);
             run = 0;
         } break;
     }
@@ -153,20 +151,18 @@ render() {
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 SDL_Rect cellRect = {cX, cY, CELL_SIZE, CELL_SIZE};
-                SDL_SetRenderDrawColor(r, C_WHITE);
-                SDL_RenderFillRect(r, &cellRect);
-                renderTexture(flag, CELL_SIZE, CELL_SIZE, cX, cY);
+                SDL_FillRect(screen, &cellRect, CI_WHITE);
+                renderSurface(flag, CELL_SIZE, CELL_SIZE, cX, cY);
             }
             /* Otherwise just a tile */
             else {
                 SDL_Rect cellRect = {cX, cY, CELL_SIZE, CELL_SIZE};
-                SDL_SetRenderDrawColor(r, C_WHITE);
-                SDL_RenderFillRect(r, &cellRect);
+                SDL_FillRect(screen, &cellRect, CI_WHITE);
             }
         }
     }
 
-    SDL_RenderPresent(r);
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 
 int
@@ -186,23 +182,19 @@ SDL1Start(const int *lboard, int lsize) {
     if (TTF_Init() < 0)
         printf("TTF_Init failed: %s\n", TTF_GetError());
 
-    int imgFlags = IMG_INIT_PNG;
-    if(!(IMG_Init(imgFlags) & imgFlags))
-        printf("IMG_Init failed: %s\n", IMG_GetError());
-
     /* Create stuff */
-    if (SDL_SetVideoMode(wWidth, wHeight,
-        SDL_OPENGL | SDL_DOUBLEBUF) == NULL)
-        printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+    if ((screen = SDL_SetVideoMode(wWidth, wHeight, 32,
+        SDL_OPENGL | SDL_DOUBLEBUF)) == NULL)
+        printf("SDL_SetVideoMode failed: %s\n", SDL_GetError());
 
-    if ((r = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED)) == NULL)
-        printf("SDL_CreateRenderer failed: %s\n", SDL_GetError());
+    SDL_WM_SetCaption(TXT_TITLE, TXT_TITLE);
 
+    
     if (!(font = TTF_OpenFont(FONT_TTF_PATH, 16)))
         printf("Error opening font: %s\n", TTF_GetError());
 
-    if (!(flag = IMG_LoadTexture(r, FLAG_PNG_PATH)))
-        printf("Error loading texture: %s\n", IMG_GetError());
+    if (!(flag = SDL_LoadBMP(FLAG_PNG_PATH)))
+        printf("Error loading texture: %s\n", SDL_GetError());
 
     /* SDL event loop */
     SDL_Event e;
@@ -240,8 +232,7 @@ SDL1Start(const int *lboard, int lsize) {
 
 void
 SDL1Destroy() {
-    SDL_DestroyRenderer(r);
-    SDL_DestroyWindow(w);
+    SDL_FreeSurface(flag);
     TTF_Quit();
     SDL_Quit();
 }

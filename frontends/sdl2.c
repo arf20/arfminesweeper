@@ -54,7 +54,8 @@ static int run = 1;
 
 static int wWidth = 0, wHeight = 0;
 
-SDL_Color SDLColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+static SDL_Color
+SDLColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     struct SDL_Color c;
     c.r = r;
     c.g = g;
@@ -64,7 +65,7 @@ SDL_Color SDLColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 }
 
 
-void
+static void
 renderText(const char *str, TTF_Font* f, int x, int y, unsigned int flags,
     SDL_Color c)
 {
@@ -89,7 +90,7 @@ renderText(const char *str, TTF_Font* f, int x, int y, unsigned int flags,
     SDL_DestroyTexture(textureText);
 }
 
-void
+static void
 renderTexture(SDL_Texture *t, int w, int h, int x, int y) {
     SDL_Rect rect;
     rect.h = h; rect.w = w; rect.x = x; rect.y = y;
