@@ -77,6 +77,20 @@ if (SDL2_FOUND)
     endif()
 endif()
 
+find_package(SDL)
+pkg_check_modules(SDL_ttf SDL_ttf)
+pkg_check_modules(SDL_image SDL_image)
+if (SDL_FOUND)
+    if (SDL_ttf_FOUND AND SDL_image_FOUND)
+        file (GLOB SRC ${SRC} "frontends/sdl1.c")
+        add_compile_definitions(FRONTEND_SDL1)
+        message(STATUS "Building with SDL 1.2")
+    else()
+        message(ERROR "SDL_ttf and SDL_image required")
+    endif()
+endif()
+
+
 # executable
 add_executable(arfminesweeper ${SRC})
 
@@ -106,3 +120,8 @@ endif()
 if (SDL2_FOUND AND SDL2_ttf_FOUND AND SDL2_image_FOUND)
     target_link_libraries(arfminesweeper ${SDL2_LIBRARIES} ${SDL2_ttf_LIBRARIES} ${SDL2_image_LIBRARIES})
 endif()
+
+if (SDL_FOUND AND SDL_ttf_FOUND AND SDL_image_FOUND)
+    target_link_libraries(arfminesweeper ${SDL_LIBRARIES} ${SDL_ttf_LIBRARIES} ${SDL_image_LIBRARIES})
+endif()
+

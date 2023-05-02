@@ -34,6 +34,7 @@
 #include "frontends/gtk3.h"
 #include "frontends/qt5.hpp"
 #include "frontends/sdl2.h"
+#include "frontends/sdl1.h"
 
 void
 printUsage(const char *self) {
@@ -71,6 +72,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_SDL2
         printf("sdl2 ");
+    #endif
+    #ifdef FRONTEND_SDL1
+        printf("sdl1.2 ");
     #endif
 
     printf("\n");
@@ -172,6 +176,14 @@ main(int argc, char **argv) {
         SDL2Destroy();
         #else
         printf("Error: Frontend sdl2 not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "sdl1")) {
+        #ifdef FRONTEND_SDL1
+        SDL1Start(gameGetBoard(), size);
+        SDL1Destroy();
+        #else
+        printf("Error: Frontend sdl1.2 not built\n");
         #endif
     }
     else {
