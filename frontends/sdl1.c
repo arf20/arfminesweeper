@@ -176,15 +176,15 @@ SDL1Start(const int *lboard, int lsize) {
         ((size - 1) * CELL_MARGIN);
 
     /* Initialise SDL2 */
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
         printf("SDL_Init failed: %s\n", SDL_GetError());
 
     if (TTF_Init() < 0)
         printf("TTF_Init failed: %s\n", TTF_GetError());
 
     /* Create stuff */
-    if ((screen = SDL_SetVideoMode(wWidth, wHeight, 32,
-        SDL_OPENGL | SDL_DOUBLEBUF)) == NULL)
+    if ((screen = SDL_SetVideoMode(wWidth, wHeight, 0,
+        SDL_SWSURFACE)) == NULL)
         printf("SDL_SetVideoMode failed: %s\n", SDL_GetError());
 
     SDL_WM_SetCaption(TXT_TITLE, TXT_TITLE);

@@ -73,7 +73,7 @@ if (SDL2_FOUND)
         add_compile_definitions(FRONTEND_SDL2)
         message(STATUS "Building with SDL2")
     else()
-        message(ERROR "SDL2_ttf and SDL2_image required")
+        message(ERROR "SDL2_ttf and SDL2_image required for building SDL2 frontend")
     endif()
 endif()
 
@@ -86,15 +86,30 @@ if (SDL_FOUND)
         add_compile_definitions(FRONTEND_SDL1)
         message(STATUS "Building with SDL 1.2")
     else()
-        message(ERROR "SDL_ttf and SDL_image required")
+        message(ERROR "SDL_ttf and SDL_image required for building SDL1.2 frontend")
     endif()
 endif()
+
+cmake_policy(SET CMP0072 OLD)
+find_package(GLUT)
+find_package(OpenGL)
+if (OpenGL_OpenGL_FOUND)
+    if (GLUT_FOUND)
+        file (GLOB SRC ${SRC} "frontends/opengl_1_1_glut.c")
+        add_compile_definitions(FRONTEND_GL11)
+        message(STATUS "Building with OpenGL/GLUT 1.1")
+    else()
+        message(ERROR "FreeGLUT required for building OpenGL 1.1 frontend")
+    endif()
+endif()
+
 
 
 # executable
 add_executable(arfminesweeper ${SRC})
 
-# libraries
+
+# link ibraries
 
 if (X11_FOUND)
     target_link_libraries(arfminesweeper ${X11_LIBRARIES})
@@ -123,5 +138,9 @@ endif()
 
 if (SDL_FOUND AND SDL_ttf_FOUND AND SDL_image_FOUND)
     target_link_libraries(arfminesweeper ${SDL_LIBRARIES} ${SDL_ttf_LIBRARIES} ${SDL_image_LIBRARIES})
+endif()
+
+if (OpenGL_OpenGL_FOUND AND GLUT_FOUND)
+target_link_libraries(arfminesweeper ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 endif()
 

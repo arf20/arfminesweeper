@@ -35,6 +35,7 @@
 #include "frontends/qt5.hpp"
 #include "frontends/sdl2.h"
 #include "frontends/sdl1.h"
+#include "frontends/opengl_1_1_glut.h"
 
 void
 printUsage(const char *self) {
@@ -75,6 +76,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_SDL1
         printf("sdl1.2 ");
+    #endif
+    #ifdef FRONTEND_GL11
+        printf("GL1.1 ");
     #endif
 
     printf("\n");
@@ -183,7 +187,15 @@ main(int argc, char **argv) {
         SDL1Start(gameGetBoard(), size);
         SDL1Destroy();
         #else
-        printf("Error: Frontend sdl1.2 not built\n");
+        printf("Error: Frontend sdl1 not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "gl11")) {
+        #ifdef FRONTEND_GL11
+        GL11Start(gameGetBoard(), size);
+        GL11Destroy();
+        #else
+        printf("Error: Frontend gl11 not built\n");
         #endif
     }
     else {

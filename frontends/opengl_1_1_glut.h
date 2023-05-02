@@ -18,10 +18,10 @@
 
 */
 
-#ifndef _X11_H
-#define _X11_H
+#ifndef _GL11_H
+#define _GL11_H
 
-int X11Start(const int *lboard, int lsize);
-void X11Destroy();
+int GL11Start(const int *lboard, int lsize);
+void GL11Destroy();
 
 #endif
