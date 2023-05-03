@@ -26,7 +26,7 @@
 #include <GL/freeglut.h>
 
 #include "common.h"
-#include "opengl_1_1_glut.h"
+#include "gl11.h"
 #include "../game.h"
 
 #define C_WHITE  1.0f, 1.0f, 1.0f
@@ -43,6 +43,8 @@
 #define TXT_OFFX 5
 #define TXT_OFFY 1
 
+#define TXT_HEIGHT 15
+
 static const int *board = NULL;
 static int size = 0;
 
@@ -57,15 +59,46 @@ glTransformedVertex(int x, int y) {
 }
 
 static void
-drawString(GLfloat x, GLfloat y, const char *str,
+drawStringN(int x, int y, const char *str, int n,
     GLfloat r, GLfloat g, GLfloat b)
 {
     GLfloat tx = -1.0f + (2.0f * ((float)x / (float)wWidth));
-    GLfloat ty = 1.0f - (2.0f * (((float)y + 15.0f) / (float)wHeight));
+    GLfloat ty = 1.0f - (2.0f * (((float)y + (float)TXT_HEIGHT) / (float)wHeight));
     glColor3f(r, g, b);
     glRasterPos3f(tx, ty, 0.0f);
-    for (int i = 0; i < strlen(str); i++)
+    for (int i = 0; i < n; i++)
         glutBitmapCharacter(GLUT_BITMAP_9_BY_15, str[i]);
+}
+
+static void
+drawString(int x, int y, const char *str, 
+    GLfloat r, GLfloat g, GLfloat b)
+{
+    drawStringN(x, y, str, strlen(str), r, g, b);
+}
+
+static void
+drawTextMultiline(int x, int y, const char *str) {
+    const char *line = str, *next = NULL;
+    int len = strlen(str), i = 0;
+    while (line < str + len) {
+        next = strchr(line, '\n');
+        drawStringN(x, y + (i * TXT_HEIGHT), line, next - line, C_WHITE);
+        line = next + 1;
+        i++;
+    }
+}
+
+static void
+drawFlag(int x, int y) {
+    glColor3f(C_RED);
+    glBegin(GL_POLYGON);
+    glTransformedVertex(x + (CELL_SIZE/4), y + 2);
+    glTransformedVertex(x + (CELL_SIZE/4), y + (CELL_SIZE - 2));
+    glTransformedVertex(x + ((CELL_SIZE/4)+2), y + (CELL_SIZE - 2));
+    glTransformedVertex(x + ((CELL_SIZE/4)+2), y + (CELL_SIZE/2));
+    glTransformedVertex(x + ((3*CELL_SIZE/4)+2), y + ((CELL_SIZE/2)-3));
+    glEnd();
 }
 
 static void
@@ -73,15 +106,29 @@ render() {
     static char buff[256];
 
     /* Clear screen */
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(C_BLACK, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     /* Draw title */
-    drawString(5, 5, TXT_TITLE, 1.0f, 1.0f, 1.0f);
+    drawString(5, 5, TXT_TITLE, C_WHITE);
+
+    /* Check game state*/
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            drawTextMultiline(5, 45, TXT_LOST);
+            glutSwapBuffers();
+            return;
+        } break;
+        case STATE_WON: {
+            drawTextMultiline(5, 45, TXT_WON);
+            glutSwapBuffers();
+            return;
+        } break;
+    }
 
     /* Print flags left */
     snprintf(buff, 256, "%d", gameGetFlagsLeft());
-    drawString(wWidth - 25, 35, buff, 1.0f, 1.0f, 1.0f);
+    drawString(wWidth - 25, 35, buff, C_WHITE);
 
     /* Render cell matrix */
     for (int y = 0; y < size; y++) {
@@ -95,22 +142,36 @@ render() {
                 if (n) {
                     snprintf(buff, 256, "%d", n);
                     switch (n) {
-                        case 1: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_BLUE); break;
-                        case 2: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_GREEN); break;
-                        case 3: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_RED); break;
-                        case 4: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DBLUE); break;
-                        case 5: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DRED); break;
-                        case 6: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DCYAN); break;
-                        case 7: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_BLACK); break;
-                        case 8: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DGREY); break;
+                        case 1: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_BLUE); break;
+                        case 2: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_GREEN); break;
+                        case 3: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_RED); break;
+                        case 4: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_DBLUE); break;
+                        case 5: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_DRED); break;
+                        case 6: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_DCYAN); break;
+                        case 7: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_BLACK); break;
+                        case 8: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff,
+                            C_DGREY); break;
                     }
-                    glColor3f(1.0f, 1.0f, 1.0f);
+                    glColor3f(C_WHITE);
                 }
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-
-                
+                glColor3f(C_WHITE);
+                glBegin(GL_QUADS);
+                glTransformedVertex(cX, cY);
+                glTransformedVertex(cX, cY + CELL_SIZE);
+                glTransformedVertex(cX + CELL_SIZE, cY + CELL_SIZE);
+                glTransformedVertex(cX + CELL_SIZE, cY);
+                glEnd();
+                drawFlag(cX, cY);
             }
             /* Otherwise just a tile */
             else {

@@ -35,7 +35,8 @@
 #include "frontends/qt5.hpp"
 #include "frontends/sdl2.h"
 #include "frontends/sdl1.h"
-#include "frontends/opengl_1_1_glut.h"
+#include "frontends/gl11.h"
+#include "frontends/common.h"
 
 void
 printUsage(const char *self) {
@@ -204,6 +205,8 @@ main(int argc, char **argv) {
     }
 
     gameDestroy();
+
+    printf(TXT_QUIT);
 
     return 0;
 }
