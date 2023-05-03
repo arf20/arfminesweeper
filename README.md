@@ -46,7 +46,7 @@ SDL2                    DONE            X     X   X   X
 SDL1.2                  ON DEVELOPMENT  X     X   X   X
 GLIDE (with Voodoo)                     X     X       X
 OpenGL 1.x/FreeGLUT     ON DEVELOPMENT  X     X   X   X
-OpenGL 4.6/GLFW/GLEW                    X     X   X   X
+OpenGL 4.6/GLFW/GLAD                    X     X   X   X
 ImGui                                   X     X   X   X
 Vulkan                                  X     X   X   X
 Metal                                                 X

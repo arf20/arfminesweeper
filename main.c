@@ -36,6 +36,8 @@
 #include "frontends/sdl2.h"
 #include "frontends/sdl1.h"
 #include "frontends/gl11.h"
+#include "frontends/gl33.h"
+
 #include "frontends/common.h"
 
 void
@@ -80,6 +82,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_GL11
         printf("gl1.1 ");
+    #endif
+    #ifdef FRONTEND_GL33
+        printf("gl3.3 ");
     #endif
 
     printf("\n");
@@ -199,14 +204,20 @@ main(int argc, char **argv) {
         printf("Error: Frontend gl11 not built\n");
         #endif
     }
+    else if (!strcmp(frontend, "gl33")) {
+        #ifdef FRONTEND_GL33
+        GL33Start(gameGetBoard(), size);
+        GL33Destroy();
+        #else
+        printf("Error: Frontend gl11 not built\n");
+        #endif
+    }
     else {
         printf("Error: Frontend not recognised: %s\n", frontend);
         printFrontends();
     }
 
     gameDestroy();
-
-    printf(TXT_QUIT);
 
     return 0;
 }
