@@ -46,6 +46,9 @@ static int size = 0;
 #define TEXT_CENTERX    (unsigned int)1
 #define TEXT_CENTERY    (unsigned int)2
 
+#define TXT_OFFX 5
+#define TXT_OFFY 1
+
 static SDL_Window *w;
 static SDL_Renderer *r;
 static TTF_Font *font;
@@ -148,7 +151,7 @@ render() {
                         case 7: c = SDLColor(C_BLACK); break;
                         case 8: c = SDLColor(C_DGREY); break;
                     }
-                    renderText(buff, font, cX, cY, 0, c);
+                    renderText(buff, font, cX + TXT_OFFX, cY + TXT_OFFY, 0, c);
                 }
             }
             /* If not clear, check flag and draw it */

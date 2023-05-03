@@ -20,36 +20,156 @@
 
 */
 
+#include <string.h>
+#include <stdio.h>
+
 #include <GL/freeglut.h>
 
 #include "common.h"
 #include "opengl_1_1_glut.h"
 #include "../game.h"
 
+#define C_WHITE  1.0f, 1.0f, 1.0f
+#define C_BLACK  0.0f, 0.0f, 0.0f
+#define C_YELLOW 1.0f, 1.0f, 0.0f
+#define C_RED    1.0f, 0.0f, 0.0f
+#define C_GREEN  0.0f, 1.0f, 0.0f
+#define C_BLUE   0.0f, 0.0f, 1.0f
+#define C_DBLUE  0.0f, 0.0f, 0.54f
+#define C_DRED   0.54f, 0.0f, 0.0f
+#define C_DCYAN  0.0f, 0.54f, 0.54f
+#define C_DGREY  0.66f, 0.66f, 0.66f
+
+#define TXT_OFFX 5
+#define TXT_OFFY 1
+
 static const int *board = NULL;
 static int size = 0;
 
-static int w = 0;
+static int wWidth, wHeight;
+static int window;
+
+static void
+glTransformedVertex(int x, int y) {
+    GLfloat tx = -1.0f + (2.0f * ((float)x / (float)wWidth));
+    GLfloat ty = 1.0f - (2.0f * ((float)y / (float)wHeight));
+    glVertex2f(tx, ty);
+}
+
+static void
+drawString(GLfloat x, GLfloat y, const char *str,
+    GLfloat r, GLfloat g, GLfloat b)
+{
+    GLfloat tx = -1.0f + (2.0f * ((float)x / (float)wWidth));
+    GLfloat ty = 1.0f - (2.0f * (((float)y + 15.0f) / (float)wHeight));
+    glColor3f(r, g, b);
+    glRasterPos3f(tx, ty, 0.0f);
+    for (int i = 0; i < strlen(str); i++)
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, str[i]);
+}
 
 static void
 render() {
+    static char buff[256];
+
+    /* Clear screen */
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    /* Draw title */
+    drawString(5, 5, TXT_TITLE, 1.0f, 1.0f, 1.0f);
+
+    /* Print flags left */
+    snprintf(buff, 256, "%d", gameGetFlagsLeft());
+    drawString(wWidth - 25, 35, buff, 1.0f, 1.0f, 1.0f);
+
+    /* Render cell matrix */
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
+            int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
+
+            /* If clear, count surrounding cells and print n of mines */
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
+                int n = gameGetSurroundingMines(x, y);
+                if (n) {
+                    snprintf(buff, 256, "%d", n);
+                    switch (n) {
+                        case 1: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_BLUE); break;
+                        case 2: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_GREEN); break;
+                        case 3: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_RED); break;
+                        case 4: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DBLUE); break;
+                        case 5: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DRED); break;
+                        case 6: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DCYAN); break;
+                        case 7: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_BLACK); break;
+                        case 8: drawString(cX + TXT_OFFX, cY + TXT_OFFY, buff, C_DGREY); break;
+                    }
+                    glColor3f(1.0f, 1.0f, 1.0f);
+                }
+            }
+            /* If not clear, check flag and draw it */
+            else if (CHECK_FLAG(BOARDXY(x, y))) {
+
+                
+            }
+            /* Otherwise just a tile */
+            else {
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glBegin(GL_QUADS);
+                glTransformedVertex(cX, cY);
+                glTransformedVertex(cX, cY + CELL_SIZE);
+                glTransformedVertex(cX + CELL_SIZE, cY + CELL_SIZE);
+                glTransformedVertex(cX + CELL_SIZE, cY);
+                glEnd();
+            }
+        }
+    }
+
+    glEnd();
+
+
+    glutSwapBuffers();
+}
+
+static void
+reshapeCallback(GLsizei l_width, GLsizei l_height) {
 
 }
 
 static void
-reshape(GLsizei l_width, GLsizei l_height) {
+keyboardCallback(unsigned char key, int x, int y) {
 
 }
 
 static void
-keyboard(unsigned char key, int x, int y) {
+mouseCallback(int button, int state, int x, int y) {
+    if (state != GLUT_UP) return;
 
+    int ix = (x - W_MARGIN) /
+        (CELL_SIZE + CELL_MARGIN);
+    int iy = (y - HEADER_HEIGHT) /
+        (CELL_SIZE + CELL_MARGIN);
+    if (ix < 0 || ix >= size || iy < 0 || iy >= size) return;
+
+    switch (button) {
+        case GLUT_LEFT_BUTTON: { /* Left */
+            gameClearCell(ix, iy);
+        } break;
+        case GLUT_RIGHT_BUTTON: { /* Right */
+            gameFlagCell(ix, iy);
+        } break;
+    }
 }
+
 
 int
 GL11Start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
+
+    wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
+    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
+        ((size - 1) * CELL_MARGIN);
 
     /* Init FreeGLUT */
     int argc = 0;
@@ -62,14 +182,15 @@ GL11Start(const int *lboard, int lsize) {
     
     glutInitContextVersion(1, 1);
     /* Create Window */
-    glutInitWindowSize(640, 480);
-    w = glutCreateWindow(TXT_TITLE);
+    glutInitWindowSize(wWidth, wHeight);
+    window = glutCreateWindow(TXT_TITLE);
 
     /* Set callbacks */
     glutDisplayFunc(render);
     glutIdleFunc(render);
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
+    glutReshapeFunc(reshapeCallback);
+    glutKeyboardFunc(keyboardCallback);
+    glutMouseFunc(mouseCallback);
 
     /* MSAA config */
     GLint iMultiSample = 0;
@@ -83,5 +204,5 @@ GL11Start(const int *lboard, int lsize) {
 
 void
 GL11Destroy() {
-    glutDestroyWindow(w);
+    glutDestroyWindow(window);
 }

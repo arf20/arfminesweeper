@@ -78,7 +78,7 @@ printFrontends() {
         printf("sdl1.2 ");
     #endif
     #ifdef FRONTEND_GL11
-        printf("GL1.1 ");
+        printf("gl1.1 ");
     #endif
 
     printf("\n");
