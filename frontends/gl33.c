@@ -116,7 +116,8 @@ GL33Start(const int *lboard, int lsize) {
     glEnable(GL_MULTISAMPLE);
 
     /* Compile shaders */
-    GLint mss = shader_new("../assets/msboard.vs", "../assets/msboard.fs");
+    GLint mss = shader_new(NULL, "../assets/msboard.gs",
+        "../assets/msboard.fs");
 
     /* Enter the infinite event-processing loop */
     while (!glfwWindowShouldClose(window)) {

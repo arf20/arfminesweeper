@@ -28,58 +28,73 @@
 #include <string.h>
 
 GLint
-shader_new(const char *vsp, const char *fsp) {
+shader_new(const char *vsp, const char *gsp, const char *fsp) {
     /* 1. read vertex/fragment source */
-    char *vsc, *fsc;
-    FILE *vsf, *fsf;
-    size_t vss, fss;
-    GLint vs, fs, pid;
-
-    vsf = fopen(vsp, "r");
-    fsf = fopen(fsp, "r");
-
-    if (vsf == NULL || fsf == NULL) {
-        printf("Error reading shader: %s\n", strerror(errno));
-        return 0;
-    }
-
-    fseek(vsf, 0L, SEEK_END);
-    fseek(fsf, 0L, SEEK_END);
-
-    vss = ftell(vsf);
-    fss = ftell(fsf);
-
-    vsc = malloc(vss + 1);
-    fsc = malloc(fss + 1);
-
-    fseek(vsf, 0L, SEEK_SET);
-    fseek(fsf, 0L, SEEK_SET);
-
-    fread(vsc, 1, vss, vsf);
-    fread(fsc, 1, fss, fsf);
-
-    vsc[vss] = 0;
-    fsc[fss] = 0;
-
-    /* 2. Compile shaders */
-    unsigned int vertex, fragment;
+    char *vsc, *gsc, *fsc;
+    FILE *vsf, *gsf, *fsf;
+    size_t vss, gss, fss;
+    GLint vs, gs, fs, pid;
     int success;
     char infoLog[1024];
-    
-    /* Compile vertex shader */
-    vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, (const char* const*)&vsc, NULL);
-    glCompileShader(vs);
-    
-    glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vs, 1024, NULL, infoLog);
-        printf("Error compiling vertex shader: %s\n", infoLog);
-        return 0;
+
+
+    if (vsp) {
+        /* Read vertex shader source */
+        vsf = fopen(vsp, "r");
+        fseek(vsf, 0L, SEEK_END);
+        vss = ftell(vsf);
+        vsc = malloc(vss + 1);
+        fseek(vsf, 0L, SEEK_SET);
+        fread(vsc, 1, vss, vsf);
+        vsc[vss] = 0;
+
+        /* Compile vertex shader */
+        vs = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vs, 1, (const char* const*)&vsc, NULL);
+        glCompileShader(vs);
+        
+        glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(vs, 1024, NULL, infoLog);
+            printf("Error compiling vertex shader: %s\n", infoLog);
+            return 0;
+        }
     }
-    
-    /* Compile flagment shader */
-    fs = glCreateShader(GL_FRAGMENT_SHADER);
+
+    if (gsp) {
+        /* Read geometry shader source */
+        gsf = fopen(gsp, "r");
+        fseek(gsf, 0L, SEEK_END);
+        gss = ftell(gsf);
+        gsc = malloc(gss + 1);
+        fseek(gsf, 0L, SEEK_SET);
+        fread(gsc, 1, gss, gsf);
+        gsc[gss] = 0;
+
+        /* Compile geometry shader */
+        gs = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(gs, 1, (const char* const*)&gsc, NULL);
+        glCompileShader(gs);
+        
+        glGetShaderiv(gs, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(gs, 1024, NULL, infoLog);
+            printf("Error compiling geometry shader: %s\n", infoLog);
+            return 0;
+        }
+    }
+
+    /* Read geometry shader source */
+    fsf = fopen(fsp, "r");
+    fseek(fsf, 0L, SEEK_END);
+    fss = ftell(fsf);
+    fsc = malloc(fss + 1);
+    fseek(fsf, 0L, SEEK_SET);
+    fread(fsc, 1, fss, fsf);
+    fsc[fss] = 0;
+
+    /* Compile fragment shader */
+    fs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(fs, 1, (const char* const*)&fsc, NULL);
     glCompileShader(fs);
     
@@ -92,7 +107,10 @@ shader_new(const char *vsp, const char *fsp) {
     
     /* Shader Program */
     pid = glCreateProgram();
-    glAttachShader(pid, vs);
+    if (vsp)
+        glAttachShader(pid, vs);
+    if (gsp)
+        glAttachShader(pid, gs);
     glAttachShader(pid, fs);
     glLinkProgram(pid);
 
@@ -103,9 +121,42 @@ shader_new(const char *vsp, const char *fsp) {
         return 0;
     }
     
-    glDeleteShader(vs);
+    if (vsp) {
+        glDeleteShader(vs);
+        free(vsc);
+        fclose(vsf);
+    }
+    
+    if (gsp) {
+        glDeleteShader(gs);
+        free(gsc);
+        fclose(gsf);
+    }
+    
     glDeleteShader(fs);
+    free(fsc);
+    fclose(fsf);
 
     return pid;
+}
+
+void
+shader_set_int(GLint pid, const char *name, int v) {
+    glUniform1i(glGetUniformLocation(pid, name), v);
+}
+
+void
+shader_set_float(GLint pid, const char *name, float v) {
+    glUniform1f(glGetUniformLocation(pid, name), v);
+}
+
+void
+shader_set_float2(GLint pid, const char *name, float v0, float v1) {
+    glUniform2f(glGetUniformLocation(pid, name), v0, v1);
+}
+
+void
+shader_set_float3(GLint pid, const char *name, float v0, float v1, float v2) {
+    glUniform3f(glGetUniformLocation(pid, name), v0, v1, v2); 
 }
 

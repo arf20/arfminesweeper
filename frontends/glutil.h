@@ -23,6 +23,13 @@
 
 #include "glad/include/glad/glad.h"
 
-GLint shader_new(const char *vsf, const char *fsf);
+GLint shader_new(const char *vsp, const char *gsp, const char *fsp);
+
+void shader_set_int(GLint pid, const char *name, int v);
+void shader_set_float(GLint pid, const char *name, float v);
+void shader_set_float2(GLint pid, const char *name, float v0, float v1);
+void shader_set_float3(GLint pid, const char *name, float v0, float v1, float v2);
+
+
 
 #endif
