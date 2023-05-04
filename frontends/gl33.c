@@ -25,6 +25,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "glutil.h"
+
 #include "common.h"
 #include "gl33.h"
 #include "../game.h"
@@ -112,6 +114,9 @@ GL33Start(const int *lboard, int lsize) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_MULTISAMPLE);
+
+    /* Compile shaders */
+    GLint mss = shader_new("../assets/msboard.vs", "../assets/msboard.fs");
 
     /* Enter the infinite event-processing loop */
     while (!glfwWindowShouldClose(window)) {

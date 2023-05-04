@@ -104,7 +104,7 @@ if (OpenGL_OpenGL_FOUND)
 
     find_package(glfw3 3.3)
     if (glfw3_FOUND)
-        file (GLOB SRC ${SRC} "frontends/gl33.c" "frontends/glad/glad.c")
+        file (GLOB SRC ${SRC} "frontends/gl33.c" "frontends/glad/glad.c" "frontends/glutil.c")
         include_directories("frontends/glad/include/")
         add_compile_definitions(FRONTEND_GL33)
         message(STATUS "Building with OpenGL 3.3/GLFW/GLAD")
