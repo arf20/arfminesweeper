@@ -46,7 +46,7 @@ static const int *board = NULL;
 static int size = 0;
 
 int wWidth, wHeight;
-
+GLint boardShader, dummyBuffer;
 
 
 void
@@ -54,6 +54,10 @@ render(GLFWwindow *window) {
     glClearColor(C_BLACK, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    /* Execute shader */
+    glUseProgram(boardShader);
+    glVertexAttrib1f(0, 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void
@@ -116,8 +120,13 @@ GL33Start(const int *lboard, int lsize) {
     glEnable(GL_MULTISAMPLE);
 
     /* Compile shaders */
-    GLint mss = shader_new(NULL, "../assets/msboard.gs",
+    boardShader = shader_new(
+        "../assets/msboard.vs",
+        NULL,
         "../assets/msboard.fs");
+
+    glGenBuffers(1, &dummyBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, dummyBuffer);
 
     /* Enter the infinite event-processing loop */
     while (!glfwWindowShouldClose(window)) {

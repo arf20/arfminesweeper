@@ -72,7 +72,7 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
         gsc[gss] = 0;
 
         /* Compile geometry shader */
-        gs = glCreateShader(GL_VERTEX_SHADER);
+        gs = glCreateShader(GL_GEOMETRY_SHADER);
         glShaderSource(gs, 1, (const char* const*)&gsc, NULL);
         glCompileShader(gs);
         
@@ -94,7 +94,7 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
     fsc[fss] = 0;
 
     /* Compile fragment shader */
-    fs = glCreateShader(GL_VERTEX_SHADER);
+    fs = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, (const char* const*)&fsc, NULL);
     glCompileShader(fs);
     
