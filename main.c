@@ -37,6 +37,7 @@
 #include "frontends/sdl1.h"
 #include "frontends/gl11.h"
 #include "frontends/gl33.h"
+#include "frontends/vk.h"
 
 #include "frontends/common.h"
 
@@ -85,6 +86,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_GL33
         printf("gl3.3 ");
+    #endif
+    #ifdef FRONTEND_VK
+        printf("vulkan ");
     #endif
 
     printf("\n");
@@ -210,6 +214,14 @@ main(int argc, char **argv) {
         GL33Destroy();
         #else
         printf("Error: Frontend gl11 not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "vk")) {
+        #ifdef FRONTEND_VK
+        vkStart(gameGetBoard(), size);
+        vkDestroy();
+        #else
+        printf("Error: Frontend vk not built\n");
         #endif
     }
     else {

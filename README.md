@@ -31,35 +31,35 @@ make
 
 ## TODO frontends
 ```
-                                        Linux BSD Mac Win
-Console (no graphics)   DONE            X     X   X   X
-ncurses                                 X     X   X   X 
-fbdev                   ON DEVELOPMENT  X
-SVGA buffer
-X11 Xlib                DONE            X     X
-X11 XCB                                 X     X
-XForms                  DONE            X     X
-Motif                   ON DEVELOPMENT  X     X
-Tcl/Tk                                  X     X       X
-raylib                                  X     X   X   X
-SDL2                    DONE            X     X   X   X
-SDL1.2                  ON DEVELOPMENT  X     X   X   X
-GLIDE (with Voodoo)                     X     X       X
-OpenGL 1.x/FreeGLUT     ON DEVELOPMENT  X     X   X   X
-OpenGL 4.6/GLFW/GLAD                    X     X   X   X
-ImGui                                   X     X   X   X
-Vulkan                                  X     X   X   X
-Metal                                                 X
-Gtk3                    ON DEVELOPMENT  X     X
-Qt5                     DONE            X     X   X   X
-wxWidgets                               X     X   X   X
-WinAPI                                                X
-Win32 GDI+                                            X
-Direct2D                                              X
-.NET WinForms                                         X
-.NET WPF                                              X
-Java AWT                                X     X   X   X
-Java Swing                              X     X   X   X
-Unreal Engine 5                         X     X   X   X
+                              Linux BSD Mac Win
+Console (no graphics)   DONE  X     X   X   X
+ncurses                       X     X   X   X 
+fbdev                   WIP   X
+SVGA buffer                   
+X11 Xlib                DONE  X     X
+X11 XCB                       X     X
+XForms                  DONE  X     X
+Motif                   WIP   X     X
+Tcl/Tk                        X     X       X
+raylib                        X     X   X   X
+SDL2                    DONE  X     X   X   X
+SDL1.2                  WIP   X     X   X   X
+GLIDE (with Voodoo)           X     X       X
+OpenGL 1.x/FreeGLUT     DONE  X     X   X   X
+OpenGL 4.6/GLFW/GLAD    WIP   X     X   X   X
+ImGui                         X     X   X   X
+Vulkan/GLFW                   X     X   X   X
+Metal                                       X
+Gtk3                    WIP   X     X
+Qt5                     DONE  X     X   X   X
+wxWidgets                     X     X   X   X
+WinAPI                                      X
+Win32 GDI+                                  X
+Direct2D                                    X
+.NET WinForms                               X
+.NET WPF                                    X
+Java AWT                      X     X   X   X
+Java Swing                    X     X   X   X
+Unreal Engine 5               X     X   X   X
 ```
 I apologize.

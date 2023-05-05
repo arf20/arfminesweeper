@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    gl33.c: OpenGL 3.3/GLFW/GLEW frontend
+    gl33.c: OpenGL 3.3/GLFW/GLAD frontend
 
 */
 
@@ -45,8 +45,9 @@
 static const int *board = NULL;
 static int size = 0;
 
-int wWidth, wHeight;
-GLint boardShader, dummyBuffer;
+static int wWidth, wHeight;
+static GLFWwindow *g_window = NULL;
+static GLint boardShader, dummyBuffer;
 
 
 void
@@ -93,14 +94,13 @@ GL33Start(const int *lboard, int lsize) {
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     /* Create window */
-    GLFWwindow *window = NULL;
-    if ((window = glfwCreateWindow(wWidth, wHeight, TXT_TITLE, NULL, NULL))
+    if ((g_window = glfwCreateWindow(wWidth, wHeight, TXT_TITLE, NULL, NULL))
         == NULL)
     {
         printf("Error creating window\n");
         return -1;
     }
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(g_window);
 
     /* Init glad */
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -109,9 +109,9 @@ GL33Start(const int *lboard, int lsize) {
     }
 
     /* Set callbacks */
-    glfwSetFramebufferSizeCallback(window, resizeCallback);
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetMouseButtonCallback(window, mouseCallback);
+    glfwSetFramebufferSizeCallback(g_window, resizeCallback);
+    glfwSetKeyCallback(g_window, keyCallback);
+    glfwSetMouseButtonCallback(g_window, mouseCallback);
     glfwSwapInterval(0);
 
     /* enable stuff */
@@ -129,15 +129,16 @@ GL33Start(const int *lboard, int lsize) {
     glBindBuffer(GL_ARRAY_BUFFER, dummyBuffer);
 
     /* Enter the infinite event-processing loop */
-    while (!glfwWindowShouldClose(window)) {
-        render(window);
-        glfwSwapBuffers(window);
+    while (!glfwWindowShouldClose(g_window)) {
+        render(g_window);
+        glfwSwapBuffers(g_window);
         glfwPollEvents();
     }
 }
 
 void
 GL33Destroy() {
+    glfwDestroyWindow(g_window);
     glfwTerminate();
 }
 
