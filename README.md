@@ -48,7 +48,7 @@ GLIDE (with Voodoo)           X     X       X
 OpenGL 1.x/FreeGLUT     DONE  X     X   X   X
 OpenGL 4.6/GLFW/GLAD    WIP   X     X   X   X
 ImGui                         X     X   X   X
-Vulkan/GLFW                   X     X   X   X
+Vulkan/GLFW             WIP   X     X   X   X
 Metal                                       X
 Gtk3                    WIP   X     X
 Qt5                     DONE  X     X   X   X

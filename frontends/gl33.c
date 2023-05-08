@@ -47,7 +47,7 @@ static int size = 0;
 
 static int wWidth, wHeight;
 static GLFWwindow *g_window = NULL;
-static GLint boardShader, dummyBuffer;
+static GLint boardShader, dummyvao;
 
 
 void
@@ -57,7 +57,6 @@ render(GLFWwindow *window) {
 
     /* Execute shader */
     glUseProgram(boardShader);
-    glVertexAttrib1f(0, 0);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
@@ -125,8 +124,9 @@ GL33Start(const int *lboard, int lsize) {
         NULL,
         "../assets/msboard.fs");
 
-    glGenBuffers(1, &dummyBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, dummyBuffer);
+    /* Generate and bind dummy VAO, required in most OpenGL implementations */
+    glGenVertexArrays(1, &dummyvao);
+    glBindVertexArray(dummyvao);
 
     /* Enter the infinite event-processing loop */
     while (!glfwWindowShouldClose(g_window)) {
