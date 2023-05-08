@@ -123,6 +123,9 @@ GL33Start(const int *lboard, int lsize) {
         "../assets/msboard.vs",
         NULL,
         "../assets/msboard.fs");
+    /* Set shader uniforms */
+    glUseProgram(boardShader);
+    shader_set_float2(boardShader, "sSize", wWidth, wHeight);
 
     /* Generate and bind dummy VAO, required in most OpenGL implementations */
     glGenVertexArrays(1, &dummyvao);
