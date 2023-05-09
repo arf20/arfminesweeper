@@ -23,17 +23,12 @@ out vec4 color;
 #define C_DGREY  0.66, 0.66, 0.66
 
 
-float getX() {
-    return gl_FragCoord.x;
-}
-
-float getY() {
-    return gl_FragCoord.x;
-}
 
 void main() {
-    int x = int((sSize.x - W_MARGIN) / (CELL_SIZE + CELL_MARGIN));
-    int y = int((sSize.x - W_MARGIN) / (CELL_SIZE + CELL_MARGIN));
+    int x = int((gl_FragCoord.x - W_MARGIN) / (CELL_SIZE + CELL_MARGIN));
+    int y = int((gl_FragCoord.y - HEADER_HEIGHT) / (CELL_SIZE + CELL_MARGIN));
+    
+
 
     if (   gl_FragCoord.x > W_MARGIN
         && gl_FragCoord.x < sSize.x - W_MARGIN
@@ -41,8 +36,19 @@ void main() {
         && gl_FragCoord.y < sSize.y - W_MARGIN
         )
     {
-        color = vec4(C_WHITE, 1.0);
+        float cX = W_MARGIN + (float(x) * (CELL_SIZE + CELL_MARGIN));
+        float cY = HEADER_HEIGHT + (float(y) * (CELL_SIZE + CELL_MARGIN));
+
+        if (   gl_FragCoord.x > cX
+            && gl_FragCoord.x < cX + CELL_SIZE
+            && gl_FragCoord.y > cY
+            && gl_FragCoord.y < cY + CELL_SIZE)
+        {
+            color = vec4(float(x) / 8.0, float(y) / 8.0, 0.0, 1.0);
+        } else {
+            color = vec4(C_BLACK, 1.0);
+        }
     } else {
         color = vec4(C_BLACK, 1.0);
-    }
+    } 
 }
