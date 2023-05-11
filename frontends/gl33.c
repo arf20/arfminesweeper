@@ -57,6 +57,7 @@ render(GLFWwindow *window) {
 
     /* Execute shader */
     glUseProgram(boardShader);
+    shader_set_uintv(boardShader, "board", size*size, board);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
@@ -126,6 +127,7 @@ GL33Start(const int *lboard, int lsize) {
     /* Set shader uniforms */
     glUseProgram(boardShader);
     shader_set_float2(boardShader, "sSize", wWidth, wHeight);
+    shader_set_uint(boardShader, "size", size);
 
     /* Generate and bind dummy VAO, required in most OpenGL implementations */
     glGenVertexArrays(1, &dummyvao);

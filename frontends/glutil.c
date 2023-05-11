@@ -160,3 +160,13 @@ shader_set_float3(GLint pid, const char *name, float v0, float v1, float v2) {
     glUniform3f(glGetUniformLocation(pid, name), v0, v1, v2); 
 }
 
+void
+shader_set_uintv(GLint pid, const char *name, int size, const unsigned int *v) {
+    glUniform1uiv(glGetUniformLocation(pid, name), size, v);
+}
+
+void
+shader_set_uint(GLint pid, const char *name, unsigned int v) {
+    glUniform1ui(glGetUniformLocation(pid, name), v);
+}
+
