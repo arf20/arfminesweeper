@@ -79,8 +79,6 @@ mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
-    printf("mouse %d, %d\n", x, y);
-
     int ix = ((int)x - W_MARGIN) /
         (CELL_SIZE + CELL_MARGIN);
     int iy = ((int)y - HEADER_HEIGHT) /
