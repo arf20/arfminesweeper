@@ -74,7 +74,28 @@ keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 void
 mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     //if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-        
+    if (action != GLFW_RELEASE) return;
+
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    printf("mouse %d, %d\n", x, y);
+
+    int ix = ((int)x - W_MARGIN) /
+        (CELL_SIZE + CELL_MARGIN);
+    int iy = ((int)y - HEADER_HEIGHT) /
+        (CELL_SIZE + CELL_MARGIN);
+    if (ix < 0 || ix >= size || iy < 0 || iy >= size) return;
+
+    switch (button) {
+        case GLFW_MOUSE_BUTTON_LEFT: {
+            gameClearCell(ix, iy);
+        } break;
+        case GLFW_MOUSE_BUTTON_RIGHT: {
+            gameFlagCell(ix, iy);
+        }
+    }
+
 }
 
 int
