@@ -4,7 +4,10 @@ layout(origin_upper_left) in vec4 gl_FragCoord;
 
 uniform vec2 sSize;
 uniform uint size;
-uniform uint board[1022];
+
+layout(std140) uniform BoardBlock {
+    uint board[512];
+};
 
 out vec4 color;
 
