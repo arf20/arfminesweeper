@@ -47,8 +47,8 @@ static int size = 0;
 
 static int wWidth, wHeight;
 static GLFWwindow *g_window = NULL;
-static GLint boardShader, dummyvao;
-
+static GLint boardShader, dummyvao, boardUBO;
+static unsigned int *boardUBOdata = NULL;
 
 void
 render(GLFWwindow *window) {
@@ -57,7 +57,7 @@ render(GLFWwindow *window) {
 
     /* Execute shader */
     glUseProgram(boardShader);
-    shader_set_uintv(boardShader, "board", size*size, board);
+    
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
@@ -72,6 +72,14 @@ keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 }
 
 void
+updateBoadUBO() {
+    glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(int)*size*size, board, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, boardUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
+}
+
+void
 mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     //if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     if (action != GLFW_RELEASE) return;
@@ -79,7 +87,7 @@ mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
-    printf("mouse %d, %d\n", x, y);
+    printf("mouse %f, %f\n", x, y);
 
     int ix = ((int)x - W_MARGIN) /
         (CELL_SIZE + CELL_MARGIN);
@@ -90,9 +98,11 @@ mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: {
             gameClearCell(ix, iy);
+            updateBoadUBO();
         } break;
         case GLFW_MOUSE_BUTTON_RIGHT: {
             gameFlagCell(ix, iy);
+            updateBoadUBO();
         }
     }
 
@@ -153,6 +163,13 @@ GL33Start(const int *lboard, int lsize) {
     /* Generate and bind dummy VAO, required in most OpenGL implementations */
     glGenVertexArrays(1, &dummyvao);
     glBindVertexArray(dummyvao);
+
+    /* Generate board UBO */
+    glGenBuffers(1, &boardUBO);
+    boardUBO = glGetUniformBlockIndex(boardShader, "BoardBlock");
+    glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(int)*size*size, board, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, boardUBO);
 
     /* Enter the infinite event-processing loop */
     while (!glfwWindowShouldClose(g_window)) {

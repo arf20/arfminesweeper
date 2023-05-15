@@ -4,7 +4,10 @@ layout(origin_upper_left) in vec4 gl_FragCoord;
 
 uniform vec2 sSize;
 uniform uint size;
-uniform uint board[1024];
+
+layout(std140) uniform BoardBlock {
+    uint board[512];
+};
 
 out vec4 color;
 
@@ -64,7 +67,7 @@ void main() {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-
+                color = vec4(C_RED, 1.0);
             }
             /* Otherwise just a tile */
             else {
