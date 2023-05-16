@@ -19,9 +19,14 @@ add_compile_definitions(FRONTEND_CONSOLE)
 
 if (WIN32)
     message(STATUS "No fbdev support in Win32")
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD" OR
+       ${CMAKE_SYSTEM_NAME} STREQUAL "NetBSD" OR
+       ${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD")
+    message(STATUS "No fbdev support in *BSD")
 else()
     file (GLOB SRC ${SRC} "frontends/fbdev.c" "frontends/bmp.c")
     add_compile_definitions(FRONTEND_FBDEV)
+    message(STATUS "Building with fbdev")
 endif()
 
 
