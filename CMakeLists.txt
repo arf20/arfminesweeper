@@ -5,7 +5,7 @@ project(arfminesweeper)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-find_package(PkgConfig REQUIRED)
+find_package(PkgConfig)
 
 file (GLOB SRC
     "main.c"
@@ -17,8 +17,13 @@ file (GLOB SRC
 file (GLOB SRC ${SRC} "frontends/console.c")
 add_compile_definitions(FRONTEND_CONSOLE)
 
-file (GLOB SRC ${SRC} "frontends/fbdev.c" "frontends/bmp.c")
-add_compile_definitions(FRONTEND_FBDEV)
+if (WIN32)
+    message(STATUS "No fbdev support in Win32")
+else()
+    file (GLOB SRC ${SRC} "frontends/fbdev.c" "frontends/bmp.c")
+    add_compile_definitions(FRONTEND_FBDEV)
+endif()
+
 
 find_package(X11)
 if (X11_FOUND)
