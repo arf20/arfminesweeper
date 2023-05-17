@@ -38,8 +38,13 @@
 #include "frontends/gl11.h"
 #include "frontends/gl33.h"
 #include "frontends/vk.h"
+#include "frontends/win32.h"
 
 #include "frontends/common.h"
+
+#ifdef _WIN32
+    #include <windows.h>
+#endif
 
 void
 printUsage(const char *self) {
@@ -90,12 +95,16 @@ printFrontends() {
     #ifdef FRONTEND_VK
         printf("vulkan ");
     #endif
+    #ifdef FRONTEND_WIN32
+        printf("win32 ");
+    #endif
 
     printf("\n");
 }
 
 int
 main(int argc, char **argv) {
+    MessageBox(NULL, "WinMain entry point", "WinMain entry point", MB_OK);
     printf("arfminesweeper by arf20\n"
         "Copyright 2023 Ángel Ruiz Fernandez\n"
         "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n\n");
@@ -224,6 +233,14 @@ main(int argc, char **argv) {
         printf("Error: Frontend vk not built\n");
         #endif
     }
+    else if (!strcmp(frontend, "win32")) {
+        #ifdef FRONTEND_WIN32
+        Win32Start(gameGetBoard(), size);
+        Win32Destroy();
+        #else
+        printf("Error: Frontend win32 not built\n");
+        #endif
+    }
     else {
         printf("Error: Frontend not recognised: %s\n", frontend);
         printFrontends();
@@ -233,4 +250,13 @@ main(int argc, char **argv) {
 
     return 0;
 }
+
+#ifdef _WIN32
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    AttachConsole(ATTACH_PARENT_PROCESS);
+    printf("WinMain entry point\n");
+    MessageBox(NULL, "WinMain entry point", "WinMain entry point", MB_OK);
+    return main(__argc, __argv);
+}
+#endif
         

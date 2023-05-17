@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.10)
 
 project(arfminesweeper)
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD" OR
+    ${CMAKE_SYSTEM_NAME} STREQUAL "NetBSD" OR
+    ${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD")
+    set(BSD true)
+endif()
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
@@ -19,10 +25,8 @@ add_compile_definitions(FRONTEND_CONSOLE)
 
 if (WIN32)
     message(STATUS "No fbdev support in Win32")
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD" OR
-       ${CMAKE_SYSTEM_NAME} STREQUAL "NetBSD" OR
-       ${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD")
-    message(STATUS "No fbdev support in *BSD")
+elseif(BSD)
+    message(STATUS "No fbdev support in BSD")
 else()
     file (GLOB SRC ${SRC} "frontends/fbdev.c" "frontends/bmp.c")
     add_compile_definitions(FRONTEND_FBDEV)
@@ -135,10 +139,15 @@ if (Vulkan_FOUND)
     endif()
 endif()
 
-
+if (WIN32)
+    file (GLOB SRC ${SRC} "frontends/win32.c")
+    add_compile_definitions(FRONTEND_WIN32)
+    set (WIN32_FLAG "WIN32")
+    message(STATUS "Building with Win32")
+endif()
 
 # executable
-add_executable(arfminesweeper ${SRC})
+add_executable(arfminesweeper WIN32 ${SRC})
 
 
 # link ibraries

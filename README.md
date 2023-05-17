@@ -38,6 +38,7 @@ fbdev                   WIP   X
 SVGA buffer                   
 X11 Xlib                DONE  X     X
 X11 XCB                       X     X
+Wayland                       X     X
 XForms                  DONE  X     X
 Motif                   WIP   X     X
 Tcl/Tk                        X     X       X
