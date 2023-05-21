@@ -23,6 +23,9 @@ file (GLOB SRC
 file (GLOB SRC ${SRC} "frontends/console.c")
 add_compile_definitions(FRONTEND_CONSOLE)
 
+file (GLOB SRC ${SRC} "frontends/httpd.c")
+add_compile_definitions(FRONTEND_HTTPD)
+
 if (WIN32)
     message(STATUS "No fbdev support in Win32")
 elseif(BSD)
@@ -150,7 +153,9 @@ endif()
 add_executable(arfminesweeper WIN32 ${SRC})
 
 
-# link ibraries
+# link libraries
+
+target_link_libraries(arfminesweeper Threads::Threads)
 
 if (X11_FOUND)
     target_link_libraries(arfminesweeper ${X11_LIBRARIES})

@@ -39,6 +39,7 @@
 #include "frontends/gl33.h"
 #include "frontends/vk.h"
 #include "frontends/win32.h"
+#include "frontends/httpd.h"
 
 #include "frontends/common.h"
 
@@ -98,13 +99,16 @@ printFrontends() {
     #ifdef FRONTEND_WIN32
         printf("win32 ");
     #endif
+    #ifdef FRONTEND_HTTPD
+        printf("webapp ");
+    #endif
 
     printf("\n");
 }
 
 int
 main(int argc, char **argv) {
-    MessageBox(NULL, "WinMain entry point", "WinMain entry point", MB_OK);
+    //MessageBox(NULL, "WinMain entry point", "WinMain entry point", MB_OK);
     printf("arfminesweeper by arf20\n"
         "Copyright 2023 Ángel Ruiz Fernandez\n"
         "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n\n");
@@ -239,6 +243,14 @@ main(int argc, char **argv) {
         Win32Destroy();
         #else
         printf("Error: Frontend win32 not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "webapp")) {
+        #ifdef FRONTEND_HTTPD
+        httpdStart(gameGetBoard(), size);
+        httpdDestroy();
+        #else
+        printf("Error: Frontend webapp not built\n");
         #endif
     }
     else {
