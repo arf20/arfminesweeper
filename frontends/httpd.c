@@ -116,6 +116,17 @@ size_t strlcat(char *restrict dst, const char *restrict src, size_t dstsize) {
     return d_len + s_len;
 }
 
+void
+cpynum(const char *restrict src, char *restrict dst, size_t dstsize) {
+    const char *restrict ptr = src;
+    while (*ptr && (*ptr >= 48 && *ptr <= 57) && (ptr - src < dstsize)) {
+        *dst = *ptr;
+        ptr++;
+        dst++;
+    }
+    *dst = '\0';
+}
+
 int
 strlencrlf(const char *str) {
     const char *ptr = str;
@@ -156,11 +167,14 @@ generateBoardResponse() {
     char tmpBuff[1024];
     snprintf(tmpBuff, 1024, indexHeadSource, gameGetFlagsLeft());
     snprintf(sendBuffer, BUFF_SIZE, "%s\n%s", indexHeaders, tmpBuff);
+
     for (int y = 0; y < size; y++) {
         strlcat(sendBuffer, "<tr>\n", BUFF_SIZE);
         for (int x = 0; x < size; x++) {
+            int btni = (size * y) + x;
             /* If clear, count surrounding cells and print n of mines */
             if (CHECK_CLEAR(BOARDXY(x, y))) {
+                strlcat(sendBuffer, "<td>\n", BUFF_SIZE);
                 int n = gameGetSurroundingMines(x, y);
                 const char *color = NULL;
                 if (n) {
@@ -174,9 +188,12 @@ generateBoardResponse() {
                         case 7: color = "black"; break;
                         case 8: color = "darkgrey"; break;
                     }
-                    snprintf(tmpBuff, 1024, "<td><span style=\"color: %s;\">%d</span></td>\n", color, n);
+                    snprintf(tmpBuff, 1024,
+                        "<span style=\"color: %s;\">%d</span>\n",
+                        color, n);
                     strlcat(sendBuffer, tmpBuff, BUFF_SIZE);
                 }
+                strlcat(sendBuffer, "</td>\n", BUFF_SIZE);
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
@@ -185,7 +202,9 @@ generateBoardResponse() {
             }
             /* Otherwise just a tile */
             else {
-                snprintf(tmpBuff, 1024, "<td><button class=\"cell\"></button></td>\n");
+                snprintf(tmpBuff, 1024, "<td><a href=\"?btni=%d\">"
+                    "<button class=\"cell\" type=\"submit\">"
+                    "</button></a></td>\n", btni);
                 strlcat(sendBuffer, tmpBuff, BUFF_SIZE);
             }
         }
@@ -207,13 +226,13 @@ clientThread(void *data) {
     int cfd = *(int*)data;
 
     char recvBuff[BUFF_SIZE];
-    int r = -1;
+    char tmpBuff[256];
 
     printf("Accepted connection\n");
 
     /* Recv loop loop */
     while (1) {
-        r = recv(cfd, recvBuff, BUFF_SIZE, 0);
+        int r = recv(cfd, recvBuff, BUFF_SIZE, 0);
         if (r < 0) {
             printf("Error receiving \n");
             return NULL;
@@ -226,12 +245,23 @@ clientThread(void *data) {
 
         if (strncmp(recvBuff, "GET", 3) == 0) {
             if (strncmp(recvBuff + 4, "/ ", 2) == 0) {
-                /* Index Response */
+                /* Index */
+                generateBoardResponse();
+                send(cfd, sendBuffer, strlen(sendBuffer), 0);
+                printf("Index Response sent\n");
+            } else if (strncmp(recvBuff + 4, "/?", 2) == 0) {
+                /* Parameter */
+                if (strncmp(recvBuff + 6, "btni=", 5) == 0) {
+                    cpynum(recvBuff + 11, tmpBuff, 256);
+                    int btni = atoi(tmpBuff);
+                    gameClearCell(btni % size, btni / size);
+                }
+
                 generateBoardResponse();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
                 printf("Index Response sent\n");
             } else {
-                /* 404 Response */
+                /* 404 */
                 generate404Response();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
                 printf("Warning: 404 Fot Found\n");
