@@ -182,7 +182,9 @@ generateBoardResponse() {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                strlcat(tmpBuff, "<td><img src=\"/flag.png\"></td>\n", BUFF_SIZE);
+                snprintf(tmpBuff2, 1024, "<td><button name=\"btn\" class=\"cell\">"
+                    "<img id=\"%d\" src=\"/flag.png\"></button></td>\n", btni);
+                strlcat(tmpBuff, tmpBuff2, BUFF_SIZE);
             }
             /* Otherwise just a tile */
             else {
