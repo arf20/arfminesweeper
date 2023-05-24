@@ -48,55 +48,19 @@ static const char *indexHeaders =
     "Server: arfminesweeper httpd\n"
     "Content-Type: text/html\n";
 
+static const char *pngHeaders =
+    "HTTP/1.1 200 OK\n"
+    "Server: arfminesweeper httpd\n"
+    "Content-Type: image/png\n";
+
 static const char *err404Headers =
     "HTTP/1.1 404 Not Found\n"
     "Server: arfminesweeper httpd\n";
 
-static const char *indexHeadSource =
-    "<!DOCTYPE html>\n"
-    "<html>\n"
-    "    <head>\n"
-    "        <title>arfminesweeper</title>\n"
-    "        <style>\n"
-    "            table, th, td {\n"
-    "                /*border: 1px solid black;*/\n"
-    "                padding: 0px;\n"
-    "                margin: 0px;\n"
-    "            }\n"
-    "            .cell {\n"
-    "                display: inline-block;\n"
-    "                width: 20px;\n"
-    "                height: 20px;\n"
-    "                /*padding: 0px;*/\n"
-    "            }\n"
-    "        </style>\n"
-    
-    "    </head>\n"
-    "    <body>\n"
-    "        <h1>arfminesweeper</h1>\n"
-    "        <p>%d</p>\n"
-    "        <hr>\n"
-    "        <table>\n";
-
-static const char *indexFooterSource =
-    "        </table>\n"
-    "        <script>\n"
-    "        function btnHandler(e) {\n"
-    "            e.preventDefault();\n"
-    "            console.log(e.target.id);\n"
-    "            window.location.search = 'flag=' + e.target.id;"
-    "        }\n"
-
-    "        let buttons = document.getElementsByName(\"btn\");\n"
-    "        for (let btn of buttons) {\n"
-    "            btn.addEventListener(\"contextmenu\", btnHandler);\n"
-    "        }\n"
-    "        </script>\n"
-    "    </body>\n"
-    "</html>\n";
-
-
 static char *htmlContent = NULL;
+static char *pngFlagContent = NULL;
+static size_t pngFlagSize = 0;
+
 static char *sendBuffer = NULL;
 
 
@@ -237,6 +201,14 @@ generateBoardResponse() {
     convertcrlf(sendBuffer, BUFF_SIZE);
 }
 
+size_t
+generateFlagPNGResponse() {
+    snprintf(sendBuffer, BUFF_SIZE, "%s\n", pngHeaders);
+    size_t size = strlen(sendBuffer);
+    memcpy(sendBuffer + size, pngFlagContent, pngFlagSize);
+    return size + pngFlagSize;
+}
+
 void
 generate404Response() {
     snprintf(sendBuffer, BUFF_SIZE, "%s", err404Headers);
@@ -270,8 +242,14 @@ clientThread(void *data) {
                 /* Index */
                 generateBoardResponse();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
-                printf("Index Response sent\n");
-            } else if (strncmp(recvBuff + 4, "/?", 2) == 0) {
+                printf("GET / 200 OK\n");
+            } else if (strncmp(recvBuff + 4, "/flag.png ", 10) == 0) {
+                /* Flag PNG file */
+                size_t size = generateFlagPNGResponse();
+                send(cfd, sendBuffer, size, 0);
+                printf("GET /flag.png 200 OK\n");
+            }
+            else if (strncmp(recvBuff + 4, "/?", 2) == 0) {
                 /* Parameter */
                 if (strncmp(recvBuff + 6, "clear=", 6) == 0) {
                     cpynum(recvBuff + 12, tmpBuff, 256);
@@ -285,14 +263,16 @@ clientThread(void *data) {
 
                 generateBoardResponse();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
-                printf("Index Response sent\n");
+                printf("GET ");
+                printToSpace(recvBuff + 4);
+                printf(" 200 OK\n");
             } else {
                 /* 404 */
                 generate404Response();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
-                printf("Warning: 404 Fot Found: ");
+                printf("GET ");
                 printToSpace(recvBuff + 4);
-                printf("\n");
+                printf(" 404 Not Found\n");
             }
         } else {
             printf("Warning: Only GET supported\n");
@@ -336,21 +316,32 @@ httpdListen(unsigned short port) {
     return fd;
 }
 
+static int
+loadFile(const char *path, char **buff, size_t *size) {
+    FILE *f = fopen(path, "r");
+    if (f == NULL) {
+        printf("Error opening file: %s\n", strerror(errno));
+        return -1;
+    }
+    fseek(f, 0L, SEEK_END);
+    size_t s = ftell(f);
+    fseek(f, 0L, SEEK_SET);
+    *buff = malloc(s);
+    fread(*buff, 1, s, f);
+
+    if (size) *size = s;
+
+    return 0;
+}
+
 int
 httpdStart(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
-    /* Read HTML file */
-    FILE *htmlFile = fopen("../assets/msboard.html", "r");
-    if (htmlFile == NULL) {
-        printf("Error opening file: %s\n", strerror(errno));
-    }
-    fseek(htmlFile, 0L, SEEK_END);
-    size_t htmlContentSize = ftell(htmlFile);
-    fseek(htmlFile, 0L, SEEK_SET);
-    htmlContent = malloc(htmlContentSize);
-    fread(htmlContent, 1, htmlContentSize, htmlFile);
+    /* Load assets */
+    loadFile("../assets/msboard.html", &htmlContent, NULL);
+    loadFile("../assets/flag.png", &pngFlagContent, &pngFlagSize);
 
     sendBuffer = malloc(65536);
 
