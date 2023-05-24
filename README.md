@@ -51,7 +51,7 @@ OpenGL 4.6/GLFW/GLAD    WIP   X     X   X   X
 ImGui                         X     X   X   X
 Vulkan/GLFW             WIP   X     X   X   X
 Metal                                       X
-Gtk3                    WIP   X     X
+Gtk3                    DONE  X     X
 Qt5                     DONE  X     X   X   X
 wxWidgets                     X     X   X   X
 WinAPI                                      X
@@ -61,6 +61,6 @@ Direct2D                                    X
 .NET WPF                                    X
 Java AWT                      X     X   X   X
 Java Swing                    X     X   X   X
-Webapp                  WIP   X     X   X   X
+Webapp                  DONE  X     X   X   X
 ```
 I apologize.
