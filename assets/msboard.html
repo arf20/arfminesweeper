@@ -8,12 +8,16 @@
             table, th, td {
                 padding: 0px;
                 margin: 0px;
+                table-layout: fixed;
             }
             .cell {
                 display: inline-block;
                 width: 20px;
                 height: 20px;
                 padding: 0px;
+            }
+            .td {
+                width: 20px;
             }
         </style>
     </head>
@@ -34,6 +38,8 @@
             for (let btn of buttons) {
                 btn.addEventListener("contextmenu", btnHandler);
             }
+
+            %s
         </script>
     </body>
 </html>

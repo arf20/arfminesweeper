@@ -57,6 +57,10 @@ static const char *err404Headers =
     "HTTP/1.1 404 Not Found\n"
     "Server: arfminesweeper httpd\n";
 
+static const char *alertContent =
+    "%s\n<!DOCTYPE html><html><head><script>alert(%s);</script></head>"
+    "<body></body></html>";
+
 static char *htmlContent = NULL;
 static char *pngFlagContent = NULL;
 static size_t pngFlagSize = 0;
@@ -140,6 +144,30 @@ convertcrlf(char *buff, size_t size) {
 }
 
 static void
+convertlfescaped(char *buff, size_t size) {
+    size_t bufflen = strlen(buff) + 1;
+    char *ptr = buff;
+
+    while (*ptr) {
+        char *p = strchr(ptr, '\n');
+        /* walked past last occurrence of needle or run out of buffer */
+        if (p == NULL || bufflen + 1 >= size || p >= buff + size) {
+            break;
+        }
+
+        /* move part after lf */
+        memmove(p + 1, p, bufflen - (p - buff));
+
+        /* insert cr */
+        p[0] = '\\';
+        p[1] = 'n';
+
+        bufflen += 2;
+        ptr = p + 2;
+    }
+}
+
+static void
 printToSpace(const char *str) {
     while (*str != ' ') {
         putc(*str, stdout);
@@ -197,13 +225,27 @@ generateBoardResponse() {
         strlcat(tmpBuff, "</tr>\n", BUFF_SIZE);
     }
 
+    /* Check game state*/
+    char alert[1024];
+    alert[0] = '\0';
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            strncpy(alert, "alert(\""TXT_LOST"\");", 1024);
+            convertlfescaped(alert, 1024);
+        } break;
+        case STATE_WON: {
+            strncpy(alert, "alert(\""TXT_WON"\");", 1024);
+            convertlfescaped(alert, 1024);
+        } break;
+    }
+
     snprintf(sendBuffer, BUFF_SIZE, htmlContent, indexHeaders,
-        gameGetFlagsLeft(), tmpBuff);
+        gameGetFlagsLeft(), tmpBuff, alert);
 
     convertcrlf(sendBuffer, BUFF_SIZE);
 }
 
-size_t
+static size_t
 generateFlagPNGResponse() {
     snprintf(sendBuffer, BUFF_SIZE, "%s\n", pngHeaders);
     size_t size = strlen(sendBuffer);
@@ -211,7 +253,7 @@ generateFlagPNGResponse() {
     return size + pngFlagSize;
 }
 
-void
+static void
 generate404Response() {
     snprintf(sendBuffer, BUFF_SIZE, "%s", err404Headers);
     convertcrlf(sendBuffer, BUFF_SIZE);
