@@ -70,6 +70,7 @@ static const char *indexHeadSource =
     "                /*padding: 0px;*/\n"
     "            }\n"
     "        </style>\n"
+    
     "    </head>\n"
     "    <body>\n"
     "        <h1>arfminesweeper</h1>\n"
@@ -79,6 +80,18 @@ static const char *indexHeadSource =
 
 static const char *indexFooterSource =
     "        </table>\n"
+    "        <script>\n"
+    "        function btnHandler(e) {\n"
+    "            e.preventDefault();\n"
+    "            console.log(e.target.id);\n"
+    "            window.location.search = 'flag=' + e.target.id;"
+    "        }\n"
+
+    "        let buttons = document.getElementsByName(\"btn\");\n"
+    "        for (let btn of buttons) {\n"
+    "            btn.addEventListener(\"contextmenu\", btnHandler);\n"
+    "        }\n"
+    "        </script>\n"
     "    </body>\n"
     "</html>\n";
 
@@ -202,9 +215,9 @@ generateBoardResponse() {
             }
             /* Otherwise just a tile */
             else {
-                snprintf(tmpBuff, 1024, "<td><a href=\"?btni=%d\">"
-                    "<button class=\"cell\" type=\"submit\">"
-                    "</button></a></td>\n", btni);
+                snprintf(tmpBuff, 1024, "<td><a href=\"?clear=%d\" name=\"btn\">"
+                    "<button id=\"%d\" class=\"cell\"></button></a></td>\n",
+                    btni, btni);
                 strlcat(sendBuffer, tmpBuff, BUFF_SIZE);
             }
         }
@@ -251,10 +264,14 @@ clientThread(void *data) {
                 printf("Index Response sent\n");
             } else if (strncmp(recvBuff + 4, "/?", 2) == 0) {
                 /* Parameter */
-                if (strncmp(recvBuff + 6, "btni=", 5) == 0) {
-                    cpynum(recvBuff + 11, tmpBuff, 256);
+                if (strncmp(recvBuff + 6, "clear=", 6) == 0) {
+                    cpynum(recvBuff + 12, tmpBuff, 256);
                     int btni = atoi(tmpBuff);
                     gameClearCell(btni % size, btni / size);
+                } else if (strncmp(recvBuff + 6, "flag=", 5) == 0) {
+                    cpynum(recvBuff + 11, tmpBuff, 256);
+                    int btni = atoi(tmpBuff);
+                    gameFlagCell(btni % size, btni / size);
                 }
 
                 generateBoardResponse();
@@ -266,10 +283,8 @@ clientThread(void *data) {
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
                 printf("Warning: 404 Fot Found\n");
             }
-        } else if (strncmp(recvBuff, "POST", 4)) {
-
         } else {
-            printf("Warning: Only GET and POST supported\n");
+            printf("Warning: Only GET supported\n");
             return NULL;
         }
 
