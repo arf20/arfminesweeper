@@ -175,19 +175,27 @@ convertcrlf(char *buff, size_t size) {
     }
 }
 
-void
+static void
+printToSpace(const char *str) {
+    while (*str != ' ') {
+        putc(*str, stdout);
+        str++;
+    }
+}
+
+static void
 generateBoardResponse() {
-    char tmpBuff[1024];
-    snprintf(tmpBuff, 1024, indexHeadSource, gameGetFlagsLeft());
-    snprintf(sendBuffer, BUFF_SIZE, "%s\n%s", indexHeaders, tmpBuff);
+    char tmpBuff[BUFF_SIZE];
+    char tmpBuff2[1024];
+    tmpBuff[0] = '\0';
 
     for (int y = 0; y < size; y++) {
-        strlcat(sendBuffer, "<tr>\n", BUFF_SIZE);
+        strlcat(tmpBuff, "<tr>\n", BUFF_SIZE);
         for (int x = 0; x < size; x++) {
             int btni = (size * y) + x;
             /* If clear, count surrounding cells and print n of mines */
             if (CHECK_CLEAR(BOARDXY(x, y))) {
-                strlcat(sendBuffer, "<td>\n", BUFF_SIZE);
+                strlcat(tmpBuff, "<td>\n", BUFF_SIZE);
                 int n = gameGetSurroundingMines(x, y);
                 const char *color = NULL;
                 if (n) {
@@ -201,29 +209,30 @@ generateBoardResponse() {
                         case 7: color = "black"; break;
                         case 8: color = "darkgrey"; break;
                     }
-                    snprintf(tmpBuff, 1024,
+                    snprintf(tmpBuff2, 1024,
                         "<span style=\"color: %s;\">%d</span>\n",
                         color, n);
-                    strlcat(sendBuffer, tmpBuff, BUFF_SIZE);
+                    strlcat(tmpBuff, tmpBuff2, BUFF_SIZE);
                 }
-                strlcat(sendBuffer, "</td>\n", BUFF_SIZE);
+                strlcat(tmpBuff2, "</td>\n", BUFF_SIZE);
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                snprintf(tmpBuff, 1024, "<td><img src=\"/flag.png\"></td>\n");
-                strlcat(sendBuffer, tmpBuff, BUFF_SIZE);
+                strlcat(tmpBuff, "<td><img src=\"/flag.png\"></td>\n", BUFF_SIZE);
             }
             /* Otherwise just a tile */
             else {
-                snprintf(tmpBuff, 1024, "<td><a href=\"?clear=%d\" name=\"btn\">"
+                snprintf(tmpBuff2, 1024, "<td><a href=\"?clear=%d\" name=\"btn\">"
                     "<button id=\"%d\" class=\"cell\"></button></a></td>\n",
                     btni, btni);
-                strlcat(sendBuffer, tmpBuff, BUFF_SIZE);
+                strlcat(tmpBuff, tmpBuff2, BUFF_SIZE);
             }
         }
-        strlcat(sendBuffer, "</tr>\n", BUFF_SIZE);
+        strlcat(tmpBuff, "</tr>\n", BUFF_SIZE);
     }
-    strlcat(sendBuffer, indexFooterSource, BUFF_SIZE);
+
+    snprintf(sendBuffer, BUFF_SIZE, htmlContent, indexHeaders,
+        gameGetFlagsLeft(), tmpBuff);
 
     convertcrlf(sendBuffer, BUFF_SIZE);
 }
@@ -281,7 +290,9 @@ clientThread(void *data) {
                 /* 404 */
                 generate404Response();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
-                printf("Warning: 404 Fot Found\n");
+                printf("Warning: 404 Fot Found: ");
+                printToSpace(recvBuff + 4);
+                printf("\n");
             }
         } else {
             printf("Warning: Only GET supported\n");

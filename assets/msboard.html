@@ -1,9 +1,38 @@
+%s
+
 <!DOCTYPE html>
 <html>
     <head>
         <title>arfminesweeper</title>
+        <style>
+            table, th, td {
+                padding: 0px;
+                margin: 0px;
+            }
+            .cell {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+            }
+        </style>
     </head>
     <body>
-        <h1>Shitty C webserver working i guess</h1>
+        <h1>arfminesweeper</h1>
+        <p>%d</p>
+        <hr>
+        <table>
+%s
+        </table>
+        <script>
+            function btnHandler(e) {
+                e.preventDefault();
+                console.log(e.target.id);
+                window.location.search = 'flag=' + e.target.id;
+            }
+            let buttons = document.getElementsByName("btn");
+            for (let btn of buttons) {
+                btn.addEventListener("contextmenu", btnHandler);
+            }
+        </script>
     </body>
 </html>
