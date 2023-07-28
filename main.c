@@ -40,6 +40,7 @@
 #include "frontends/vk.h"
 #include "frontends/win32.h"
 #include "frontends/httpd.h"
+#include "frontends/wayland.h"
 
 #include "frontends/common.h"
 
@@ -101,6 +102,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_HTTPD
         printf("webapp ");
+    #endif
+    #ifdef FRONTEND_WAYLAND
+        printf("wayland ");
     #endif
 
     printf("\n");
@@ -249,6 +253,14 @@ main(int argc, char **argv) {
         #ifdef FRONTEND_HTTPD
         httpdStart(gameGetBoard(), size);
         httpdDestroy();
+        #else
+        printf("Error: Frontend webapp not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "wayland")) {
+        #ifdef FRONTEND_WAYLAND
+        WaylandStart(gameGetBoard(), size);
+        WaylandDestroy();
         #else
         printf("Error: Frontend webapp not built\n");
         #endif

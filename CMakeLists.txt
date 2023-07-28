@@ -58,6 +58,14 @@ if (X11_FOUND)
     endif()
 endif()
 
+#find_package(Wayland)
+pkg_check_modules(WAYLAND wayland-client) 
+if (WAYLAND_FOUND)
+    file (GLOB SRC ${SRC} "frontends/wayland.c")
+    add_compile_definitions(FRONTEND_WAYLAND)
+    message(STATUS "Building with Wayland")
+endif()
+
 pkg_check_modules(GTK3 gtk+-3.0) 
 if (GTK3_FOUND)
     file (GLOB SRC ${SRC} "frontends/gtk3.c")
@@ -202,4 +210,6 @@ if (Vulkan_FOUND AND glfw3_FOUND)
     target_link_libraries(arfminesweeper Vulkan::Vulkan)
 endif()
 
-
+if (WAYLAND_FOUND)
+    target_link_libraries(arfminesweeper wayland-client)
+endif()
