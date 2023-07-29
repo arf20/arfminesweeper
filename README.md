@@ -38,7 +38,7 @@ fbdev                   WIP   X
 SVGA buffer                   
 X11 Xlib                DONE  X     X
 X11 XCB                       X     X
-Wayland                       X     X
+Wayland                 WIP   X     X
 XForms                  DONE  X     X
 Motif                   WIP   X     X
 Tcl/Tk                        X     X       X
@@ -54,7 +54,7 @@ Metal                                       X
 Gtk3                    DONE  X     X
 Qt5                     DONE  X     X   X   X
 wxWidgets                     X     X   X   X
-WinAPI                                      X
+WinAPI                  WIP                 X
 Win32 GDI+                                  X
 Direct2D                                    X
 .NET WinForms                               X

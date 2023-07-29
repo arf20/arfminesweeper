@@ -26,6 +26,9 @@ add_compile_definitions(FRONTEND_CONSOLE)
 file (GLOB SRC ${SRC} "frontends/httpd.c")
 add_compile_definitions(FRONTEND_HTTPD)
 
+file (GLOB SRC ${SRC} "frontends/raylib.c")
+add_compile_definitions(FRONTEND_RAYLIB)
+
 if (WIN32)
     message(STATUS "No fbdev support in Win32")
 elseif(BSD)
