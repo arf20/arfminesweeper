@@ -41,7 +41,6 @@
 #include "frontends/win32.h"
 #include "frontends/httpd.h"
 #include "frontends/wayland.h"
-#include "frontends/raylib.h"
 
 #include "frontends/common.h"
 
@@ -106,9 +105,6 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_WAYLAND
         printf("wayland ");
-    #endif
-    #ifdef FRONTEND_WAYLAND
-        printf("raylib ");
     #endif
 
     printf("\n");
@@ -265,14 +261,6 @@ main(int argc, char **argv) {
         #ifdef FRONTEND_WAYLAND
         WaylandStart(gameGetBoard(), size);
         WaylandDestroy();
-        #else
-        printf("Error: Frontend webapp not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "raylib")) {
-        #ifdef FRONTEND_RAYLIB
-        raylibStart(gameGetBoard(), size);
-        raylibDestroy();
         #else
         printf("Error: Frontend webapp not built\n");
         #endif

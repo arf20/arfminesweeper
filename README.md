@@ -42,7 +42,7 @@ Wayland                 WIP   X     X
 XForms                  DONE  X     X
 Motif                   WIP   X     X
 Tcl/Tk                        X     X       X
-raylib                        X     X   X   X
+raylib                  NO    X     X   X   X  Redefines GLAD
 SDL2                    DONE  X     X   X   X
 SDL1.2                  WIP   X     X   X   X
 GLIDE (with Voodoo)           X     X       X
