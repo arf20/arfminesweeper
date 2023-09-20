@@ -269,14 +269,6 @@ main(int argc, char **argv) {
         printf("Error: Frontend webapp not built\n");
         #endif
     }
-    else if (!strcmp(frontend, "raylib")) {
-        #ifdef FRONTEND_RAYLIB
-        raylibStart(gameGetBoard(), size);
-        raylibDestroy();
-        #else
-        printf("Error: Frontend webapp not built\n");
-        #endif
-    }
     else {
         printf("Error: Frontend not recognised: %s\n", frontend);
         printFrontends();
