@@ -117,6 +117,11 @@ GL33Start(const int *lboard, int lsize) {
     wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
         ((size - 1) * CELL_MARGIN);
 
+    gameClearCell(0, 0);
+    gameClearCell(1, 1);
+    gameClearCell(2, 2);
+    gameClearCell(3, 3);
+
     /* Init glfw context */
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -166,7 +171,7 @@ GL33Start(const int *lboard, int lsize) {
 
     /* Generate board UBO */
     glGenBuffers(1, &boardUBO);
-    boardUBO = glGetUniformBlockIndex(boardShader, "BoardBlock");
+    //boardUBO_idx = glGetUniformBlockIndex(boardShader, "BoardBlock");
     glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(int)*size*size, board, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, boardUBO);

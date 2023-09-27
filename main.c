@@ -86,16 +86,16 @@ printFrontends() {
         printf("sdl2 ");
     #endif
     #ifdef FRONTEND_SDL1
-        printf("sdl1.2 ");
+        printf("sdl12 ");
     #endif
     #ifdef FRONTEND_GL11
-        printf("gl1.1 ");
+        printf("gl11 ");
     #endif
     #ifdef FRONTEND_GL33
-        printf("gl3.3 ");
+        printf("gl33 ");
     #endif
     #ifdef FRONTEND_VK
-        printf("vulkan ");
+        printf("vk ");
     #endif
     #ifdef FRONTEND_WIN32
         printf("win32 ");
