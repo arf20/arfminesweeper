@@ -6,12 +6,17 @@ uniform vec2 sSize;
 uniform uint size;
 
 layout(std140) uniform BoardBlock {
-    uint board[512];
+    uvec4 board[1024];
 };
 
 out vec4 color;
 
-#define BOARDXY(x, y)  board[((y) * size) + (x)]
+
+
+uint boardxy(uint x, uint y) {
+    uint n = (y * size) + x;
+    return board[n / 4u][n % 4u];
+}
 
 /* Cell bit field */
 #define CELL_BIT_MINE       0u
@@ -62,11 +67,11 @@ void main() {
             && gl_FragCoord.y < cY + CELL_SIZE)
         {
             /* If clear, count surrounding cells and print n of mines */
-            if (CHECK_CLEAR(BOARDXY(x, y))) {
+            if (CHECK_CLEAR(boardxy(x, y))) {
                 
             }
             /* If not clear, check flag and draw it */
-            else if (CHECK_FLAG(BOARDXY(x, y))) {
+            else if (CHECK_FLAG(boardxy(x, y))) {
                 color = vec4(C_RED, 1.0);
             }
             /* Otherwise just a tile */
