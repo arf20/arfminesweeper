@@ -87,8 +87,6 @@ mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
-    printf("mouse %f, %f\n", x, y);
-
     int ix = ((int)x - W_MARGIN) /
         (CELL_SIZE + CELL_MARGIN);
     int iy = ((int)y - HEADER_HEIGHT) /
@@ -116,11 +114,6 @@ GL33Start(const int *lboard, int lsize) {
     wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
     wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
         ((size - 1) * CELL_MARGIN);
-
-    gameClearCell(0, 0);
-    gameClearCell(1, 1);
-    gameClearCell(2, 2);
-    gameClearCell(3, 3);
 
     /* Init glfw context */
     glfwInit();
