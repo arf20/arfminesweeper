@@ -41,6 +41,10 @@ static VkDevice device;
 static VkSurfaceKHR surface;
 static VkSwapchainKHR swapChain;
 
+static uint32_t imageCount;
+static VkImage* swapChainImages;
+static VkImageView *swapChainImageViews;
+
 
 #define VALIDATION_LAYER "VK_LAYER_KHRONOS_validation"
 static char *validationLayer = NULL;
@@ -63,7 +67,7 @@ checkValidationLayerSupport() {
     /* get validation layers */
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, NULL);
-    VkLayerProperties* availableLayers = malloc(sizeof(VkLayerProperties));
+    VkLayerProperties* availableLayers = malloc(sizeof(VkLayerProperties) * layerCount);
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers);
 
     /* search layer */
@@ -78,6 +82,8 @@ checkValidationLayerSupport() {
 
     validationLayer = malloc(strlen(VALIDATION_LAYER) + 1);
     strcpy(validationLayer, VALIDATION_LAYER);
+
+    free(availableLayers);
 
     return found;
 }
@@ -115,6 +121,8 @@ findGraphicQueueFamilies(VkPhysicalDevice device) {
         }
     }
 
+    free(queueFamilies);
+
     return graphicQueueFamilyIdx;
 }
 
@@ -134,6 +142,8 @@ findPresentationQueueFamilies(VkPhysicalDevice device) {
             break;
         }
     }
+
+    free(queueFamilies);
 
     return presentationQueueFamilyIdx;
 }
@@ -170,6 +180,8 @@ pickDevice() {
     discrete ? printf("d") : printf("i");
     printf("GPU %s\n", dp.deviceName);
 
+    free(devices);
+
     return physicalDevice;
 }
 
@@ -199,6 +211,8 @@ checkExtensionSupport(VkPhysicalDevice device) {
             return -1;
         }
     }
+
+    free(availableExtensions);
 
     return 0;
 }
@@ -249,6 +263,9 @@ checkSwapChainSupport(VkPhysicalDevice device) {
         printf("No presentation modes for swap chain\n");
         return -1;
     }
+
+    free(formats);
+    free(presentModes);
 
     return 0;
 }
@@ -414,6 +431,8 @@ vkStart(const int *lboard, int lsize) {
         return 0;
     }
 
+    free(queueCreateInfos);
+
     /* Get Graphics Queue Handler */
     VkQueue graphicsQueue;
     vkGetDeviceQueue(device, graphicQueueFamilyIdx, 0, &graphicsQueue);
@@ -426,7 +445,7 @@ vkStart(const int *lboard, int lsize) {
 
     extent = chooseSwapExtent(capabilities); /* Resolution */
 
-    uint32_t imageCount = capabilities.minImageCount + 1;
+    imageCount = capabilities.minImageCount + 1;
     if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
         imageCount = capabilities.maxImageCount;
     }
@@ -463,8 +482,34 @@ vkStart(const int *lboard, int lsize) {
 
     /* Get swap chain images */
     vkGetSwapchainImagesKHR(device, swapChain, &imageCount, NULL);
-    VkImage* swapChainImages = malloc(sizeof(VkImage) * imageCount);
+    swapChainImages = malloc(sizeof(VkImage) * imageCount);
     vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages);
+
+
+    /* Image views */
+    swapChainImageViews = malloc(sizeof(VkImageView) * imageCount);
+
+    for (size_t i = 0; i < imageCount; i++) {
+        VkImageViewCreateInfo imageViewCreateInfo = { 0 };
+        imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        imageViewCreateInfo.image = swapChainImages[i];
+        imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        imageViewCreateInfo.format = surfaceFormat.format;
+        imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        imageViewCreateInfo.subresourceRange.levelCount = 1;
+        imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+        if (vkCreateImageView(device, &imageViewCreateInfo, NULL, &swapChainImageViews[i]) != VK_SUCCESS) {
+            printf("Failed to create image views\n");
+        }
+    }
+
 
     /* ==================== VULKAN INITIALISED ==================== */
 
@@ -477,6 +522,12 @@ vkStart(const int *lboard, int lsize) {
 
 void
 vkDestroy() {
+    for (size_t i = 0; i < imageCount; i++) {
+        vkDestroyImageView(device, swapChainImageViews[i], NULL);
+    }
+    free(swapChainImageViews);
+    free(swapChainImages);
+
     vkDestroySwapchainKHR(device, swapChain, NULL);
     vkDestroySurfaceKHR(instance, surface, NULL);
     vkDestroyDevice(device, NULL);
