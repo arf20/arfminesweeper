@@ -39,11 +39,24 @@ static GLFWwindow* window;
 static VkInstance instance;
 static VkDevice device;
 static VkSurfaceKHR surface;
-
+static VkSwapchainKHR swapChain;
 
 
 #define VALIDATION_LAYER "VK_LAYER_KHRONOS_validation"
-char *validationLayer = NULL;
+static char *validationLayer = NULL;
+
+#define EXTENSIONS VK_KHR_SWAPCHAIN_EXTENSION_NAME
+static const char *requiredExtensions[] = { EXTENSIONS };
+static size_t requiredExtCount = sizeof(requiredExtensions) / sizeof(requiredExtensions[0]);
+
+#define FORMAT      VK_FORMAT_B8G8R8A8_SRGB
+#define COLORSPACE  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+#define PRESENTMODE VK_PRESENT_MODE_MAILBOX_KHR
+
+static VkExtent2D extent;
+static VkSurfaceFormatKHR surfaceFormat;
+static VkPresentModeKHR presentMode;
+
 
 int
 checkValidationLayerSupport() {
@@ -160,6 +173,113 @@ pickDevice() {
     return physicalDevice;
 }
 
+int
+checkExtensionSupport(VkPhysicalDevice device) {
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, NULL);
+    VkExtensionProperties* availableExtensions = malloc(sizeof(VkExtensionProperties) * extensionCount);
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, availableExtensions);
+    
+    /* Print extensions */
+    printf("Available Extensions:\n");
+    for (int i = 0; i < extensionCount; i++)
+        printf("\t%s\n", availableExtensions[i].extensionName);
+    
+    
+    for (int i = 0; i < requiredExtCount; i++) {
+        int extFound = 0;
+        for (int j = 0; j < extensionCount; j++) {
+            if (strcmp(availableExtensions[j].extensionName, requiredExtensions[i]) == 0) {
+                extFound = 1;
+                break;
+            }
+        }
+        if (!extFound) {
+            printf("Required extension %s unavailable\n", requiredExtensions[i]);
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+int
+checkSwapChainSupport(VkPhysicalDevice device) {
+    uint32_t formatCount, presentModeCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, NULL);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, NULL);
+
+    VkSurfaceFormatKHR *formats = NULL;
+    VkPresentModeKHR *presentModes = NULL;
+
+    if (formatCount != 0) {
+        formats = malloc(sizeof(VkSurfaceFormatKHR) * formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, formats);
+    }
+
+    if (presentModeCount != 0) {
+        presentModes = malloc(sizeof(VkPresentModeKHR) * presentModeCount);;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, presentModes);
+    }
+    
+    int formatAvailable = 0;
+    for (int i = 0; i < formatCount; i++) {
+        if (formats[i].format == FORMAT && formats[i].colorSpace == COLORSPACE) {
+            formatAvailable = 1;
+            surfaceFormat = formats[i];
+            break;
+        }
+    }
+
+    int presentModesAvailable = 0;
+    for (int i = 0; i < presentModeCount; i++) {
+        if (presentModes[i] == PRESENTMODE) {
+            presentModesAvailable = 1;
+            presentMode = presentModes[i];
+            break;
+        }
+    }
+    // NOTE: VK_PRESENT_MODE_FIFO_KHR is guaranteed to be available
+    
+    if (formatAvailable == 0) {
+        printf("Format unavailable for swap chain\n");
+        return -1;
+    }
+    if (presentModeCount == 0) {
+        printf("No presentation modes for swap chain\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+uint32_t
+clamp(uint32_t d, uint32_t min, uint32_t max) {
+  const uint32_t t = d < min ? min : d;
+  return t > max ? max : t;
+}
+
+VkExtent2D
+chooseSwapExtent(VkSurfaceCapabilitiesKHR capabilities) {
+    if (capabilities.currentExtent.width != UINT32_MAX) {
+        return capabilities.currentExtent;
+    } else {
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        VkExtent2D actualExtent = {
+            (uint32_t)width,
+            (uint32_t)height
+        };
+
+        actualExtent.width  = clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+        actualExtent.height = clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+        return actualExtent;
+    }
+}
+
+
 
 int
 vkStart(const int *lboard, int lsize) {
@@ -232,6 +352,14 @@ vkStart(const int *lboard, int lsize) {
         return 0;
     }
 
+    if (checkExtensionSupport(physicalDevice) < 0) {
+        return 0;
+    }
+
+    if (checkSwapChainSupport(physicalDevice) < 0) {
+        return 0;
+    }
+
     /* Create Logical Device */
     VkPhysicalDeviceFeatures deviceFeatures = { 0 };
 
@@ -240,7 +368,8 @@ vkStart(const int *lboard, int lsize) {
 
     deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
 
-    deviceCreateInfo.enabledExtensionCount = 0;
+    deviceCreateInfo.enabledExtensionCount = requiredExtCount;
+    deviceCreateInfo.ppEnabledExtensionNames = requiredExtensions;
 
     deviceCreateInfo.enabledLayerCount = 1;
     deviceCreateInfo.ppEnabledLayerNames = (const char* const*)&validationLayer;
@@ -259,22 +388,22 @@ vkStart(const int *lboard, int lsize) {
 
     VkDeviceQueueCreateInfo* queueCreateInfos = malloc(sizeof(VkDeviceQueueCreateInfo) * 2);
     memset(queueCreateInfos, 0, sizeof(VkDeviceQueueCreateInfo) * 2);
-    uint32_t uniqueQueueFamilies[] = { graphicQueueFamilyIdx, presentationQueueFamilyIdx };
+    uint32_t queueFamilyIndices[] = { graphicQueueFamilyIdx, presentationQueueFamilyIdx };
 
     queueCreateInfos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfos[0].queueFamilyIndex = uniqueQueueFamilies[0];
+    queueCreateInfos[0].queueFamilyIndex = queueFamilyIndices[0];
     queueCreateInfos[0].queueCount = 1;
     float queuePriority = 1.0f;
     queueCreateInfos[0].pQueuePriorities = &queuePriority;
 
     queueCreateInfos[1].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfos[1].queueFamilyIndex = uniqueQueueFamilies[1];
+    queueCreateInfos[1].queueFamilyIndex = queueFamilyIndices[1];
     queueCreateInfos[1].queueCount = 1;
     queueCreateInfos[1].pQueuePriorities = &queuePriority;
 
     deviceCreateInfo.queueCreateInfoCount = 2;
     // HACK: if not unique lol
-    if (uniqueQueueFamilies[0] == uniqueQueueFamilies[1])
+    if (queueFamilyIndices[0] == queueFamilyIndices[1])
         deviceCreateInfo.queueCreateInfoCount = 1;
 
     deviceCreateInfo.pQueueCreateInfos = queueCreateInfos;
@@ -291,6 +420,52 @@ vkStart(const int *lboard, int lsize) {
     VkQueue presentQueue;
     vkGetDeviceQueue(device, presentationQueueFamilyIdx, 0, &presentQueue);
 
+    /* Create swap chain */
+    VkSurfaceCapabilitiesKHR capabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities);
+
+    extent = chooseSwapExtent(capabilities); /* Resolution */
+
+    uint32_t imageCount = capabilities.minImageCount + 1;
+    if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
+        imageCount = capabilities.maxImageCount;
+    }
+
+    VkSwapchainCreateInfoKHR swapChainCreateInfo = { 0 };
+    swapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapChainCreateInfo.surface = surface;
+    swapChainCreateInfo.minImageCount = imageCount;
+    swapChainCreateInfo.imageFormat = surfaceFormat.format;
+    swapChainCreateInfo.imageColorSpace = surfaceFormat.colorSpace;
+    swapChainCreateInfo.imageExtent = extent;
+    swapChainCreateInfo.imageArrayLayers = 1;
+    swapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    if (graphicQueueFamilyIdx != presentationQueueFamilyIdx) {
+        swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        swapChainCreateInfo.queueFamilyIndexCount = 2;
+        swapChainCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
+    } else {
+        swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        swapChainCreateInfo.queueFamilyIndexCount = 0;  // Optional
+        swapChainCreateInfo.pQueueFamilyIndices = NULL; // Optional
+    }
+
+    swapChainCreateInfo.preTransform = capabilities.currentTransform;
+    swapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapChainCreateInfo.presentMode = presentMode;
+    swapChainCreateInfo.clipped = VK_TRUE;
+    swapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+
+    if (vkCreateSwapchainKHR(device, &swapChainCreateInfo, NULL, &swapChain) != VK_SUCCESS) {
+        printf("Failed to create swap chain\n");
+    }
+
+    /* Get swap chain images */
+    vkGetSwapchainImagesKHR(device, swapChain, &imageCount, NULL);
+    VkImage* swapChainImages = malloc(sizeof(VkImage) * imageCount);
+    vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages);
+
     /* ==================== VULKAN INITIALISED ==================== */
 
     
@@ -302,6 +477,7 @@ vkStart(const int *lboard, int lsize) {
 
 void
 vkDestroy() {
+    vkDestroySwapchainKHR(device, swapChain, NULL);
     vkDestroySurfaceKHR(instance, surface, NULL);
     vkDestroyDevice(device, NULL);
     vkDestroyInstance(instance, NULL);
