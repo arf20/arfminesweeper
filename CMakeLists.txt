@@ -20,6 +20,22 @@ file (GLOB SRC
 
 # frontends
 
+# compile vulkan shaders
+add_custom_command(
+  OUTPUT "assets/msboard4vs.spv"
+  COMMAND "glslc"
+  ARGS "assets/msboard4.vert" "-o" "assets/msboard4vs.spv"
+  DEPENDS "assets/msboard4.vert"
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+add_custom_target(vulkan_shaders ALL
+    DEPENDS "assets/msboard4vs.spv"
+)
+
+#execute_process (
+#    COMMAND bash -c "glslc assets/msboard4.vert assets/msboard4vs.spv"
+#)
+
 file (GLOB SRC ${SRC} "frontends/console.c")
 add_compile_definitions(FRONTEND_CONSOLE)
 
