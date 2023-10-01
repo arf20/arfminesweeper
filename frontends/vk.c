@@ -76,6 +76,15 @@ static VkSurfaceFormatKHR swapChainSurfaceFormat;
 static VkPresentModeKHR presentMode;
 
 
+/* SHADER THING: uniform struct */
+typedef struct {
+    float sSizeX, sSizeY;
+    uint32_t size;
+} PushConstantsData;
+
+PushConstantsData pushConstantsData;
+
+
 int
 checkValidationLayerSupport() {
     /* get validation layers */
@@ -357,7 +366,7 @@ recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = renderPass;
     renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
-    renderPassInfo.renderArea.offset = (VkOffset2D){.x = 0, .y = 0};
+    renderPassInfo.renderArea.offset = (VkOffset2D){ .x = 0, .y = 0 };
     renderPassInfo.renderArea.extent = swapChainExtent;
     VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
     renderPassInfo.clearValueCount = 1;
@@ -366,6 +375,9 @@ recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+
+    vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PushConstantsData), &pushConstantsData);
 
     vkCmdDraw(commandBuffer, 4, 1, 0, 0); /* Draw command */
 
@@ -389,6 +401,8 @@ vkStart(const int *lboard, int lsize) {
     wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
     wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
         ((size - 1) * CELL_MARGIN);
+
+    pushConstantsData = (PushConstantsData){ .sSizeX = wWidth, .sSizeY = wHeight, .size = size };
 
     /* Init glfw */
     glfwInit();
@@ -687,8 +701,15 @@ vkStart(const int *lboard, int lsize) {
     colorBlending.attachmentCount = 1;
     colorBlending.pAttachments = &colorBlendAttachment;
 
+    VkPushConstantRange range = { 0 };
+    range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    range.offset = 0;
+    range.size = sizeof(PushConstantsData); /* SHADER THING: vec2 + uint = 2 * 4 + 4 = 12 bytes */
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = { 0 };
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.pushConstantRangeCount = 1;
+    pipelineLayoutInfo.pPushConstantRanges = &range;
 
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS) {
         printf("Failed to create pipeline layout\n");
