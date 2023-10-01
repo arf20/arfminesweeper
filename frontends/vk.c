@@ -49,6 +49,8 @@ static VkShaderModule vertShaderModule;
 static VkShaderModule fragShaderModule;
 
 static VkPipelineLayout pipelineLayout;
+static VkRenderPass renderPass;
+static VkPipeline graphicsPipeline;
 
 #define VALIDATION_LAYER "VK_LAYER_KHRONOS_validation"
 static char *validationLayer = NULL;
@@ -62,7 +64,7 @@ static size_t requiredExtCount = sizeof(requiredExtensions) / sizeof(requiredExt
 #define PRESENTMODE VK_PRESENT_MODE_MAILBOX_KHR
 
 static VkExtent2D swapChainExtent;
-static VkSurfaceFormatKHR surfaceFormat;
+static VkSurfaceFormatKHR swapChainSurfaceFormat;
 static VkPresentModeKHR presentMode;
 
 
@@ -244,7 +246,7 @@ checkSwapChainSupport(VkPhysicalDevice device) {
     for (int i = 0; i < formatCount; i++) {
         if (formats[i].format == FORMAT && formats[i].colorSpace == COLORSPACE) {
             formatAvailable = 1;
-            surfaceFormat = formats[i];
+            swapChainSurfaceFormat = formats[i];
             break;
         }
     }
@@ -491,8 +493,8 @@ vkStart(const int *lboard, int lsize) {
     swapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     swapChainCreateInfo.surface = surface;
     swapChainCreateInfo.minImageCount = imageCount;
-    swapChainCreateInfo.imageFormat = surfaceFormat.format;
-    swapChainCreateInfo.imageColorSpace = surfaceFormat.colorSpace;
+    swapChainCreateInfo.imageFormat = swapChainSurfaceFormat.format;
+    swapChainCreateInfo.imageColorSpace = swapChainSurfaceFormat.colorSpace;
     swapChainCreateInfo.imageExtent = swapChainExtent;
     swapChainCreateInfo.imageArrayLayers = 1;
     swapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -532,7 +534,7 @@ vkStart(const int *lboard, int lsize) {
         imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         imageViewCreateInfo.image = swapChainImages[i];
         imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        imageViewCreateInfo.format = surfaceFormat.format;
+        imageViewCreateInfo.format = swapChainSurfaceFormat.format;
         imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -585,6 +587,12 @@ vkStart(const int *lboard, int lsize) {
 
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
+
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo = { 0 };
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexBindingDescriptionCount = 0;
+    vertexInputInfo.vertexAttributeDescriptionCount = 0;
+
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = { 0 };
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
@@ -623,7 +631,7 @@ vkStart(const int *lboard, int lsize) {
     VkPipelineMultisampleStateCreateInfo multisampling = { 0 };
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling.sampleShadingEnable = VK_FALSE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
+    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
     VkPipelineColorBlendAttachmentState colorBlendAttachment = { 0 };
     colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -644,6 +652,61 @@ vkStart(const int *lboard, int lsize) {
     }
 
 
+    VkAttachmentDescription colorAttachment = { 0 };
+    colorAttachment.format = swapChainSurfaceFormat.format;
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkAttachmentReference colorAttachmentRef = { 0 };
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    
+    VkSubpassDescription subpass = { 0 };
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+
+
+    VkRenderPassCreateInfo renderPassInfo = { 0 };
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = 1;
+    renderPassInfo.pAttachments = &colorAttachment;
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+
+    if (vkCreateRenderPass(device, &renderPassInfo, NULL, &renderPass) != VK_SUCCESS) {
+        printf("failed to create render pass\n");
+        return 0;
+    }
+
+
+    /* Create pipeline finally */
+    VkGraphicsPipelineCreateInfo pipelineInfo = { 0 };
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = 2;
+    pipelineInfo.pStages = shaderStages;
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &inputAssembly;
+    pipelineInfo.pViewportState = &viewportState;
+    pipelineInfo.pRasterizationState = &rasterizer;
+    pipelineInfo.pMultisampleState = &multisampling;
+    pipelineInfo.pColorBlendState = &colorBlending;
+    pipelineInfo.pViewportState = &viewportState;
+    pipelineInfo.layout = pipelineLayout;
+    pipelineInfo.renderPass = renderPass;
+    pipelineInfo.subpass = 0;
+
+    if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &graphicsPipeline) != VK_SUCCESS) {
+        printf("Failed to create graphics pipeline\n");
+        return 0;
+    }
+
+
     free(vertShaderCode);
     free(fragShaderCode);
 
@@ -654,9 +717,9 @@ vkStart(const int *lboard, int lsize) {
 
 void
 vkDestroy() {
+    vkDestroyPipeline(device, graphicsPipeline, NULL);
     vkDestroyPipelineLayout(device, pipelineLayout, NULL);
-
-    
+    vkDestroyRenderPass(device, renderPass, NULL);
 
     for (size_t i = 0; i < imageCount; i++) {
         vkDestroyImageView(device, swapChainImageViews[i], NULL);
