@@ -41,7 +41,7 @@ static VkDevice device;
 static VkSurfaceKHR surface;
 static VkSwapchainKHR swapChain;
 
-static uint32_t imageCount;
+static uint32_t swapChainImageCount;
 static VkImage* swapChainImages;
 static VkImageView *swapChainImageViews;
 
@@ -51,6 +51,14 @@ static VkShaderModule fragShaderModule;
 static VkPipelineLayout pipelineLayout;
 static VkRenderPass renderPass;
 static VkPipeline graphicsPipeline;
+
+static VkFramebuffer *swapChainFramebuffers;
+static VkCommandPool commandPool;
+static VkCommandBuffer commandBuffer;
+
+static VkSemaphore imageAvailableSemaphore;
+static VkSemaphore renderFinishedSemaphore;
+static VkFence inFlightFence;
 
 #define VALIDATION_LAYER "VK_LAYER_KHRONOS_validation"
 static char *validationLayer = NULL;
@@ -335,6 +343,42 @@ createShaderModule(const char *code, size_t size) {
     return shaderModule;
 }
 
+int
+recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
+    VkCommandBufferBeginInfo beginInfo = { 0 };
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        printf("Failed to begin recording command buffer\n");
+        return -1;
+    }
+
+    VkRenderPassBeginInfo renderPassInfo = { 0 };
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+    renderPassInfo.renderArea.offset = (VkOffset2D){.x = 0, .y = 0};
+    renderPassInfo.renderArea.extent = swapChainExtent;
+    VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+    vkCmdDraw(commandBuffer, 4, 1, 0, 0); /* Draw command */
+
+    vkCmdEndRenderPass(commandBuffer);
+
+    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        printf("Failed to record command buffer\n");
+        return -1;
+    }
+
+    return 0;
+}
+
 /* ===================== MAIN ===================== */
 
 int
@@ -484,15 +528,15 @@ vkStart(const int *lboard, int lsize) {
 
     swapChainExtent = chooseSwapExtent(capabilities); /* Resolution */
 
-    imageCount = capabilities.minImageCount + 1;
-    if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
-        imageCount = capabilities.maxImageCount;
+    swapChainImageCount = capabilities.minImageCount + 1;
+    if (capabilities.maxImageCount > 0 && swapChainImageCount > capabilities.maxImageCount) {
+        swapChainImageCount = capabilities.maxImageCount;
     }
 
     VkSwapchainCreateInfoKHR swapChainCreateInfo = { 0 };
     swapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     swapChainCreateInfo.surface = surface;
-    swapChainCreateInfo.minImageCount = imageCount;
+    swapChainCreateInfo.minImageCount = swapChainImageCount;
     swapChainCreateInfo.imageFormat = swapChainSurfaceFormat.format;
     swapChainCreateInfo.imageColorSpace = swapChainSurfaceFormat.colorSpace;
     swapChainCreateInfo.imageExtent = swapChainExtent;
@@ -521,15 +565,15 @@ vkStart(const int *lboard, int lsize) {
     }
 
     /* Get swap chain images */
-    vkGetSwapchainImagesKHR(device, swapChain, &imageCount, NULL);
-    swapChainImages = malloc(sizeof(VkImage) * imageCount);
-    vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages);
+    vkGetSwapchainImagesKHR(device, swapChain, &swapChainImageCount, NULL);
+    swapChainImages = malloc(sizeof(VkImage) * swapChainImageCount);
+    vkGetSwapchainImagesKHR(device, swapChain, &swapChainImageCount, swapChainImages);
 
 
     /* Image views */
-    swapChainImageViews = malloc(sizeof(VkImageView) * imageCount);
+    swapChainImageViews = malloc(sizeof(VkImageView) * swapChainImageCount);
 
-    for (size_t i = 0; i < imageCount; i++) {
+    for (size_t i = 0; i < swapChainImageCount; i++) {
         VkImageViewCreateInfo imageViewCreateInfo = { 0 };
         imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         imageViewCreateInfo.image = swapChainImages[i];
@@ -671,6 +715,14 @@ vkStart(const int *lboard, int lsize) {
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
 
+    VkSubpassDependency dependency = { 0 };
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 
     VkRenderPassCreateInfo renderPassInfo = { 0 };
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -678,6 +730,8 @@ vkStart(const int *lboard, int lsize) {
     renderPassInfo.pAttachments = &colorAttachment;
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpass;
+    renderPassInfo.dependencyCount = 1;
+    renderPassInfo.pDependencies = &dependency;
 
     if (vkCreateRenderPass(device, &renderPassInfo, NULL, &renderPass) != VK_SUCCESS) {
         printf("failed to create render pass\n");
@@ -712,16 +766,133 @@ vkStart(const int *lboard, int lsize) {
 
     vkDestroyShaderModule(device, fragShaderModule, NULL);
     vkDestroyShaderModule(device, vertShaderModule, NULL);
+
+    /* ==================== GRAPHIC PIPELINE DONE ==================== */
+
+    swapChainFramebuffers = malloc(sizeof(VkFramebuffer) * swapChainImageCount);
+
+    for (size_t i = 0; i < swapChainImageCount; i++) {
+        VkImageView attachments[] = {
+            swapChainImageViews[i]
+        };
+
+        VkFramebufferCreateInfo framebufferInfo = { 0 };
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.width = swapChainExtent.width;
+        framebufferInfo.height = swapChainExtent.height;
+        framebufferInfo.layers = 1;
+
+        if (vkCreateFramebuffer(device, &framebufferInfo, NULL, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+            printf("Failed to create framebuffer\n");
+            return 0;
+        }
+    }
+
+    VkCommandPoolCreateInfo poolInfo = { 0 };
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    poolInfo.queueFamilyIndex = graphicQueueFamilyIdx;
+
+    if (vkCreateCommandPool(device, &poolInfo, NULL, &commandPool) != VK_SUCCESS) {
+        printf("Failed to create command pool\n");
+        return 0;
+    }
+
+    VkCommandBufferAllocateInfo allocInfo = { 0 };
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = commandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = 1;
+
+    if (vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer) != VK_SUCCESS) {
+        printf("Failed to allocate command buffers\n");
+        return 0;
+    }
+
+    
+
+    VkSemaphoreCreateInfo semaphoreInfo = { 0 };
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkFenceCreateInfo fenceInfo = { 0 };
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; /* prevent vkWaitForFences to block indefinitely in the first frame */
+
+    if (vkCreateSemaphore(device, &semaphoreInfo, NULL, &imageAvailableSemaphore) != VK_SUCCESS ||
+        vkCreateSemaphore(device, &semaphoreInfo, NULL, &renderFinishedSemaphore) != VK_SUCCESS ||
+        vkCreateFence(device, &fenceInfo, NULL, &inFlightFence) != VK_SUCCESS) {
+        printf("Failed to create semaphores\n");
+        return 0;
+    }
+   
+
+    /* ==================== MAIN LOOP ==================== */
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+        
+        vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
+        vkResetFences(device, 1, &inFlightFence);
+
+        uint32_t imageIndex;
+        vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+        vkResetCommandBuffer(commandBuffer, 0); /* make sure its able to be recorded */
+        if (recordCommandBuffer(commandBuffer, imageIndex) < 0) {
+            printf("Failed to record command buffer\n");
+            return 0;
+        }
+
+        VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+        VkSubmitInfo submitInfo = { 0 };
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = &imageAvailableSemaphore;
+        submitInfo.pWaitDstStageMask = waitStages;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = &renderFinishedSemaphore;
+
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS) {
+            printf("Failed to submit draw command buffer\n");
+            return 0;
+        }
+
+        VkPresentInfoKHR presentInfo = { 0 };
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = &renderFinishedSemaphore;
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = &swapChain;
+        presentInfo.pImageIndices = &imageIndex;
+
+        vkQueuePresentKHR(presentQueue, &presentInfo);
+    }
+
+    vkDeviceWaitIdle(device);
 }
 
 
 void
 vkDestroy() {
+    vkDestroySemaphore(device, imageAvailableSemaphore, NULL);
+    vkDestroySemaphore(device, renderFinishedSemaphore, NULL);
+    vkDestroyFence(device, inFlightFence, NULL);
+
+    vkDestroyCommandPool(device, commandPool, NULL);
+
+    for (size_t i = 0; i < swapChainImageCount; i++) {
+        vkDestroyFramebuffer(device, swapChainFramebuffers[i], NULL);
+    }
+
     vkDestroyPipeline(device, graphicsPipeline, NULL);
     vkDestroyPipelineLayout(device, pipelineLayout, NULL);
     vkDestroyRenderPass(device, renderPass, NULL);
 
-    for (size_t i = 0; i < imageCount; i++) {
+    for (size_t i = 0; i < swapChainImageCount; i++) {
         vkDestroyImageView(device, swapChainImageViews[i], NULL);
     }
     free(swapChainImageViews);
