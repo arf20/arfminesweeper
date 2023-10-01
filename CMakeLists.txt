@@ -28,8 +28,17 @@ add_custom_command(
   DEPENDS "assets/msboard4.vert"
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
+
+add_custom_command(
+  OUTPUT "assets/msboard4fs.spv"
+  COMMAND "glslc"
+  ARGS "assets/msboard4.frag" "-o" "assets/msboard4fs.spv"
+  DEPENDS "assets/msboard4.frag"
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+
 add_custom_target(vulkan_shaders ALL
-    DEPENDS "assets/msboard4vs.spv"
+    DEPENDS "assets/msboard4vs.spv" "assets/msboard4fs.spv"
 )
 
 #execute_process (

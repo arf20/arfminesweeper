@@ -45,6 +45,10 @@ static uint32_t imageCount;
 static VkImage* swapChainImages;
 static VkImageView *swapChainImageViews;
 
+static VkShaderModule vertShaderModule;
+static VkShaderModule fragShaderModule;
+
+static VkPipelineLayout pipelineLayout;
 
 #define VALIDATION_LAYER "VK_LAYER_KHRONOS_validation"
 static char *validationLayer = NULL;
@@ -57,7 +61,7 @@ static size_t requiredExtCount = sizeof(requiredExtensions) / sizeof(requiredExt
 #define COLORSPACE  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
 #define PRESENTMODE VK_PRESENT_MODE_MAILBOX_KHR
 
-static VkExtent2D extent;
+static VkExtent2D swapChainExtent;
 static VkSurfaceFormatKHR surfaceFormat;
 static VkPresentModeKHR presentMode;
 
@@ -296,7 +300,40 @@ chooseSwapExtent(VkSurfaceCapabilitiesKHR capabilities) {
     }
 }
 
+size_t
+readFile(const char *path, char **buff) {
+    FILE *f = fopen(path, "rb");
+    if (f == NULL) return -1;
+    fseek(f, 0, SEEK_END);
+    long fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
 
+    *buff = malloc(fsize + 1);
+    fread(*buff, fsize, 1, f);
+
+    fclose(f);
+    (*buff)[fsize] = '\0';
+
+    return fsize;
+}
+
+
+VkShaderModule
+createShaderModule(const char *code, size_t size) {
+    VkShaderModuleCreateInfo shaderModuleCreateInfo = { 0 };
+    shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shaderModuleCreateInfo.codeSize = size;
+    shaderModuleCreateInfo.pCode = (uint32_t*)code;
+
+    VkShaderModule shaderModule;
+    if (vkCreateShaderModule(device, &shaderModuleCreateInfo, NULL, &shaderModule) != VK_SUCCESS) {
+        printf("Failed to create shader module\n");
+    }
+
+    return shaderModule;
+}
+
+/* ===================== MAIN ===================== */
 
 int
 vkStart(const int *lboard, int lsize) {
@@ -443,7 +480,7 @@ vkStart(const int *lboard, int lsize) {
     VkSurfaceCapabilitiesKHR capabilities;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities);
 
-    extent = chooseSwapExtent(capabilities); /* Resolution */
+    swapChainExtent = chooseSwapExtent(capabilities); /* Resolution */
 
     imageCount = capabilities.minImageCount + 1;
     if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
@@ -456,7 +493,7 @@ vkStart(const int *lboard, int lsize) {
     swapChainCreateInfo.minImageCount = imageCount;
     swapChainCreateInfo.imageFormat = surfaceFormat.format;
     swapChainCreateInfo.imageColorSpace = surfaceFormat.colorSpace;
-    swapChainCreateInfo.imageExtent = extent;
+    swapChainCreateInfo.imageExtent = swapChainExtent;
     swapChainCreateInfo.imageArrayLayers = 1;
     swapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -478,6 +515,7 @@ vkStart(const int *lboard, int lsize) {
 
     if (vkCreateSwapchainKHR(device, &swapChainCreateInfo, NULL, &swapChain) != VK_SUCCESS) {
         printf("Failed to create swap chain\n");
+        return 0;
     }
 
     /* Get swap chain images */
@@ -507,21 +545,119 @@ vkStart(const int *lboard, int lsize) {
 
         if (vkCreateImageView(device, &imageViewCreateInfo, NULL, &swapChainImageViews[i]) != VK_SUCCESS) {
             printf("Failed to create image views\n");
+            return 0;
         }
     }
 
 
     /* ==================== VULKAN INITIALISED ==================== */
 
+    /* Create graphics pipeline (shader path) */
+    char *vertShaderCode, *fragShaderCode;
+    size_t vertShaderCodeSize = readFile("../assets/msboard4vs.spv", &vertShaderCode);
+    if (vertShaderCodeSize < 0) {
+        printf("Error reading vertex shader\n");
+        return 0;
+    }
     
+    size_t fragShaderCodeSize = readFile("../assets/msboard4fs.spv", &fragShaderCode);
+    if (fragShaderCodeSize < 0) {
+        printf("Error reading frag shader\n");
+        return 0;
+    }
+    
+    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode, vertShaderCodeSize);
+    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode, fragShaderCodeSize);
 
     
+
+    VkPipelineShaderStageCreateInfo vertShaderStageInfo = { 0 };
+    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    vertShaderStageInfo.module = vertShaderModule;
+    vertShaderStageInfo.pName = "main";
+
+    VkPipelineShaderStageCreateInfo fragShaderStageInfo = { 0 };
+    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    fragShaderStageInfo.module = fragShaderModule;
+    fragShaderStageInfo.pName = "main";
+
+    VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly = { 0 };
+    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+    inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+    VkViewport viewport = { 0 };
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = (float)swapChainExtent.width;
+    viewport.height = (float)swapChainExtent.height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D scissor = { 0 };
+    scissor.offset.x = 0; scissor.offset.y = 0;
+    scissor.extent = swapChainExtent;
+
+    VkPipelineViewportStateCreateInfo viewportState = { 0 };
+    viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewportState.viewportCount = 1;
+    viewportState.pViewports = &viewport;
+    viewportState.scissorCount = 1;
+    viewportState.pScissors = &scissor;
+
+
+    VkPipelineRasterizationStateCreateInfo rasterizer = { 0 };
+    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterizer.depthClampEnable = VK_FALSE;
+    rasterizer.rasterizerDiscardEnable = VK_FALSE;
+    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer.lineWidth = 1.0f;
+    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.depthBiasEnable = VK_FALSE;
     
+    VkPipelineMultisampleStateCreateInfo multisampling = { 0 };
+    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisampling.sampleShadingEnable = VK_FALSE;
+    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_4_BIT;
+
+    VkPipelineColorBlendAttachmentState colorBlendAttachment = { 0 };
+    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    colorBlendAttachment.blendEnable = VK_FALSE;
+
+    VkPipelineColorBlendStateCreateInfo colorBlending = { 0 };
+    colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    colorBlending.logicOpEnable = VK_FALSE;
+    colorBlending.attachmentCount = 1;
+    colorBlending.pAttachments = &colorBlendAttachment;
+
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo = { 0 };
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS) {
+        printf("Failed to create pipeline layout\n");
+        return 0;
+    }
+
+
+    free(vertShaderCode);
+    free(fragShaderCode);
+
+    vkDestroyShaderModule(device, fragShaderModule, NULL);
+    vkDestroyShaderModule(device, vertShaderModule, NULL);
 }
 
 
 void
 vkDestroy() {
+    vkDestroyPipelineLayout(device, pipelineLayout, NULL);
+
+    
+
     for (size_t i = 0; i < imageCount; i++) {
         vkDestroyImageView(device, swapChainImageViews[i], NULL);
     }
