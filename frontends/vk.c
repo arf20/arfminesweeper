@@ -65,6 +65,7 @@ static VkFence inFlightFence;
 
 static VkBuffer boardSSBO;
 static VkDeviceMemory ssboMemory;
+static void *boardMapped;
 
 static VkDescriptorPool descriptorPool;
 static VkDescriptorSet descriptorSet;
@@ -92,6 +93,40 @@ typedef struct {
 } PushConstantsData;
 
 PushConstantsData pushConstantsData;
+
+
+void
+updateBoardSSBO() {
+    memcpy(boardMapped, board, sizeof(int) * size * size);
+}
+
+static void
+mouseCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (action != GLFW_RELEASE) return;
+
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    int ix = ((int)x - W_MARGIN) /
+        (CELL_SIZE + CELL_MARGIN);
+    int iy = ((int)y - HEADER_HEIGHT) /
+        (CELL_SIZE + CELL_MARGIN);
+    if (ix < 0 || ix >= size || iy < 0 || iy >= size) return;
+
+    printf("mouse %d,%d\n", ix, iy);
+
+    switch (button) {
+        case GLFW_MOUSE_BUTTON_LEFT: {
+            gameClearCell(ix, iy);
+            updateBoardSSBO();
+        } break;
+        case GLFW_MOUSE_BUTTON_RIGHT: {
+            gameFlagCell(ix, iy);
+            updateBoardSSBO();
+        }
+    }
+}
+
 
 
 int
@@ -441,6 +476,8 @@ vkStart(const int *lboard, int lsize) {
         printf("Error creating window\n");
         return -1;
     }
+
+    glfwSetMouseButtonCallback(window, mouseCallback);
 
     /* ==================== GLFW & WINDOW INITIALISED ==================== */
     
@@ -922,7 +959,8 @@ vkStart(const int *lboard, int lsize) {
 
     vkBindBufferMemory(device, boardSSBO, ssboMemory, 0);
 
-    vkMapMemory(device, ssboMemory, 0, sizeof(int) * size * size, 0, (void**)&board);
+    vkMapMemory(device, ssboMemory, 0, sizeof(int) * size * size, 0, &boardMapped);
+
 
     /* ==================== DESCRIPTOR POOL + SETS ==================== */
 

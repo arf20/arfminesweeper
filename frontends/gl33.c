@@ -50,7 +50,7 @@ static GLFWwindow *g_window = NULL;
 static GLint boardShader, dummyvao, boardUBO;
 static unsigned int *boardUBOdata = NULL;
 
-void
+static void
 render(GLFWwindow *window) {
     glClearColor(C_BLACK, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -61,25 +61,25 @@ render(GLFWwindow *window) {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void
+static void
 resizeCallback(GLFWwindow *window, int w, int h) {
     
 }
 
-void
+static void
 keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
 }
 
 void
-updateBoadUBO() {
+updateBoardUBO() {
     glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(int)*size*size, board, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, boardUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
 }
 
-void
+static void
 mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     //if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     if (action != GLFW_RELEASE) return;
@@ -96,11 +96,11 @@ mouseCallback(GLFWwindow* window, int button, int action, int mods) {
     switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: {
             gameClearCell(ix, iy);
-            updateBoadUBO();
+            updateBoardUBO();
         } break;
         case GLFW_MOUSE_BUTTON_RIGHT: {
             gameFlagCell(ix, iy);
-            updateBoadUBO();
+            updateBoardUBO();
         }
     }
 
