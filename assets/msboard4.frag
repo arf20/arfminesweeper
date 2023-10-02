@@ -8,17 +8,16 @@ layout(push_constant) uniform constants {
     uint size;
 };
 
-/*layout(std140) uniform BoardBlock {
-    uvec4 board[1024];
-};*/
+layout(std430, set = 0, binding = 0) readonly buffer BoardSSBO {
+   uint board[];
+};
 
 layout (location = 0) out vec4 color;
 
 
 uint boardxy(uint x, uint y) {
-    /*uint n = (y * size) + x;
-    return board[n / 4u][n % 4u];*/
-    return 1u;
+    uint n = (y * size) + x;
+    return board[n];
 }
 
 /* Cell bit field */

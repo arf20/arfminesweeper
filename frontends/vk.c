@@ -36,7 +36,9 @@ static int size = 0;
 
 static int wWidth, wHeight;
 static GLFWwindow* window;
+
 static VkInstance instance;
+static VkPhysicalDevice physicalDevice;
 static VkDevice device;
 static VkSurfaceKHR surface;
 static VkSwapchainKHR swapChain;
@@ -48,6 +50,7 @@ static VkImageView *swapChainImageViews;
 static VkShaderModule vertShaderModule;
 static VkShaderModule fragShaderModule;
 
+static VkDescriptorSetLayout descriptorSetLayout;
 static VkPipelineLayout pipelineLayout;
 static VkRenderPass renderPass;
 static VkPipeline graphicsPipeline;
@@ -59,6 +62,12 @@ static VkCommandBuffer commandBuffer;
 static VkSemaphore imageAvailableSemaphore;
 static VkSemaphore renderFinishedSemaphore;
 static VkFence inFlightFence;
+
+static VkBuffer boardSSBO;
+static VkDeviceMemory ssboMemory;
+
+static VkDescriptorPool descriptorPool;
+static VkDescriptorSet descriptorSet;
 
 #define VALIDATION_LAYER "VK_LAYER_KHRONOS_validation"
 static char *validationLayer = NULL;
@@ -379,6 +388,8 @@ recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
 
     vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PushConstantsData), &pushConstantsData);
 
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
+
     vkCmdDraw(commandBuffer, 4, 1, 0, 0); /* Draw command */
 
     vkCmdEndRenderPass(commandBuffer);
@@ -389,6 +400,20 @@ recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
     }
 
     return 0;
+}
+
+uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+            return i;
+        }
+    }
+
+    printf("Failed to find suitable memory type\n");
+    return -1;
 }
 
 /* ===================== MAIN ===================== */
@@ -461,7 +486,7 @@ vkStart(const int *lboard, int lsize) {
     }
 
     /* Pick physical device */
-    VkPhysicalDevice physicalDevice = pickDevice();
+    physicalDevice = pickDevice();
     if (physicalDevice == VK_NULL_HANDLE) {
         return 0;
     }
@@ -612,7 +637,8 @@ vkStart(const int *lboard, int lsize) {
 
     /* ==================== VULKAN INITIALISED ==================== */
 
-    /* Create graphics pipeline (shader path) */
+    /* ==================== GRAPHICS PIPELINE  ==================== */
+    
     char *vertShaderCode, *fragShaderCode;
     size_t vertShaderCodeSize = readFile("../assets/msboard4vs.spv", &vertShaderCode);
     if (vertShaderCodeSize < 0) {
@@ -706,10 +732,29 @@ vkStart(const int *lboard, int lsize) {
     range.offset = 0;
     range.size = sizeof(PushConstantsData); /* SHADER THING: vec2 + uint = 2 * 4 + 4 = 12 bytes */
 
+    VkDescriptorSetLayoutBinding ssboLayoutBinding = { 0 };
+    ssboLayoutBinding.binding = 0;
+    ssboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    ssboLayoutBinding.descriptorCount = 1;
+    ssboLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+
+    VkDescriptorSetLayoutCreateInfo layoutInfo = { 0 };
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = 1;
+    layoutInfo.pBindings = &ssboLayoutBinding;
+
+    if (vkCreateDescriptorSetLayout(device, &layoutInfo, NULL, &descriptorSetLayout) != VK_SUCCESS) {
+        printf("Failed to create descriptor set layout\n");
+        return 0;
+    }
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo = { 0 };
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &range;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
 
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, NULL, &pipelineLayout) != VK_SUCCESS) {
         printf("Failed to create pipeline layout\n");
@@ -788,7 +833,7 @@ vkStart(const int *lboard, int lsize) {
     vkDestroyShaderModule(device, fragShaderModule, NULL);
     vkDestroyShaderModule(device, vertShaderModule, NULL);
 
-    /* ==================== GRAPHIC PIPELINE DONE ==================== */
+    /* ==================== COMMAND POOL + BUFFER ==================== */
 
     swapChainFramebuffers = malloc(sizeof(VkFramebuffer) * swapChainImageCount);
 
@@ -812,12 +857,12 @@ vkStart(const int *lboard, int lsize) {
         }
     }
 
-    VkCommandPoolCreateInfo poolInfo = { 0 };
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    poolInfo.queueFamilyIndex = graphicQueueFamilyIdx;
+    VkCommandPoolCreateInfo commanPoolInfo = { 0 };
+    commanPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    commanPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    commanPoolInfo.queueFamilyIndex = graphicQueueFamilyIdx;
 
-    if (vkCreateCommandPool(device, &poolInfo, NULL, &commandPool) != VK_SUCCESS) {
+    if (vkCreateCommandPool(device, &commanPoolInfo, NULL, &commandPool) != VK_SUCCESS) {
         printf("Failed to create command pool\n");
         return 0;
     }
@@ -833,7 +878,7 @@ vkStart(const int *lboard, int lsize) {
         return 0;
     }
 
-    
+    /* ==================== SYNC OBJECTS ==================== */
 
     VkSemaphoreCreateInfo semaphoreInfo = { 0 };
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -849,6 +894,81 @@ vkStart(const int *lboard, int lsize) {
         return 0;
     }
    
+    /* ==================== BOARD SSBO ==================== */
+
+    VkBufferCreateInfo bufferInfo = { 0 };
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    bufferInfo.size = sizeof(int) * size * size;
+
+    if (vkCreateBuffer(device, &bufferInfo, NULL, &boardSSBO) != VK_SUCCESS) {
+        printf("Failed to create vertex buffer\n");
+        return 0;
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(device, boardSSBO, &memRequirements);
+
+    VkMemoryAllocateInfo ssboAllocInfo = { 0 };
+    ssboAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    ssboAllocInfo.allocationSize = memRequirements.size;
+    ssboAllocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    if (vkAllocateMemory(device, &ssboAllocInfo, NULL, &ssboMemory) != VK_SUCCESS) {
+        printf("Failed to allocate board SSBO memory\n");
+        return 0;
+    }
+
+    vkBindBufferMemory(device, boardSSBO, ssboMemory, 0);
+
+    vkMapMemory(device, ssboMemory, 0, sizeof(int) * size * size, 0, (void**)&board);
+
+    /* ==================== DESCRIPTOR POOL + SETS ==================== */
+
+    VkDescriptorPoolSize poolSize = { 0 };
+    poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    poolSize.descriptorCount = 1u;
+
+    VkDescriptorPoolCreateInfo descriptorPoolInfo = { 0 };
+    descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    descriptorPoolInfo.poolSizeCount = 1;
+    descriptorPoolInfo.pPoolSizes = &poolSize;
+    descriptorPoolInfo.maxSets = 1u;
+
+    if (vkCreateDescriptorPool(device, &descriptorPoolInfo, NULL, &descriptorPool) != VK_SUCCESS) {
+        printf("Failed to create descriptor pool\n");
+        return 0;
+    }
+
+
+    VkDescriptorSetAllocateInfo descriptorSetAllocInfo = { 0 };
+    descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    descriptorSetAllocInfo.descriptorPool = descriptorPool;
+    descriptorSetAllocInfo.descriptorSetCount = 1u;
+    descriptorSetAllocInfo.pSetLayouts = &descriptorSetLayout;
+
+    if (vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSet) != VK_SUCCESS) {
+        printf("Failed to allocate descriptor sets\n");
+        return 0;
+    }
+
+    VkDescriptorBufferInfo descriptorBufferInfo = { 0 };
+    descriptorBufferInfo.buffer = boardSSBO;
+    descriptorBufferInfo.offset = 0;
+    descriptorBufferInfo.range = sizeof(int) * size * size;
+
+    VkWriteDescriptorSet descriptorWrite = { 0 };
+    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrite.dstSet = descriptorSet;
+    descriptorWrite.dstBinding = 0;
+    descriptorWrite.dstArrayElement = 0;
+    descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    descriptorWrite.descriptorCount = 1;
+    descriptorWrite.pBufferInfo = &descriptorBufferInfo;
+
+    vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, NULL);
+
 
     /* ==================== MAIN LOOP ==================== */
 
@@ -920,6 +1040,13 @@ vkDestroy() {
     free(swapChainImages);
 
     vkDestroySwapchainKHR(device, swapChain, NULL);
+
+    vkDestroyBuffer(device, boardSSBO, NULL);
+    vkFreeMemory(device, ssboMemory, NULL);
+
+    vkDestroyDescriptorPool(device, descriptorPool, NULL);
+    vkDestroyDescriptorSetLayout(device, descriptorSetLayout, NULL);
+
     vkDestroySurfaceKHR(instance, surface, NULL);
     vkDestroyDevice(device, NULL);
     vkDestroyInstance(instance, NULL);
