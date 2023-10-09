@@ -78,8 +78,6 @@ drawTextMultiline(int x, int y, const char *str) {
 
 static void
 render() {
-    static char buff[256];
-
     XClearWindow(d, w);
     XSetForeground(d, gc, WhitePixel(d, s));
     XSetFont(d, gc, f);
@@ -100,6 +98,7 @@ render() {
     }
 
     /* Print flags left */
+    static char buff[256];
     snprintf(buff, 256, "%d", gameGetFlagsLeft());
     XDrawString(d, w, gc, wWidth - 25, 35, buff, strlen(buff));
 
