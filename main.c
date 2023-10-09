@@ -28,7 +28,7 @@
 
 #include "frontends/console.h"
 #include "frontends/fbdev.h"
-#include "frontends/x11.h"
+#include "frontends/xlib.h"
 #include "frontends/motif.h"
 #include "frontends/xforms.h"
 #include "frontends/gtk3.h"
@@ -41,6 +41,7 @@
 #include "frontends/win32.h"
 #include "frontends/httpd.h"
 #include "frontends/wayland.h"
+#include "frontends/xcb.h"
 
 #include "frontends/common.h"
 
@@ -67,8 +68,8 @@ printFrontends() {
     #ifdef FRONTEND_FBDEV
         printf("fbdev ");
     #endif
-    #ifdef FRONTEND_X11
-        printf("x11 ");
+    #ifdef FRONTEND_XLIB
+        printf("xlib ");
     #endif
     #ifdef FRONTEND_MOTIF
         printf("motif ");
@@ -105,6 +106,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_WAYLAND
         printf("wayland ");
+    #endif
+    #ifdef FRONTEND_XCB
+        printf("xcb ");
     #endif
 
     printf("\n");
@@ -153,12 +157,12 @@ main(int argc, char **argv) {
     if (!strcmp(frontend, "console")) {
         conStart(gameGetBoard(), size);
     }
-    else if (!strcmp(frontend, "x11")) {
-        #ifdef FRONTEND_X11
-        X11Start(gameGetBoard(), size);
-        X11Destroy();
+    else if (!strcmp(frontend, "xlib")) {
+        #ifdef FRONTEND_XLIB
+        XlibStart(gameGetBoard(), size);
+        XlibDestroy();
         #else
-        printf("Error: Frontend x11 not built\n");
+        printf("Error: Frontend xlib not built\n");
         #endif
     }
     else if (!strcmp(frontend, "fbdev")) {
@@ -263,6 +267,14 @@ main(int argc, char **argv) {
         WaylandDestroy();
         #else
         printf("Error: Frontend webapp not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "xcb")) {
+        #ifdef FRONTEND_XCB
+        xcbStart(gameGetBoard(), size);
+        xcbDestroy();
+        #else
+        printf("Error: Frontend xcb not built\n");
         #endif
     }
     else {

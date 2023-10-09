@@ -64,9 +64,15 @@ endif()
 
 find_package(X11)
 if (X11_FOUND)
-    file (GLOB SRC ${SRC} "frontends/x11.c")
-    add_compile_definitions(FRONTEND_X11)
-    message(STATUS "Building with X11")
+    file (GLOB SRC ${SRC} "frontends/xlib.c")
+    add_compile_definitions(FRONTEND_XLIB)
+    message(STATUS "Building with X11 Xlib")
+
+    if (X11_xcb_FOUND)
+        file (GLOB SRC ${SRC} "frontends/xcb.c")
+        add_compile_definitions(FRONTEND_XCB)
+        message(STATUS "Building with xcb")
+    endif()
 
     find_package(Motif)
     if (MOTIF_FOUND)
@@ -192,6 +198,10 @@ target_link_libraries(arfminesweeper Threads::Threads)
 
 if (X11_FOUND)
     target_link_libraries(arfminesweeper ${X11_LIBRARIES})
+
+    if (X11_xcb_FOUND)
+        target_link_libraries(arfminesweeper X11::xcb)
+    endif()
 
     if (MOTIF_FOUND)
         target_link_libraries(arfminesweeper ${MOTIF_LIBRARIES} Xt)

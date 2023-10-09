@@ -37,7 +37,7 @@ ncurses                       X     X   X   X
 fbdev                   WIP   X
 SVGA buffer                   
 X11 Xlib                DONE  X     X
-X11 XCB                       X     X
+X11 XCB                 WIP   X     X
 Wayland                 WIP   X     X
 XForms                  DONE  X     X
 Motif                   WIP   X     X

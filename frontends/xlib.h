@@ -18,10 +18,10 @@
 
 */
 
-#ifndef _X11_H
-#define _X11_H
+#ifndef _XLIB_H
+#define _XLIB_H
 
-int X11Start(const int *lboard, int lsize);
-void X11Destroy();
+int XlibStart(const int *lboard, int lsize);
+void XlibDestroy();
 
 #endif

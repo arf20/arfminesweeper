@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    x11.c: X11 Xlib frontend
+    xlib.c: X11 Xlib frontend
 
 */
 
@@ -28,7 +28,7 @@
 
 #include "common.h"
 #include "../game.h"
-#include "x11.h"
+#include "xlib.h"
 
 #define TXT_OFFX    5
 #define TXT_OFFY    15
@@ -144,7 +144,7 @@ render() {
 }
 
 int
-X11Start(const int *lboard, int lsize) {
+XlibStart(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -219,7 +219,7 @@ X11Start(const int *lboard, int lsize) {
 }
 
 void
-X11Destroy() {
+XlibDestroy() {
     XDestroyWindow(d, w);
     XCloseDisplay(d);
 }
