@@ -34,33 +34,49 @@
 #include "common.h"
 #include "../game.h"
 #include "fbdev.h"
-#include "bmp.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 static const int *board = NULL;
 static int size = 0;
 
 static int fbfd = 0, screensize = 0;
 
-static int sWidth = 0, fbWidth = 0, sHeight = 0;
-static rgba_t *fbp = NULL; /* assume 32bpp */
-#define FB_XY(x, y)  fbp[(y * fbWidth) + x]
+typedef struct {
+    char b, g, r, a;
+} bgra_t;
 
-/* assume 9x15 font */
-const rgba_t *fontimg = NULL;
+static int sWidth = 0, fbWidth = 0, sHeight = 0;
+static bgra_t *fbp = NULL; /* assume 32bpp */
+#define FB_XY(x, y)  fbp[((y) * fbWidth) + (x)]
+
+/* assume 9x15 font that starts at space */
+const unsigned char *fontimg = NULL;
 int fontiw = 0, fontih = 0;
 #define FONT_W  9
 #define FONT_H  15
-#define FONT_XY(x, y)  fontimg[(y * fontiw) + x]
+#define FONT_FIRSTC 0x20
+
+#define TXT_OFFX    5
+#define TXT_OFFY    4
 
 /* assume 32bpp */
-rgba_t fbColor(char r, char g, char b, char a) {
-    rgba_t c;
+bgra_t fbColor(char r, char g, char b, char a) {
+    bgra_t c;
     c.r = r; c.g = g; c.b = b; c.a = a;
     return c;
 }
 
 #define FB_WHITE    fbColor(0xff, 0xff, 0xff, 0xff)
 #define FB_BLACK    fbColor(0x00, 0x00, 0x00, 0xff)
+#define FB_BLUE     fbColor(0x00, 0x00, 0xff, 0xff)
+#define FB_GREEN    fbColor(0x00, 0xff, 0x00, 0xff)
+#define FB_RED      fbColor(0xff, 0x00, 0x00, 0xff)
+#define FB_DARKBLUE fbColor(0x00, 0x00, 0x8b, 0xff)
+#define FB_DARKRED  fbColor(0x8b, 0x00, 0x00, 0xff)
+#define FB_DARKCYAN fbColor(0x00, 0x8b, 0x8b, 0xff)
+#define FB_DARKGREY fbColor(0xa9, 0xa9, 0xa9, 0xff)
 
 /* fb utils */
 void
@@ -72,7 +88,7 @@ fbClear() {
 }
 
 void
-fbFillRect(int ix, int iy, int w, int h, rgba_t c) {
+fbFillRect(int ix, int iy, int w, int h, bgra_t c) {
     if (ix < 0 || iy < 0 || ix + w >= sWidth || iy + h >= sHeight) return;
     for (int y = iy; y < iy + h; y++)
         for (int x = ix; x < ix + w; x++)
@@ -80,21 +96,34 @@ fbFillRect(int ix, int iy, int w, int h, rgba_t c) {
 }
 
 void
-fbCopy(int dx, int dy, int sx, int sy, int w, int h, const rgba_t *src) {
-    if (dx < 0 || dy < 0 || dx + w >= sWidth || dy + h >= sHeight) return;
+fbCopyFont(int dx, int dy, int sx, int sy, int w, int h, bgra_t fg, bgra_t bg, const unsigned char *src) {
+    if (dx < 0 || dy < 0 || dx + w > sWidth || dy + h > sHeight) return;
     for (int y = 0; y < h; y++)
         for (int x = 0; x < w; x++)
-            FB_XY(dx + x, dy + y) = FONT_XY(sx + x, sy + y);
+            FB_XY(dx + x, dy + y) = src[((sy + y) * fontiw) + (sx + x)] > 0 ? fg : bg;
 }
 
 void
-fbDrawString(int ix, int iy, rgba_t fg, rgba_t bg, const char *str) {
+fbDrawString(int ix, int iy, bgra_t fg, bgra_t bg, const char *str, size_t len) {
     const char *ptr = str;
     int i = 0;
-    while (*ptr) {
+    while (*ptr && (i < len)) {
         i = ptr - str;
-        fbCopy((FONT_W * i) + ix, iy, FONT_W * *ptr, 0, FONT_W, FONT_H, fontimg);
+        if (*ptr < FONT_FIRSTC) { ptr++; continue; }
+        fbCopyFont((FONT_W * i) + ix, iy, FONT_W * (*ptr - FONT_FIRSTC), 0, FONT_W, FONT_H, fg, bg, fontimg);
         ptr++;
+    }
+}
+
+static void
+drawTextMultiline(int x, int y, const char *str) {
+    const char *line = str, *next = NULL;
+    int len = strlen(str), i = 0;
+    while (line < str + len) {
+        next = strchr(line, '\n');
+        fbDrawString(x, y + (i * FONT_H), FB_WHITE, FB_BLACK, line, next - line);
+        line = next + 1;
+        i++;
     }
 }
 
@@ -108,9 +137,21 @@ render() {
     static char buff[256];
 
     fbClear();
-    fbDrawString(5, 0, FB_WHITE, FB_BLACK, TXT_TITLE);
-    fbCopy(100, 100, 0, 0, 200, 15, fontimg);
+    fbDrawString(5, 15, FB_WHITE, FB_BLACK, TXT_TITLE, sizeof(TXT_TITLE));
 
+    /* Check game state*/
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            drawTextMultiline(5, 45, TXT_LOST);
+            return;
+        } break;
+        case STATE_WON: {
+            drawTextMultiline(5, 45, TXT_WON);
+            return;
+        } break;
+    }
+
+    bgra_t c;
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
             int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
@@ -120,11 +161,19 @@ render() {
                 int n = gameGetSurroundingMines(x, y);
                 if (n) {
                     snprintf(buff, 256, "%d", n);
+
                     switch (n) {
-                        
+                        case 1: c = FB_BLUE; break;
+                        case 2: c = FB_GREEN; break;
+                        case 3: c = FB_RED; break;
+                        case 4: c = FB_DARKBLUE; break;
+                        case 5: c = FB_DARKRED; break;
+                        case 6: c = FB_DARKCYAN; break;
+                        case 7: c = FB_BLACK; break;
+                        case 8: c = FB_DARKGREY; break;
                     }
-                    //XDrawString(d, w, gc, cX + TXT_OFFX, cY + TXT_OFFY,
-                    //    buff, strlen(buff));
+                    fbDrawString(cX + TXT_OFFX, cY + TXT_OFFY,
+                        c, FB_BLACK, buff, strlen(buff));
                 }
             }
             /* If not clear, check flag and draw it */
@@ -145,10 +194,17 @@ fbdevStart(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
+    gameClearCell(0, 0);
+    gameClearCell(7, 7);
+
     /* Read bitmap font */
-    if (readBMP(FONT_BMP_PATH, &fontimg, &fontiw, &fontih) != 0) {
+    int ch;
+    fontimg = stbi_load(FONT_BMP_PATH, &fontiw, &fontih, &ch, 1);
+    if (!fontimg) {
+        printf("Error loading bitmap font: " FONT_BMP_PATH "\n");
         return -1;
     }
+    printf("Bitmap font: %dx%d, %dch\n", fontiw, fontih, ch);
 
     /* Through the power of linux magic, open the framebuffer device and map it
         to memory */
@@ -177,7 +233,7 @@ fbdevStart(const int *lboard, int lsize) {
     const int PADDING = 4096;
     int mmapsize = (screensize + PADDING - 1) & ~(PADDING-1);
 
-    fbp = (rgba_t*)mmap(0, mmapsize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
+    fbp = (bgra_t*)mmap(0, mmapsize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
     if (fbp == MAP_FAILED) {
         printf("Error mapping fbdev to memory: %s\n", strerror(errno));
         return -1;
@@ -188,7 +244,7 @@ fbdevStart(const int *lboard, int lsize) {
 
     while (1) {
         render();
-        sleep(1);
+        usleep(100000);
     }
 }
 

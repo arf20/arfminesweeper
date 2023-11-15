@@ -224,6 +224,8 @@ xcbStart(const int *lboard, int lsize) {
     darkcyan = _darkcyan->pixel;
     darkgrey = _darkgrey->pixel;
 
+    free(_blue); free(_green); free(_red); free(_darkblue); free(_darkred); free(_darkcyan); free(_darkgrey);
+    
     /* allocate font */
     font = xcb_generate_id(c);
     xcb_open_font_checked(c, font, strlen("9x15"), "9x15");
