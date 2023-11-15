@@ -65,6 +65,10 @@ int fontiw = 0, fontih = 0;
 #define TXT_OFFX    5
 #define TXT_OFFY    4
 
+/* flag */
+const unsigned char *flag = NULL;
+int flagw = 0, flagh = 0;
+
 /* term stuff */
 struct termios raw;
 struct termios orig;
@@ -79,6 +83,7 @@ bgra_t fbColor(char r, char g, char b, char a) {
     return c;
 }
 
+#define FB_TRANS    fbColor(0x00, 0x00, 0x00, 0x00)
 #define FB_WHITE    fbColor(0xff, 0xff, 0xff, 0xff)
 #define FB_BLACK    fbColor(0x00, 0x00, 0x00, 0xff)
 #define FB_BLUE     fbColor(0x00, 0x00, 0xff, 0xff)
@@ -109,33 +114,35 @@ fbFillRect(int ix, int iy, int w, int h, bgra_t c) {
 void
 fbHLine(int ix, int l, int y, bgra_t c) {
     if (ix < 0 || y < 0 || ix + l >= sWidth || y >= sHeight) return;
-    for (int x = ix; x < l; x++)
+    for (int x = ix; x < ix + l; x++)
         FB_XY(x, y) = c;
 }
 
 void
 fbVLine(int x, int l, int iy, bgra_t c) {
     if (x < 0 || iy < 0 || x >= sWidth || iy + l >= sHeight) return;
-    for (int y = iy; y < l; y++)
+    for (int y = iy; y < iy + l; y++)
         FB_XY(x, y) = c;
 }
 
 void
-fbCopyFont(int dx, int dy, int sx, int sy, int w, int h, bgra_t fg, bgra_t bg, const unsigned char *src) {
+fbRenderFont(int dx, int dy, int sx, int sy, int w, int h, bgra_t fg) {
     if (dx < 0 || dy < 0 || dx + w > sWidth || dy + h > sHeight) return;
     for (int y = 0; y < h; y++)
         for (int x = 0; x < w; x++)
-            FB_XY(dx + x, dy + y) = src[((sy + y) * fontiw) + (sx + x)] > 0 ? fg : bg;
+            FB_XY(dx + x, dy + y)
+                = fontimg[((sy + y) * fontiw) + (sx + x)] > 0 ? fg : FB_TRANS;
 }
 
 void
-fbDrawString(int ix, int iy, bgra_t fg, bgra_t bg, const char *str, size_t len) {
+fbDrawString(int ix, int iy, bgra_t fg, const char *str, size_t len) {
     const char *ptr = str;
     int i = 0;
     while (*ptr && (i < len)) {
         i = ptr - str;
         if (*ptr < FONT_FIRSTC) { ptr++; continue; }
-        fbCopyFont((FONT_W * i) + ix, iy, FONT_W * (*ptr - FONT_FIRSTC), 0, FONT_W, FONT_H, fg, bg, fontimg);
+        fbRenderFont((FONT_W * i) + ix, iy, FONT_W * (*ptr - FONT_FIRSTC), 0,
+            FONT_W, FONT_H, fg);
         ptr++;
     }
 }
@@ -146,21 +153,24 @@ drawTextMultiline(int x, int y, const char *str) {
     int len = strlen(str), i = 0;
     while (line < str + len) {
         next = strchr(line, '\n');
-        fbDrawString(x, y + (i * FONT_H), FB_WHITE, FB_BLACK, line, next - line);
+        fbDrawString(x, y + (i * FONT_H), FB_WHITE, line, next - line);
         line = next + 1;
         i++;
     }
 }
 
 static void
-drawFlag(int x, int y) {
-    
+drawFlag(int ix, int iy) {
+    for (int y = 0; y < flagh; y++)
+        for (int x = 0; x < flagw; x++)
+            FB_XY(ix + x + 2, iy + y + 2)
+                = flag[(flagw * y) + x] > 0 ? FB_RED : FB_WHITE;
 }
 
 static void
 render() {
     fbClear();
-    fbDrawString(5, 15, FB_WHITE, FB_BLACK, TXT_TITLE, sizeof(TXT_TITLE));
+    fbDrawString(5, 15, FB_WHITE, TXT_TITLE, sizeof(TXT_TITLE));
 
     /* Check game state*/
     switch (gameGetState()) {
@@ -177,7 +187,7 @@ render() {
     /* Print flags left */
     static char buff[256];
     snprintf(buff, 256, "%d", gameGetFlagsLeft());
-    fbDrawString(wWidth - 25, 35, FB_WHITE, FB_BLACK, buff, strlen(buff));
+    fbDrawString(wWidth - 25, 35, FB_WHITE, buff, strlen(buff));
 
     bgra_t c;
     for (int y = 0; y < size; y++) {
@@ -201,7 +211,7 @@ render() {
                         case 8: c = FB_DARKGREY; break;
                     }
                     fbDrawString(cX + TXT_OFFX, cY + TXT_OFFY,
-                        c, FB_BLACK, buff, strlen(buff));
+                        c, buff, strlen(buff));
                 }
             }
             /* If not clear, check flag and draw it */
@@ -216,10 +226,10 @@ render() {
 
             /* draw cursor */
             if (x == curx && y == cury) {
-                fbHLine(cX - 1, CELL_SIZE + 20, cY - 1, FB_RED);
-                fbHLine(cX - 1, CELL_SIZE + 20, cY + CELL_SIZE + 1, FB_RED);
-                fbVLine(cX - 1, CELL_SIZE + 2, cY - 1, FB_RED);
-                fbVLine(cX + CELL_SIZE + 1, CELL_SIZE + 2, cY - 1, FB_RED);
+                fbHLine(cX, CELL_SIZE, cY, FB_RED);
+                fbHLine(cX, CELL_SIZE, cY + CELL_SIZE - 1, FB_RED);
+                fbVLine(cX, CELL_SIZE, cY, FB_RED);
+                fbVLine(cX + CELL_SIZE - 1, CELL_SIZE, cY, FB_RED);
             }
         }
     }
@@ -229,9 +239,6 @@ int
 fbdevStart(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
-
-    gameClearCell(0, 0);
-    gameClearCell(7, 7);
 
     wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
     wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
@@ -245,6 +252,14 @@ fbdevStart(const int *lboard, int lsize) {
         return -1;
     }
     printf("Bitmap font: %dx%d, %dch\n", fontiw, fontih, ch);
+
+    /* Read flag bitmap */
+    flag = stbi_load(FLAG_PNG_PATH, &flagw, &flagh, &ch, 1);
+    if (!fontimg) {
+        printf("Error loading bitmap font: " FLAG_PNG_PATH "\n");
+        return -1;
+    }
+    printf("Bitmap flag: %dx%d, %dch\n", fontiw, fontih, ch);
 
     /* Through the power of linux magic, open the framebuffer device and map it
         to memory */
@@ -292,23 +307,39 @@ fbdevStart(const int *lboard, int lsize) {
     flags |= O_NONBLOCK;
     fcntl(STDIN_FILENO, F_SETFL, flags);
 
-    char input = 0;
+    render();
+    char input[8] = { 0 };
+    int bytesread;
     while (1) {
-        while (read(STDIN_FILENO, &input, 1) > 0) {
-            input = tolower(input);
-            switch (input) {
-                case 'a': curx--; break;
-                case 'd': curx++; break;
-                case 'w': cury--; break;
-                case 's': cury++; break;
+        while ((bytesread = read(STDIN_FILENO, &input, 8)) > 0) {
+            for (int i = 0; i < bytesread; i++) {
+                if (input[i] == '\033') {
+                    if (strncmp(input + i, "\033[A", 3) == 0) cury--;
+                    if (strncmp(input + i, "\033[B", 3) == 0) cury++;
+                    if (strncmp(input + i, "\033[C", 3) == 0) curx++;
+                    if (strncmp(input + i, "\033[D", 3) == 0) curx--;
+                    i += 2;
+                } else if (isalpha(input[i])) {
+                    input[i] = tolower(input[i]);
+                    switch (input[i]) {
+                        case 'a': curx--; break;
+                        case 'd': curx++; break;
+                        case 'w': cury--; break;
+                        case 's': cury++; break;
+                        case 'f': gameFlagCell(curx, cury); break;
+                        case 'c': gameClearCell(curx, cury); break;
+                    }
+                }
+                if (curx < 0) curx = size - 1;
+                if (cury < 0) cury = size - 1;
+                if (curx >= size) curx = 0;
+                if (cury >= size) cury = 0;
             }
-            if (curx < 0) curx = size - 1;
-            if (cury < 0) cury = size - 1;
-            if (curx >= size) curx = 0;
-            if (cury >= size) cury = 0;
+            render();
+            memset(input, 0, 8);
         }
-        render();
-        usleep(25000);
+        //render();
+        //usleep(25000);
     }
 }
 
