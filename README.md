@@ -59,6 +59,9 @@ Win32 GDI+                                  X
 Direct2D                                    X
 .NET WinForms                               X
 .NET WPF                                    X
+Win UWP                                     X
+WinUI 3                                     X
+.NET MAUI                                   X
 Java AWT                      X     X   X   X
 Java Swing                    X     X   X   X
 Webapp                  DONE  X     X   X   X

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -30,6 +31,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <errno.h>
+#include <termios.h>
 
 #include "common.h"
 #include "../game.h"
@@ -40,6 +42,8 @@
 
 static const int *board = NULL;
 static int size = 0;
+
+static int wWidth = 0, wHeight = 0;
 
 static int fbfd = 0, screensize = 0;
 
@@ -60,6 +64,13 @@ int fontiw = 0, fontih = 0;
 
 #define TXT_OFFX    5
 #define TXT_OFFY    4
+
+/* term stuff */
+struct termios raw;
+struct termios orig;
+
+/* cursor */
+int curx = 0, cury = 0;
 
 /* assume 32bpp */
 bgra_t fbColor(char r, char g, char b, char a) {
@@ -93,6 +104,20 @@ fbFillRect(int ix, int iy, int w, int h, bgra_t c) {
     for (int y = iy; y < iy + h; y++)
         for (int x = ix; x < ix + w; x++)
             FB_XY(x, y) = c;
+}
+
+void
+fbHLine(int ix, int l, int y, bgra_t c) {
+    if (ix < 0 || y < 0 || ix + l >= sWidth || y >= sHeight) return;
+    for (int x = ix; x < l; x++)
+        FB_XY(x, y) = c;
+}
+
+void
+fbVLine(int x, int l, int iy, bgra_t c) {
+    if (x < 0 || iy < 0 || x >= sWidth || iy + l >= sHeight) return;
+    for (int y = iy; y < l; y++)
+        FB_XY(x, y) = c;
 }
 
 void
@@ -134,8 +159,6 @@ drawFlag(int x, int y) {
 
 static void
 render() {
-    static char buff[256];
-
     fbClear();
     fbDrawString(5, 15, FB_WHITE, FB_BLACK, TXT_TITLE, sizeof(TXT_TITLE));
 
@@ -150,6 +173,11 @@ render() {
             return;
         } break;
     }
+
+    /* Print flags left */
+    static char buff[256];
+    snprintf(buff, 256, "%d", gameGetFlagsLeft());
+    fbDrawString(wWidth - 25, 35, FB_WHITE, FB_BLACK, buff, strlen(buff));
 
     bgra_t c;
     for (int y = 0; y < size; y++) {
@@ -185,6 +213,14 @@ render() {
             else {
                 fbFillRect(cX, cY, CELL_SIZE, CELL_SIZE, FB_WHITE);
             }
+
+            /* draw cursor */
+            if (x == curx && y == cury) {
+                fbHLine(cX - 1, CELL_SIZE + 20, cY - 1, FB_RED);
+                fbHLine(cX - 1, CELL_SIZE + 20, cY + CELL_SIZE + 1, FB_RED);
+                fbVLine(cX - 1, CELL_SIZE + 2, cY - 1, FB_RED);
+                fbVLine(cX + CELL_SIZE + 1, CELL_SIZE + 2, cY - 1, FB_RED);
+            }
         }
     }
 }
@@ -196,6 +232,10 @@ fbdevStart(const int *lboard, int lsize) {
 
     gameClearCell(0, 0);
     gameClearCell(7, 7);
+
+    wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
+    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
+        ((size - 1) * CELL_MARGIN);
 
     /* Read bitmap font */
     int ch;
@@ -242,9 +282,33 @@ fbdevStart(const int *lboard, int lsize) {
     printf("fb0: %d(%d)x%d, %dbpp\n", vinfo.xres, fbWidth, vinfo.yres,
         vinfo.bits_per_pixel);
 
+    /* Set terminal to non-canonical non-blocking mode mode, this may fuck it up */
+    tcgetattr(STDIN_FILENO, &orig);
+    raw = orig;
+    raw.c_lflag &= ~(ECHO | ICANON);
+    tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    fcntl(STDIN_FILENO, F_SETFL, flags);
+
+    char input = 0;
     while (1) {
+        while (read(STDIN_FILENO, &input, 1) > 0) {
+            input = tolower(input);
+            switch (input) {
+                case 'a': curx--; break;
+                case 'd': curx++; break;
+                case 'w': cury--; break;
+                case 's': cury++; break;
+            }
+            if (curx < 0) curx = size - 1;
+            if (cury < 0) cury = size - 1;
+            if (curx >= size) curx = 0;
+            if (cury >= size) cury = 0;
+        }
         render();
-        usleep(100000);
+        usleep(25000);
     }
 }
 
@@ -253,4 +317,5 @@ fbdevDestroy() {
     free((void*)fontimg);
     munmap(fbp, screensize);
     close(fbfd);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig);
 }
