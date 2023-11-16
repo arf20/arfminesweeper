@@ -33,7 +33,7 @@ static int size = 0;
 static int wWidth = 0, wHeight = 0;
 
 HWND mainhWnd = NULL;
-
+HWND titleLabel = NULL;
 
 LRESULT CALLBACK
 WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -69,6 +69,9 @@ Win32Start(const int *lboard, int lsize) {
     mainhWnd = CreateWindowEx(0, className, TXT_TITLE, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, wWidth, wHeight,
         NULL, 0, hInstance, NULL);
+
+    titleLabel = CreateWindowEx(0, "STATIC", TXT_TITLE, WS_CHILD | WS_VISIBLE,
+        5, 15, 110, 20, mainhWnd, NULL, hInstance, NULL);
 
     ShowWindow(mainhWnd, SW_SHOWDEFAULT);
 
