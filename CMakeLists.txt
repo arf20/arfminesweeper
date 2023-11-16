@@ -186,7 +186,7 @@ if (WIN32)
 endif()
 
 # executable
-add_executable(arfminesweeper WIN32 ${SRC})
+add_executable(arfminesweeper ${SRC})
 
 
 # link libraries

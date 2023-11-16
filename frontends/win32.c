@@ -27,8 +27,10 @@
 #include "../game.h"
 
 
-static const int *board = NULL;
+static const int* board = NULL;
 static int size = 0;
+
+static int wWidth = 0, wHeight = 0;
 
 HWND mainhWnd = NULL;
 
@@ -36,14 +38,23 @@ HWND mainhWnd = NULL;
 LRESULT CALLBACK
 WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
+        case WM_CLOSE: DestroyWindow(hwnd); break;
+        case WM_DESTROY: PostQuitMessage(0); break;
         default: return DefWindowProcA(hwnd, uMsg, wParam, lParam);
     }
 }
 
 int
 Win32Start(const int *lboard, int lsize) {
-    HINSTANCE hInstance = GetModuleHandle(NULL);
+    board = lboard;
+    size = lsize;
 
+    wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
+    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
+        ((size - 1) * CELL_MARGIN);
+
+    /* Win32 stuff */
+    HINSTANCE hInstance = GetModuleHandle(NULL);
 
     WNDCLASS winclass = { 0 };
 
@@ -55,22 +66,11 @@ Win32Start(const int *lboard, int lsize) {
 
     RegisterClass(&winclass);
 
-    mainhWnd = CreateWindowEx(
-        0,                              // Optional window styles.
-        className,                      // Window class
-        TXT_TITLE,                      // Window text
-        WS_OVERLAPPEDWINDOW,            // Window style
+    mainhWnd = CreateWindowEx(0, className, TXT_TITLE, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, wWidth, wHeight,
+        NULL, 0, hInstance, NULL);
 
-        // Size and position
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-
-        NULL,       // Parent window    
-        0,          // Menu
-        hInstance,  // Instance handle
-        NULL        // Additional application data
-    );
-
-    ShowWindow(mainhWnd, 0);
+    ShowWindow(mainhWnd, SW_SHOWDEFAULT);
 
     MSG msg;
     while (GetMessageA(&msg, NULL, 0, 0)) {

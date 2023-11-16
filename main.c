@@ -116,7 +116,6 @@ printFrontends() {
 
 int
 main(int argc, char **argv) {
-    //MessageBox(NULL, "WinMain entry point", "WinMain entry point", MB_OK);
     printf("arfminesweeper by arf20\n"
         "Copyright 2023 Ángel Ruiz Fernandez\n"
         "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n\n");
@@ -287,7 +286,7 @@ main(int argc, char **argv) {
     return 0;
 }
 
-
+/*
 #ifdef _WIN32
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     AttachConsole(ATTACH_PARENT_PROCESS);
@@ -295,4 +294,4 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     MessageBox(NULL, "WinMain entry point", "WinMain entry point", MB_OK);
     return main(__argc, __argv);
 }
-#endif
+#endif*/
