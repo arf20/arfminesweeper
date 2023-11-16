@@ -71,3 +71,5 @@ I apologize.
 ### Notes:
 #### gl33 (OpenGL 3.3 GLSL 330 core)
 Does not work on Intel iGPUs apparently, for some god unknown reason, maybe the bit shit?
+#### Win32
+Currently I think it only builds correctly under MSVC

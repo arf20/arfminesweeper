@@ -20,6 +20,8 @@
 
 */
 
+#include <stdio.h>
+
 #include <windows.h>
 
 #include "common.h"
@@ -34,12 +36,61 @@ static int wWidth = 0, wHeight = 0;
 
 HWND mainhWnd = NULL;
 HWND titleLabel = NULL;
+HWND flagsLeftLabel = NULL;
+HWND *buttons = NULL;
+
+
+void
+updateButtons() {
+    static char buff[256];
+
+    /* Show flags left */
+    snprintf(buff, 256, "%d", gameGetFlagsLeft());
+    SendMessage(flagsLeftLabel, WM_SETTEXT, 0, buff);
+
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            /* Variables stuff */
+            int btni = (x * size) + y;
+
+            /* If clear, hide the button, count surrounding cells and print
+                n of mines */
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
+                ShowWindow(buttons[btni], SW_HIDE);
+            }
+            /* If not clear, check flag and draw it */
+            else if (CHECK_FLAG(BOARDXY(x, y))) {
+                
+            }
+            /* Otherwise just a tile */
+            else {
+                /* Clear flag if applicable */
+                //fl_set_object_lcolor(buttons[btni], FL_COL1);
+            }
+        }
+    }
+
+    RedrawWindow(mainhWnd, NULL, NULL, RDW_ALLCHILDREN);
+}
 
 LRESULT CALLBACK
 WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_CLOSE: DestroyWindow(hwnd); break;
         case WM_DESTROY: PostQuitMessage(0); break;
+        case WM_COMMAND: {
+            int btni = -1;
+            for (int i = 0; i < size * size; i++) if (buttons[i] == lParam) btni = i;
+            
+            switch (HIWORD(wParam)) {
+                case BN_CLICKED: {
+                    gameClearCell(btni / size, btni % size);
+                    printf("Button %d clicked\n", btni);
+                } break;
+
+            }
+            updateButtons();
+        } break;
         default: return DefWindowProcA(hwnd, uMsg, wParam, lParam);
     }
 }
@@ -63,15 +114,43 @@ Win32Start(const int *lboard, int lsize) {
     winclass.lpfnWndProc = WindowProc;
     winclass.hInstance = hInstance;
     winclass.lpszClassName = className;
+    winclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 
     RegisterClass(&winclass);
 
+    /* Create window */
+    RECT crect = { 0, 0, wWidth, wHeight};
+    AdjustWindowRectEx(&crect, WS_OVERLAPPEDWINDOW, 0, 0);
+
     mainhWnd = CreateWindowEx(0, className, TXT_TITLE, WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, wWidth, wHeight,
+        CW_USEDEFAULT, CW_USEDEFAULT, crect.right - crect.left, crect.bottom - crect.top,
         NULL, 0, hInstance, NULL);
 
     titleLabel = CreateWindowEx(0, "STATIC", TXT_TITLE, WS_CHILD | WS_VISIBLE,
-        5, 15, 110, 20, mainhWnd, NULL, hInstance, NULL);
+        5, 2, 110, 20, mainhWnd, NULL, hInstance, NULL);
+
+    flagsLeftLabel = CreateWindow("STATIC", "", WS_CHILD | WS_VISIBLE,
+        wWidth - 25, 25, 20, 20, mainhWnd, NULL, hInstance, NULL);
+
+    /* Allocate object arrays */
+    buttons = malloc(sizeof(HWND) * size * size);
+    
+    /* Add UI matrix */
+    int btni = 0;
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            /* Variables stuff */
+            btni = (size * y) + x;
+            int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
+            int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
+
+            /* Button */
+            buttons[btni] = CreateWindow("BUTTON", "", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+                cX, cY, CELL_SIZE, CELL_SIZE, mainhWnd, NULL, hInstance, NULL);
+        }
+    }
+
+    updateButtons();
 
     ShowWindow(mainhWnd, SW_SHOWDEFAULT);
 

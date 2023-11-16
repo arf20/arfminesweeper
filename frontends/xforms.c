@@ -51,8 +51,6 @@ updateButtons() {
         for (int x = 0; x < size; x++) {
             /* Variables stuff */
             int btni = (x * size) + y;
-            int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
-            int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
 
             /* If clear, hide the button, count surrounding cells and print
                 n of mines */
