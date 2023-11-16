@@ -24,12 +24,17 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <WinSock2.h>
+#define close closesocket
+#else
 #include <errno.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/tcp.h>
+#endif
 
 #include <pthread.h>
 
@@ -39,37 +44,37 @@
 
 #define BUFF_SIZE 65535
 
-static const int *board = NULL;
+static const int* board = NULL;
 static int size = 0;
 
 
-static const char *indexHeaders =
-    "HTTP/1.1 200 OK\n"
-    "Server: arfminesweeper httpd\n"
-    "Content-Type: text/html\n";
+static const char* indexHeaders =
+"HTTP/1.1 200 OK\n"
+"Server: arfminesweeper httpd\n"
+"Content-Type: text/html\n";
 
-static const char *pngHeaders =
-    "HTTP/1.1 200 OK\n"
-    "Server: arfminesweeper httpd\n"
-    "Content-Type: image/png\n";
+static const char* pngHeaders =
+"HTTP/1.1 200 OK\n"
+"Server: arfminesweeper httpd\n"
+"Content-Type: image/png\n";
 
-static const char *err404Headers =
-    "HTTP/1.1 404 Not Found\n"
-    "Server: arfminesweeper httpd\n";
+static const char* err404Headers =
+"HTTP/1.1 404 Not Found\n"
+"Server: arfminesweeper httpd\n";
 
-static const char *alertContent =
-    "%s\n<!DOCTYPE html><html><head><script>alert(%s);</script></head>"
-    "<body></body></html>";
+static const char* alertContent =
+"%s\n<!DOCTYPE html><html><head><script>alert(%s);</script></head>"
+"<body></body></html>";
 
-static char *htmlContent = NULL;
-static char *pngFlagContent = NULL;
+static char* htmlContent = NULL;
+static char* pngFlagContent = NULL;
 static size_t pngFlagSize = 0;
 
-static char *sendBuffer = NULL;
+static char* sendBuffer = NULL;
 
 
 
-size_t strlcat(char *restrict dst, const char *restrict src, size_t dstsize) {
+size_t strlcat(char* restrict dst, const char* restrict src, size_t dstsize) {
     int d_len, s_len, offset, src_index;
 
     /* obtain initial sizes */
@@ -81,14 +86,14 @@ size_t strlcat(char *restrict dst, const char *restrict src, size_t dstsize) {
 
     /* append src */
     src_index = 0;
-    while(*(src+src_index) != '\0')
+    while (*(src + src_index) != '\0')
     {
         *(dst + offset) = *(src + src_index);
         offset++;
         src_index++;
         /* don't copy more than dstsize characters
            minus one */
-        if(offset == dstsize - 1)
+        if (offset == dstsize - 1)
             break;
     }
     /* always cap the string! */
@@ -98,8 +103,8 @@ size_t strlcat(char *restrict dst, const char *restrict src, size_t dstsize) {
 }
 
 void
-cpynum(const char *restrict src, char *restrict dst, size_t dstsize) {
-    const char *restrict ptr = src;
+cpynum(const char* restrict src, char* restrict dst, size_t dstsize) {
+    const char* restrict ptr = src;
     while (*ptr && (*ptr >= 48 && *ptr <= 57) && (ptr - src < dstsize)) {
         *dst = *ptr;
         ptr++;
@@ -109,8 +114,8 @@ cpynum(const char *restrict src, char *restrict dst, size_t dstsize) {
 }
 
 int
-strlencrlf(const char *str) {
-    const char *ptr = str;
+strlencrlf(const char* str) {
+    const char* ptr = str;
     int size = 0;
     while (*ptr != '\0') {
         if (*ptr == '\n') size++;
@@ -121,12 +126,12 @@ strlencrlf(const char *str) {
 }
 
 static void
-convertcrlf(char *buff, size_t size) {
+convertcrlf(char* buff, size_t size) {
     size_t bufflen = strlen(buff) + 1;
-    char *ptr = buff;
+    char* ptr = buff;
 
     while (*ptr) {
-        char *p = strchr(ptr, '\n');
+        char* p = strchr(ptr, '\n');
         /* walked past last occurrence of needle or run out of buffer */
         if (p == NULL || bufflen + 1 >= size || p >= buff + size) {
             break;
@@ -144,12 +149,12 @@ convertcrlf(char *buff, size_t size) {
 }
 
 static void
-convertlfescaped(char *buff, size_t size) {
+convertlfescaped(char* buff, size_t size) {
     size_t bufflen = strlen(buff) + 1;
-    char *ptr = buff;
+    char* ptr = buff;
 
     while (*ptr) {
-        char *p = strchr(ptr, '\n');
+        char* p = strchr(ptr, '\n');
         /* walked past last occurrence of needle or run out of buffer */
         if (p == NULL || bufflen + 1 >= size || p >= buff + size) {
             break;
@@ -168,7 +173,7 @@ convertlfescaped(char *buff, size_t size) {
 }
 
 static void
-printToSpace(const char *str) {
+printToSpace(const char* str) {
     while (*str != ' ') {
         putc(*str, stdout);
         str++;
@@ -189,17 +194,17 @@ generateBoardResponse() {
             if (CHECK_CLEAR(BOARDXY(x, y))) {
                 strlcat(tmpBuff, "<td>\n", BUFF_SIZE);
                 int n = gameGetSurroundingMines(x, y);
-                const char *color = NULL;
+                const char* color = NULL;
                 if (n) {
                     switch (n) {
-                        case 1: color = "blue"; break;
-                        case 2: color = "green"; break;
-                        case 3: color = "red"; break;
-                        case 4: color = "darkblue"; break;
-                        case 5: color = "darkred"; break;
-                        case 6: color = "darkcyan"; break;
-                        case 7: color = "black"; break;
-                        case 8: color = "darkgrey"; break;
+                    case 1: color = "blue"; break;
+                    case 2: color = "green"; break;
+                    case 3: color = "red"; break;
+                    case 4: color = "darkblue"; break;
+                    case 5: color = "darkred"; break;
+                    case 6: color = "darkcyan"; break;
+                    case 7: color = "black"; break;
+                    case 8: color = "darkgrey"; break;
                     }
                     snprintf(tmpBuff2, 1024,
                         "<span style=\"color: %s;\">%d</span>\n",
@@ -229,14 +234,14 @@ generateBoardResponse() {
     char alert[1024];
     alert[0] = '\0';
     switch (gameGetState()) {
-        case STATE_LOST: {
-            strncpy(alert, "alert(\""TXT_LOST"\");", 1024);
-            convertlfescaped(alert, 1024);
-        } break;
-        case STATE_WON: {
-            strncpy(alert, "alert(\""TXT_WON"\");", 1024);
-            convertlfescaped(alert, 1024);
-        } break;
+    case STATE_LOST: {
+        strncpy(alert, "alert(\""TXT_LOST"\");", 1024);
+        convertlfescaped(alert, 1024);
+    } break;
+    case STATE_WON: {
+        strncpy(alert, "alert(\""TXT_WON"\");", 1024);
+        convertlfescaped(alert, 1024);
+    } break;
     }
 
     snprintf(sendBuffer, BUFF_SIZE, htmlContent, indexHeaders,
@@ -260,7 +265,7 @@ generate404Response() {
 }
 
 static void*
-clientThread(void *data) {
+clientThread(void* data) {
     int cfd = *(int*)data;
 
     char recvBuff[BUFF_SIZE];
@@ -274,7 +279,8 @@ clientThread(void *data) {
         if (r < 0) {
             printf("Error receiving \n");
             return NULL;
-        } else if (r == 0) {
+        }
+        else if (r == 0) {
             printf("Client exited \n");
             return NULL;
         }
@@ -287,7 +293,8 @@ clientThread(void *data) {
                 generateBoardResponse();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
                 printf("GET / 200 OK\n");
-            } else if (strncmp(recvBuff + 4, "/flag.png ", 10) == 0) {
+            }
+            else if (strncmp(recvBuff + 4, "/flag.png ", 10) == 0) {
                 /* Flag PNG file */
                 size_t size = generateFlagPNGResponse();
                 send(cfd, sendBuffer, size, 0);
@@ -299,7 +306,8 @@ clientThread(void *data) {
                     cpynum(recvBuff + 12, tmpBuff, 256);
                     int btni = atoi(tmpBuff);
                     gameClearCell(btni % size, btni / size);
-                } else if (strncmp(recvBuff + 6, "flag=", 5) == 0) {
+                }
+                else if (strncmp(recvBuff + 6, "flag=", 5) == 0) {
                     cpynum(recvBuff + 11, tmpBuff, 256);
                     int btni = atoi(tmpBuff);
                     gameFlagCell(btni % size, btni / size);
@@ -310,7 +318,8 @@ clientThread(void *data) {
                 printf("GET ");
                 printToSpace(recvBuff + 4);
                 printf(" 200 OK\n");
-            } else {
+            }
+            else {
                 /* 404 */
                 generate404Response();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
@@ -318,7 +327,8 @@ clientThread(void *data) {
                 printToSpace(recvBuff + 4);
                 printf(" 404 Not Found\n");
             }
-        } else {
+        }
+        else {
             printf("Warning: Only GET supported\n");
             return NULL;
         }
@@ -342,7 +352,8 @@ httpdListen(unsigned short port) {
         return -1;
     }
 
-    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
+    int v = 1;
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void*)&v, sizeof(int)) < 0) {
         return -1;
     }
 
@@ -361,8 +372,8 @@ httpdListen(unsigned short port) {
 }
 
 static int
-loadFile(const char *path, char **buff, size_t *size) {
-    FILE *f = fopen(path, "r");
+loadFile(const char* path, char** buff, size_t* size) {
+    FILE* f = fopen(path, "r");
     if (f == NULL) {
         printf("Error opening file: %s\n", strerror(errno));
         return -1;
@@ -379,7 +390,7 @@ loadFile(const char *path, char **buff, size_t *size) {
 }
 
 int
-httpdStart(const int *lboard, int lsize) {
+httpdStart(const int* lboard, int lsize) {
     board = lboard;
     size = lsize;
 

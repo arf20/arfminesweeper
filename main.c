@@ -287,6 +287,7 @@ main(int argc, char **argv) {
     return 0;
 }
 
+
 #ifdef _WIN32
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     AttachConsole(ATTACH_PARENT_PROCESS);
@@ -295,4 +296,3 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     return main(__argc, __argv);
 }
 #endif
-        

@@ -37,23 +37,17 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
-add_custom_target(vulkan_shaders ALL
-    DEPENDS "assets/msboard4vs.spv" "assets/msboard4fs.spv"
-)
-
-#execute_process (
-#    COMMAND bash -c "glslc assets/msboard4.vert assets/msboard4vs.spv"
-#)
-
 file (GLOB SRC ${SRC} "frontends/console.c")
 add_compile_definitions(FRONTEND_CONSOLE)
 
-file (GLOB SRC ${SRC} "frontends/httpd.c")
-add_compile_definitions(FRONTEND_HTTPD)
+if (UNIX)
+    file (GLOB SRC ${SRC} "frontends/httpd.c")
+    add_compile_definitions(FRONTEND_HTTPD)
+endif (UNIX)
 
 if (WIN32)
     message(STATUS "No fbdev support in Win32")
-elseif(BSD)
+elseif (BSD)
     message(STATUS "No fbdev support in BSD")
 else()
     file (GLOB SRC ${SRC} "frontends/fbdev.c")
@@ -175,6 +169,9 @@ if (Vulkan_FOUND)
         file (GLOB SRC ${SRC} "frontends/vk.c")
         include_directories("frontends/glad/include/")
         add_compile_definitions(FRONTEND_VK)
+        add_custom_target(vulkan_shaders ALL
+            DEPENDS "assets/msboard4vs.spv" "assets/msboard4fs.spv"
+        )
         message(STATUS "Building with Vulkan/GLFW")
     else()
         message(WARNING "GLFW required for building Vulkan frontend")
@@ -195,6 +192,10 @@ add_executable(arfminesweeper WIN32 ${SRC})
 # link libraries
 
 target_link_libraries(arfminesweeper Threads::Threads)
+
+if (WIN32)
+    target_link_libraries(arfminesweeper ws2_32)
+endif()
 
 if (X11_FOUND)
     target_link_libraries(arfminesweeper ${X11_LIBRARIES})

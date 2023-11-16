@@ -40,49 +40,48 @@ WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     }
 }
 
-
-
 int
 Win32Start(const int *lboard, int lsize) {
-
-}
-
-void
-Win32Destroy() {
     HINSTANCE hInstance = GetModuleHandle(NULL);
 
-    
+
     WNDCLASS winclass = { 0 };
 
-	const char className[] = TXT_TITLE;
+    const char className[] = TXT_TITLE;
 
-	winclass.lpfnWndProc = WindowProc;
-	winclass.hInstance = hInstance;
-	winclass.lpszClassName = className;
+    winclass.lpfnWndProc = WindowProc;
+    winclass.hInstance = hInstance;
+    winclass.lpszClassName = className;
 
     RegisterClass(&winclass);
 
     mainhWnd = CreateWindowEx(
-		0,                              // Optional window styles.
-		className,                      // Window class
-		TXT_TITLE,                      // Window text
-		WS_OVERLAPPEDWINDOW,            // Window style
+        0,                              // Optional window styles.
+        className,                      // Window class
+        TXT_TITLE,                      // Window text
+        WS_OVERLAPPEDWINDOW,            // Window style
 
-		// Size and position
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        // Size and position
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 
-		NULL,       // Parent window    
-		0,          // Menu
-		hInstance,  // Instance handle
-		NULL        // Additional application data
-	);
+        NULL,       // Parent window    
+        0,          // Menu
+        hInstance,  // Instance handle
+        NULL        // Additional application data
+    );
 
     ShowWindow(mainhWnd, 0);
 
     MSG msg;
-	while (GetMessageA(&msg, NULL, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessageA(&msg);
-	}
+    while (GetMessageA(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessageA(&msg);
+    }
+
+    return 0;
 }
 
+void
+Win32Destroy() {
+    
+}
