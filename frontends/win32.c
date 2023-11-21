@@ -38,6 +38,7 @@ HWND mainhWnd = NULL;
 HWND titleLabel = NULL;
 HWND flagsLeftLabel = NULL;
 HWND *buttons = NULL;
+HWND *labels = NULL;
 
 
 void
@@ -57,6 +58,7 @@ updateButtons() {
                 n of mines */
             if (CHECK_CLEAR(BOARDXY(x, y))) {
                 ShowWindow(buttons[btni], SW_HIDE);
+                ShowWindow(labels[btni], SW_SHOW);
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
@@ -65,7 +67,8 @@ updateButtons() {
             /* Otherwise just a tile */
             else {
                 /* Clear flag if applicable */
-                //fl_set_object_lcolor(buttons[btni], FL_COL1);
+                ShowWindow(buttons[btni], SW_SHOW);
+                ShowWindow(labels[btni], SW_HIDE);
             }
         }
     }
@@ -78,6 +81,12 @@ WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_CLOSE: DestroyWindow(hwnd); break;
         case WM_DESTROY: PostQuitMessage(0); break;
+        case WM_PAINT: {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+            FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+            EndPaint(hwnd, &ps);
+        } break;
         case WM_COMMAND: {
             int btni = -1;
             for (int i = 0; i < size * size; i++) if (buttons[i] == lParam) btni = i;
@@ -129,13 +138,15 @@ Win32Start(const int *lboard, int lsize) {
     titleLabel = CreateWindowEx(0, "STATIC", TXT_TITLE, WS_CHILD | WS_VISIBLE,
         5, 2, 110, 20, mainhWnd, NULL, hInstance, NULL);
 
-    flagsLeftLabel = CreateWindow("STATIC", "", WS_CHILD | WS_VISIBLE,
+    flagsLeftLabel = CreateWindowEx(0, "STATIC", "", WS_CHILD | WS_VISIBLE,
         wWidth - 25, 25, 20, 20, mainhWnd, NULL, hInstance, NULL);
 
     /* Allocate object arrays */
     buttons = malloc(sizeof(HWND) * size * size);
+    labels = malloc(sizeof(HWND) * size * size);
     
     /* Add UI matrix */
+    char buff[256];
     int btni = 0;
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
@@ -145,7 +156,14 @@ Win32Start(const int *lboard, int lsize) {
             int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
 
             /* Button */
-            buttons[btni] = CreateWindow("BUTTON", "", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+            buttons[btni] = CreateWindowEx(0, "BUTTON", "", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+                cX, cY, CELL_SIZE, CELL_SIZE, mainhWnd, (HMENU)btni, hInstance, NULL);
+
+            /* Label */
+            int n = gameGetSurroundingMines(x, y);
+            if (n) snprintf(buff, 256, "%d", n);
+            else *buff = 0;
+            labels[btni] = CreateWindowEx(0, "STATIC", buff, WS_VISIBLE | WS_CHILD,
                 cX, cY, CELL_SIZE, CELL_SIZE, mainhWnd, NULL, hInstance, NULL);
         }
     }
