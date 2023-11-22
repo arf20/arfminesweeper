@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include <windows.h>
+#include <uxtheme.h>
 
 #include "common.h"
 #include "win32.h"
@@ -40,7 +41,9 @@ HWND flagsLeftLabel = NULL;
 HWND *buttons = NULL;
 HWND *labels = NULL;
 
-HICON flag = NULL;
+HANDLE flag = NULL;
+
+WNDPROC OldButtonProc;
 
 #define RGB_BLACK       (0, 0, 0)
 #define RGB_RED         255, 0, 0
@@ -51,15 +54,25 @@ HICON flag = NULL;
 #define RGB_DCYAN       0, 139, 139
 #define RGB_DGREY       169, 169, 169
 
-HWND OldButtonProc;
-
 void
-updateButtons() {
+updateButtons(HWND hWnd) {
     static char buff[256];
+
+    /* Check game state*/
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            MessageBox(hWnd, TXT_LOST, "Game Over", MB_OK | MB_ICONSTOP | MB_APPLMODAL);
+            return;
+        } break;
+        case STATE_WON: {
+            MessageBox(hWnd, TXT_WON, "Game Over", MB_OK | MB_ICONWARNING | MB_APPLMODAL);
+            return;
+        } break;
+    }
 
     /* Show flags left */
     snprintf(buff, 256, "%d", gameGetFlagsLeft());
-    SendMessage(flagsLeftLabel, WM_SETTEXT, 0, buff);
+    SendMessage(flagsLeftLabel, WM_SETTEXT, 0, (LPARAM)buff);
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
@@ -75,6 +88,7 @@ updateButtons() {
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 SendMessage(buttons[btni], BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)flag);
+                printf("sendmessage: %d\n", GetLastError());
             }
             /* Otherwise just a tile */
             else {
@@ -93,13 +107,34 @@ LRESULT CALLBACK
 WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_CLOSE: DestroyWindow(hWnd); break;
-        case WM_DESTROY: PostQuitMessage(0); break;
+        case WM_DESTROY: {
+            PostQuitMessage(0);
+        } break;
         case WM_PAINT: {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+            FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW));
             EndPaint(hWnd, &ps);
         } break;
+        case WM_CTLCOLORSTATIC: {
+            HDC hdcStatic = (HDC)wParam;
+            SetBkMode(hdcStatic, TRANSPARENT);
+
+            int btni = -1;
+            for (int i = 0; i < size * size; i++) if (labels[i] == (HWND)lParam) btni = i;
+            int n = gameGetSurroundingMines(btni / size, btni % size);
+            switch (n) {
+                case 1: SetTextColor(hdcStatic, RGB(0, 0, 255)); break;
+                case 2: SetTextColor(hdcStatic, RGB(0, 255, 0)); break;
+                case 3: SetTextColor(hdcStatic, RGB(255, 0, 0)); break;
+                case 4: SetTextColor(hdcStatic, RGB(0, 0, 139)); break;
+                case 5: SetTextColor(hdcStatic, RGB(139, 0, 0)); break;
+                case 6: SetTextColor(hdcStatic, RGB(0, 139, 139)); break;
+                case 7: SetTextColor(hdcStatic, RGB(0, 0, 0)); break;
+                case 8: SetTextColor(hdcStatic, RGB(169, 169, 169)); break;
+            }
+            return (LRESULT)GetSysColorBrush(COLOR_MENU);
+        }
         default: return DefWindowProcA(hWnd, uMsg, wParam, lParam);
     }
 }
@@ -110,19 +145,19 @@ ButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         case WM_LBUTTONUP: {
             int btni = (int)GetProp(hWnd, TEXT("btni"));
             gameClearCell(btni / size, btni % size);
-            updateButtons();
+            updateButtons(hWnd);
             printf("left click %d\n", btni);
             return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
         } break;
         case WM_RBUTTONUP: {
             int btni = (int)GetProp(hWnd, TEXT("btni"));
             gameFlagCell(btni / size, btni % size);
-            updateButtons();
+            updateButtons(hWnd);
             printf("right click %d\n", btni);
             return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
         } break;
         case WM_DESTROY: {
-            SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)OldButtonProc);
+            SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)OldButtonProc);
         } break;
         default: return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
     }
@@ -158,6 +193,12 @@ Win32Start(const int *lboard, int lsize) {
     mainhWnd = CreateWindowEx(0, className, TXT_TITLE, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, crect.right - crect.left, crect.bottom - crect.top,
         NULL, 0, hInstance, NULL);
+    if (!mainhWnd) {
+        printf("Error creating window: %d\n", GetLastError());
+    }
+    //SetWindowTheme(mainhWnd, L" ", L" ");
+
+    
 
     titleLabel = CreateWindowEx(0, "STATIC", TXT_TITLE, WS_CHILD | WS_VISIBLE,
         5, 2, 110, 20, mainhWnd, NULL, hInstance, NULL);
@@ -166,7 +207,10 @@ Win32Start(const int *lboard, int lsize) {
         wWidth - 25, 25, 20, 20, mainhWnd, NULL, hInstance, NULL);
 
     /* Load flag image */
-    flag = (HICON)LoadImage(NULL, FLAG_PNG_PATH, IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+    flag = LoadImage(NULL, FLAG_ICO_PATH, IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+    if (!flag) {
+        printf("Error loading " FLAG_ICO_PATH ": %d\n", GetLastError());
+    }
 
     /* Allocate object arrays */
     buttons = malloc(sizeof(HWND) * size * size);
@@ -183,7 +227,7 @@ Win32Start(const int *lboard, int lsize) {
             int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
 
             /* Button */
-            buttons[btni] = CreateWindowEx(0, "BUTTON", "", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+            buttons[btni] = CreateWindowEx(0, "BUTTON", "", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_BITMAP,
                 cX, cY, CELL_SIZE, CELL_SIZE, mainhWnd, (HMENU)btni, hInstance, NULL);
             OldButtonProc = (WNDPROC)SetWindowLongPtr(buttons[btni], GWLP_WNDPROC, (LONG_PTR)ButtonProc);
             SetProp(buttons[btni], TEXT("btni"), (HANDLE)btni);
@@ -192,12 +236,12 @@ Win32Start(const int *lboard, int lsize) {
             int n = gameGetSurroundingMines(y, x);
             if (n) snprintf(buff, 256, "%d", n);
             else *buff = 0;
-            labels[btni] = CreateWindowEx(0, "STATIC", buff, WS_VISIBLE | WS_CHILD,
+            labels[btni] = CreateWindowEx(0, "STATIC", buff, WS_VISIBLE | WS_CHILD | SS_CENTER,
                 cX, cY, CELL_SIZE, CELL_SIZE, mainhWnd, NULL, hInstance, NULL);
         }
     }
 
-    updateButtons();
+    updateButtons(mainhWnd);
 
     ShowWindow(mainhWnd, SW_SHOW);
 

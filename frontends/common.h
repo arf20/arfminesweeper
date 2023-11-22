@@ -22,7 +22,9 @@
 #define _COMMON_H
 
 #define FLAG_PNG_PATH "../assets/flag.png"
+#define FLAG_BMP_PATH "../assets/flag.bmp"
 #define FLAG_XBM_PATH "../assets/flag.xbm"
+#define FLAG_ICO_PATH "../assets/flag.ico"
 #define FONT_TTF_PATH "../assets/FSEX300.ttf"
 #define FONT_BMP_PATH "../assets/charstrip.bmp"
 
