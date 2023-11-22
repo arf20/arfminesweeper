@@ -40,6 +40,14 @@ HWND flagsLeftLabel = NULL;
 HWND *buttons = NULL;
 HWND *labels = NULL;
 
+#define RGB_BLACK       (0, 0, 0)
+#define RGB_RED         255, 0, 0
+#define RGB_GREEN       0, 255, 0
+#define RGB_BLUE        0, 0, 255
+#define RGB_DBLUE       0, 0, 139
+#define RGB_DRED        139, 0, 0
+#define RGB_DCYAN       0, 139, 139
+#define RGB_DGREY       169, 169, 169
 
 void
 updateButtons() {
@@ -89,17 +97,36 @@ WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         } break;
         case WM_COMMAND: {
             int btni = -1;
-            for (int i = 0; i < size * size; i++) if (buttons[i] == lParam) btni = i;
+            for (int i = 0; i < size * size; i++) if (buttons[i] == (HWND)lParam) btni = i;
             
             switch (HIWORD(wParam)) {
                 case BN_CLICKED: {
                     gameClearCell(btni / size, btni % size);
-                    printf("Button %d clicked\n", btni);
                 } break;
 
             }
             updateButtons();
         } break;
+        case WM_CTLCOLORSTATIC: {
+            HDC hdcStatic = (HDC)wParam;
+            SetBkMode(hdcStatic, TRANSPARENT);
+
+            int btni = -1;
+            for (int i = 0; i < size * size; i++) if (labels[i] == (HWND)lParam) btni = i;
+            int n = gameGetSurroundingMines(btni / size, btni % size);
+            switch (n) {
+                case 1: SetTextColor(hdcStatic, RGB(0, 0, 255)); break;
+                case 2: SetTextColor(hdcStatic, RGB(0, 255, 0)); break;
+                case 3: SetTextColor(hdcStatic, RGB(255, 0, 0)); break;
+                case 4: SetTextColor(hdcStatic, RGB(0, 0, 139)); break;
+                case 5: SetTextColor(hdcStatic, RGB(139, 0, 0)); break;
+                case 6: SetTextColor(hdcStatic, RGB(0, 139, 139)); break;
+                case 7: SetTextColor(hdcStatic, RGB(0, 0, 0)); break;
+                case 8: SetTextColor(hdcStatic, RGB(169, 169, 169)); break;
+            }
+
+            return (BOOL)GetSysColorBrush(COLOR_MENU);
+        }
         default: return DefWindowProcA(hwnd, uMsg, wParam, lParam);
     }
 }
@@ -160,7 +187,7 @@ Win32Start(const int *lboard, int lsize) {
                 cX, cY, CELL_SIZE, CELL_SIZE, mainhWnd, (HMENU)btni, hInstance, NULL);
 
             /* Label */
-            int n = gameGetSurroundingMines(x, y);
+            int n = gameGetSurroundingMines(y, x);
             if (n) snprintf(buff, 256, "%d", n);
             else *buff = 0;
             labels[btni] = CreateWindowEx(0, "STATIC", buff, WS_VISIBLE | WS_CHILD,
@@ -170,7 +197,7 @@ Win32Start(const int *lboard, int lsize) {
 
     updateButtons();
 
-    ShowWindow(mainhWnd, SW_SHOWDEFAULT);
+    ShowWindow(mainhWnd, SW_SHOW);
 
     MSG msg;
     while (GetMessageA(&msg, NULL, 0, 0)) {
