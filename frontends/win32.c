@@ -40,6 +40,8 @@ HWND flagsLeftLabel = NULL;
 HWND *buttons = NULL;
 HWND *labels = NULL;
 
+HICON flag = NULL;
+
 #define RGB_BLACK       (0, 0, 0)
 #define RGB_RED         255, 0, 0
 #define RGB_GREEN       0, 255, 0
@@ -48,6 +50,8 @@ HWND *labels = NULL;
 #define RGB_DRED        139, 0, 0
 #define RGB_DCYAN       0, 139, 139
 #define RGB_DGREY       169, 169, 169
+
+HWND OldButtonProc;
 
 void
 updateButtons() {
@@ -70,11 +74,12 @@ updateButtons() {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                
+                SendMessage(buttons[btni], BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)flag);
             }
             /* Otherwise just a tile */
             else {
                 /* Clear flag if applicable */
+                SendMessage(buttons[btni], BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)NULL);
                 ShowWindow(buttons[btni], SW_SHOW);
                 ShowWindow(labels[btni], SW_HIDE);
             }
@@ -85,49 +90,41 @@ updateButtons() {
 }
 
 LRESULT CALLBACK
-WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
-        case WM_CLOSE: DestroyWindow(hwnd); break;
+        case WM_CLOSE: DestroyWindow(hWnd); break;
         case WM_DESTROY: PostQuitMessage(0); break;
         case WM_PAINT: {
             PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hwnd, &ps);
+            HDC hdc = BeginPaint(hWnd, &ps);
             FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
-            EndPaint(hwnd, &ps);
+            EndPaint(hWnd, &ps);
         } break;
-        case WM_COMMAND: {
-            int btni = -1;
-            for (int i = 0; i < size * size; i++) if (buttons[i] == (HWND)lParam) btni = i;
-            
-            switch (HIWORD(wParam)) {
-                case BN_CLICKED: {
-                    gameClearCell(btni / size, btni % size);
-                } break;
+        default: return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+    }
+}
 
-            }
+LRESULT CALLBACK
+ButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    switch (uMsg) {
+        case WM_LBUTTONUP: {
+            int btni = (int)GetProp(hWnd, TEXT("btni"));
+            gameClearCell(btni / size, btni % size);
             updateButtons();
+            printf("left click %d\n", btni);
+            return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
         } break;
-        case WM_CTLCOLORSTATIC: {
-            HDC hdcStatic = (HDC)wParam;
-            SetBkMode(hdcStatic, TRANSPARENT);
-
-            int btni = -1;
-            for (int i = 0; i < size * size; i++) if (labels[i] == (HWND)lParam) btni = i;
-            int n = gameGetSurroundingMines(btni / size, btni % size);
-            switch (n) {
-                case 1: SetTextColor(hdcStatic, RGB(0, 0, 255)); break;
-                case 2: SetTextColor(hdcStatic, RGB(0, 255, 0)); break;
-                case 3: SetTextColor(hdcStatic, RGB(255, 0, 0)); break;
-                case 4: SetTextColor(hdcStatic, RGB(0, 0, 139)); break;
-                case 5: SetTextColor(hdcStatic, RGB(139, 0, 0)); break;
-                case 6: SetTextColor(hdcStatic, RGB(0, 139, 139)); break;
-                case 7: SetTextColor(hdcStatic, RGB(0, 0, 0)); break;
-                case 8: SetTextColor(hdcStatic, RGB(169, 169, 169)); break;
-            }
-
-            return (BOOL)GetSysColorBrush(COLOR_MENU);
-        }
-        default: return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+        case WM_RBUTTONUP: {
+            int btni = (int)GetProp(hWnd, TEXT("btni"));
+            gameFlagCell(btni / size, btni % size);
+            updateButtons();
+            printf("right click %d\n", btni);
+            return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
+        } break;
+        case WM_DESTROY: {
+            SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)OldButtonProc);
+        } break;
+        default: return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
     }
 }
 
@@ -168,6 +165,9 @@ Win32Start(const int *lboard, int lsize) {
     flagsLeftLabel = CreateWindowEx(0, "STATIC", "", WS_CHILD | WS_VISIBLE,
         wWidth - 25, 25, 20, 20, mainhWnd, NULL, hInstance, NULL);
 
+    /* Load flag image */
+    flag = (HICON)LoadImage(NULL, FLAG_PNG_PATH, IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+
     /* Allocate object arrays */
     buttons = malloc(sizeof(HWND) * size * size);
     labels = malloc(sizeof(HWND) * size * size);
@@ -185,6 +185,8 @@ Win32Start(const int *lboard, int lsize) {
             /* Button */
             buttons[btni] = CreateWindowEx(0, "BUTTON", "", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
                 cX, cY, CELL_SIZE, CELL_SIZE, mainhWnd, (HMENU)btni, hInstance, NULL);
+            OldButtonProc = (WNDPROC)SetWindowLongPtr(buttons[btni], GWLP_WNDPROC, (LONG_PTR)ButtonProc);
+            SetProp(buttons[btni], TEXT("btni"), (HANDLE)btni);
 
             /* Label */
             int n = gameGetSurroundingMines(y, x);
