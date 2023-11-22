@@ -181,8 +181,11 @@ endif()
 if (WIN32)
     file (GLOB SRC ${SRC} "frontends/win32.c")
     add_compile_definitions(FRONTEND_WIN32)
-    set (WIN32_FLAG "WIN32")
-    message(STATUS "Building with Win32")
+    message(STATUS "Building with Win32 ComCtl")
+
+    file (GLOB SRC ${SRC} "frontends/gdi.c")
+    add_compile_definitions(FRONTEND_GDI)
+    message(STATUS "Building with Win32 GDI")
 endif()
 
 # executable

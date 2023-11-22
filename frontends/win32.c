@@ -16,14 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    win32.c: Win32 frontend
+    win32.c: Win32 ComCtl API frontend
 
 */
 
 #include <stdio.h>
 
 #include <windows.h>
-#include <uxtheme.h>
 
 #include "common.h"
 #include "win32.h"
@@ -35,17 +34,16 @@ static int size = 0;
 
 static int wWidth = 0, wHeight = 0;
 
-HWND mainhWnd = NULL;
-HWND titleLabel = NULL;
-HWND flagsLeftLabel = NULL;
-HWND *buttons = NULL;
-HWND *labels = NULL;
+static HWND mainhWnd = NULL;
+static HWND titleLabel = NULL;
+static HWND flagsLeftLabel = NULL;
+static HWND *buttons = NULL;
+static HWND *labels = NULL;
 
-HANDLE flag = NULL;
+static HANDLE flag = NULL;
 
-WNDPROC OldButtonProc;
+static WNDPROC OldButtonProc;
 
-#define RGB_BLACK       (0, 0, 0)
 #define RGB_RED         255, 0, 0
 #define RGB_GREEN       0, 255, 0
 #define RGB_BLUE        0, 0, 255
@@ -54,7 +52,7 @@ WNDPROC OldButtonProc;
 #define RGB_DCYAN       0, 139, 139
 #define RGB_DGREY       169, 169, 169
 
-void
+static void
 updateButtons(HWND hWnd) {
     static char buff[256];
 
@@ -103,7 +101,7 @@ updateButtons(HWND hWnd) {
     RedrawWindow(mainhWnd, NULL, NULL, RDW_ALLCHILDREN);
 }
 
-LRESULT CALLBACK
+static LRESULT CALLBACK
 WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_CLOSE: DestroyWindow(hWnd); break;
@@ -139,7 +137,7 @@ WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     }
 }
 
-LRESULT CALLBACK
+static LRESULT CALLBACK
 ButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_LBUTTONUP: {

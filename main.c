@@ -42,6 +42,7 @@
 #include "frontends/httpd.h"
 #include "frontends/wayland.h"
 #include "frontends/xcb.h"
+#include "frontends/gdi.h"
 
 #include "frontends/common.h"
 
@@ -109,6 +110,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_XCB
         printf("xcb ");
+    #endif
+    #ifdef FRONTEND_GDI
+        printf("gdi ");
     #endif
 
     printf("\n");
@@ -276,6 +280,14 @@ main(int argc, char **argv) {
         printf("Error: Frontend xcb not built\n");
         #endif
     }
+    else if (!strcmp(frontend, "gdi")) {
+        #ifdef FRONTEND_GDI
+        gdiStart(gameGetBoard(), size);
+        gdiDestroy();
+        #else
+        printf("Error: Frontend gdi not built\n");
+        #endif
+        }
     else {
         printf("Error: Frontend not recognised: %s\n", frontend);
         printFrontends();
