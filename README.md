@@ -55,7 +55,7 @@ Gtk3                    DONE  X     X
 Qt5                     DONE  X     X   X   X
 wxWidgets                     X     X   X   X
 WinAPI                  WIP                 X
-Win32 GDI                                   X
+Win32 GDI               WIP                 X
 Direct2D                                    X
 .NET WinForms                               X
 .NET WPF                                    X

@@ -64,7 +64,17 @@ render(HDC hdc) {
     /* Draw title */
     TextOut(hdc, 5, 5, TXT_TITLE, sizeof(TXT_TITLE));
 
-    /* Check game state*/
+    /* Check game state */
+    switch (gameGetState()) {
+        case STATE_LOST: {
+            MessageBox(mainhWnd, TXT_LOST, "Game Over", MB_OK | MB_ICONSTOP | MB_APPLMODAL);
+            return;
+        } break;
+        case STATE_WON: {
+            MessageBox(mainhWnd, TXT_WON, "Game Over", MB_OK | MB_ICONWARNING | MB_APPLMODAL);
+            return;
+        } break;
+    }
 
     /* Print flags left */
     static char buff[256];
