@@ -46,8 +46,8 @@ raylib                  NO    X     X   X   X  Redefines GLAD
 SDL2                    DONE  X     X   X   X
 SDL1.2                  WIP   X     X   X   X
 GLIDE (with Voodoo)           X     X       X
-OpenGL 1.x/FreeGLUT     DONE  X     X   X   X
-OpenGL 4.6/GLFW/GLAD    WIP   X     X   X   X
+OpenGL 2.x FFP/FreeGLUT DONE  X     X   X   X
+OpenGL 3.3/GLFW/GLAD    WIP   X     X   X   X
 ImGui                         X     X   X   X
 Vulkan/GLFW             WIP   X     X   X   X
 Metal                                       X
