@@ -43,6 +43,7 @@
 #include "frontends/wayland.h"
 #include "frontends/xcb.h"
 #include "frontends/gdi.h"
+#include "frontends/d2d.h"
 
 #include "frontends/common.h"
 
@@ -113,6 +114,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_GDI
         printf("gdi ");
+    #endif
+    #ifdef FRONTEND_D2D
+        printf("d2d ");
     #endif
 
     printf("\n");
@@ -287,7 +291,15 @@ main(int argc, char **argv) {
         #else
         printf("Error: Frontend gdi not built\n");
         #endif
-        }
+    }
+    else if (!strcmp(frontend, "d2d")) {
+        #ifdef FRONTEND_D2D
+        d2dStart(gameGetBoard(), size);
+        d2dDestroy();
+        #else
+        printf("Error: Frontend d2d not built\n");
+        #endif
+    }
     else {
         printf("Error: Frontend not recognised: %s\n", frontend);
         printFrontends();
@@ -297,13 +309,3 @@ main(int argc, char **argv) {
 
     return 0;
 }
-
-/*
-#ifdef _WIN32
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    AttachConsole(ATTACH_PARENT_PROCESS);
-    printf("WinMain entry point\n");
-    MessageBox(NULL, "WinMain entry point", "WinMain entry point", MB_OK);
-    return main(__argc, __argv);
-}
-#endif*/

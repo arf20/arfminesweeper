@@ -56,7 +56,7 @@ Qt5                     DONE  X     X   X   X
 wxWidgets                     X     X   X   X
 WinAPI                  WIP                 X
 Win32 GDI               WIP                 X
-Direct2D                                    X
+Direct2D                WIP                 X
 .NET WinForms                               X
 .NET WPF                                    X
 Win UWP                                     X

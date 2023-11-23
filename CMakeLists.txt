@@ -186,6 +186,10 @@ if (WIN32)
     file (GLOB SRC ${SRC} "frontends/gdi.c")
     add_compile_definitions(FRONTEND_GDI)
     message(STATUS "Building with Win32 GDI")
+
+    file (GLOB SRC ${SRC} "frontends/d2d.c")
+    add_compile_definitions(FRONTEND_D2D)
+    message(STATUS "Building with Win32 Direct2D")
 endif()
 
 # executable
@@ -197,7 +201,7 @@ add_executable(arfminesweeper ${SRC})
 target_link_libraries(arfminesweeper Threads::Threads)
 
 if (WIN32)
-    target_link_libraries(arfminesweeper ws2_32 msimg32)
+    target_link_libraries(arfminesweeper ws2_32 msimg32 D2d1)
 endif()
 
 if (X11_FOUND)

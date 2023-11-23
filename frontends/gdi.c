@@ -130,7 +130,7 @@ render(HDC hdc) {
 
 }
 
-LRESULT CALLBACK
+static LRESULT CALLBACK
 WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_CLOSE: DestroyWindow(hWnd); break;
