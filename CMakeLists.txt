@@ -197,7 +197,7 @@ add_executable(arfminesweeper ${SRC})
 target_link_libraries(arfminesweeper Threads::Threads)
 
 if (WIN32)
-    target_link_libraries(arfminesweeper ws2_32)
+    target_link_libraries(arfminesweeper ws2_32 msimg32)
 endif()
 
 if (X11_FOUND)
