@@ -35,7 +35,7 @@ add_executable(kernel ${KERN_SRC})
 
 target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:C>:
     -Wall -Wextra -Wpedantic -Werror
-    -m32 -ffreestanding>
+    -m32 -ffreestanding -nostdlib -fno-pie>
 )
 
 set_target_properties(kernel PROPERTIES NASM_OBJ_FORMAT elf32)
@@ -45,7 +45,21 @@ set_target_properties(kernel PROPERTIES NASM_OBJ_FORMAT elf32)
 #)
 
 target_link_options(kernel PRIVATE 
-    -m32 -ffreestanding -nostdlib
+    -m32 -ffreestanding -nostdlib -fno-pie
+    -Wl,-m,elf_i386 -Wl,-Ttext,0x1000 -Wl,--oformat=binary
+    #-m elf_i386 -Ttext 0x1000 --oformat binary
 )
+
+# build disk image
+set(IMAGE_BIN "arfminesweeper.bin")
+
+add_custom_command(
+    OUTPUT ${IMAGE_BIN}
+    COMMAND cat ${BOOT_BIN} kernel > ${IMAGE_BIN}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS ${BOOT_BIN} kernel VERBATIM
+)
+
+add_custom_target(image ALL DEPENDS ${IMAGE_BIN})
 
 message(STATUS "Building bootable image")
