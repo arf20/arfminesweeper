@@ -33,38 +33,8 @@
 static int size = 0;
 static const int *board = NULL;
 
-/* debug wallhack xray thing */
-void
-conPrintBoardDebug() {
-    printf("+");
-    for (int x = 0; x < size; x++)
-        printf("-");
-    printf("+\n");
-
-    for (int y = 0; y < size; y++) {
-        printf("|");
-        for (int x = 0; x < size; x++) {
-            if (CHECK_CLEAR(BOARDXY(x, y))) {
-                printf(" ");
-            }
-            else {
-                if (CHECK_MINE(BOARDXY(x, y)) && CHECK_FLAG(BOARDXY(x, y))) printf("X");
-                else if (CHECK_MINE(BOARDXY(x, y))) printf("O");
-                else if (CHECK_FLAG(BOARDXY(x, y))) printf("F");
-                else printf("#");
-            }
-        }
-        printf("|\n");
-    }
-
-    printf("+");
-    for (int x = 0; x < size; x++)
-        printf("-");
-    printf("+\n");
-}
-
-void
-conPrintBoard() {
+static void
+printBoard() {
     printf("+");
     for (int x = 0; x < size; x++)
         printf("-");
@@ -92,7 +62,7 @@ conPrintBoard() {
     printf("+\n");
 }
 
-void
+static void
 printHelp() {
     printf("\thelp:             Get this message\n"
            "\tclear | c <x, y>: Clear cell\n"
@@ -100,7 +70,7 @@ printHelp() {
            "\tquit  | q:        Quit\n");
 }
 
-int
+static int
 parseXYCommand(char *buff, int *x, int *y) {
     char *cmd = strtok(buff, " ");
     char *xstr = strtok(NULL, " ");
@@ -127,7 +97,7 @@ conStart(const int *lboard, int lsize) {
     int x = 0, y = 0, r = 0;
     while (1) {
         /* Print state and prompt */
-        conPrintBoard();
+        printBoard();
         printf("> ");
         memset(buffin, 256, 0);
         fgets(buffin, 256, stdin); /* safe */
@@ -162,7 +132,7 @@ conStart(const int *lboard, int lsize) {
         }
 
         if (gameGetState() == STATE_WON) {
-            printf(TXT_LOST);
+            printf(TXT_WON);
             return 0;
         }
     }

@@ -65,7 +65,7 @@ WinUI 3                                     X
 Java AWT                      X     X   X   X
 Java Swing                    X     X   X   X
 Webapp                  DONE  X     X   X   X
-Kernel module           WIP   X              
+Kernel module           DONE  X              
 ```
 I apologize.
 
@@ -74,3 +74,7 @@ I apologize.
 Does not work on Intel iGPUs apparently, for some god unknown reason, maybe the bit shit?
 #### Win32
 Currently I think it only builds correctly under MSVC
+#### Kernel module
+Exposes a character device at /dev/arfminesweeper.
+`cat` it to get the board, and send commands like echo 'c 0 0' > /dev/arfminesweer
+Usage is c|f x y, c for clear f for flag
