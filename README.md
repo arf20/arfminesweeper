@@ -31,41 +31,48 @@ make
 
 ## TODO frontends
 ```
-                              Linux BSD Mac Win
-Console (no graphics)   DONE  X     X   X   X
-ncurses                       X     X   X   X 
-fbdev                   WIP   X
-SVGA buffer                   
-X11 Xlib                DONE  X     X
-X11 XCB                 WIP   X     X
-Wayland                 WIP   X     X
-XForms                  DONE  X     X
-Motif                   WIP   X     X
-Tcl/Tk                        X     X       X
-raylib                  NO    X     X   X   X  Redefines GLAD
-SDL2                    DONE  X     X   X   X
-SDL1.2                  WIP   X     X   X   X
-GLIDE (with Voodoo)           X     X       X
-OpenGL 2.x FFP/FreeGLUT DONE  X     X   X   X
-OpenGL 3.3/GLFW/GLAD    WIP   X     X   X   X
-ImGui                         X     X   X   X
-Vulkan/GLFW             WIP   X     X   X   X
-Metal                                       X
-Gtk3                    DONE  X     X
-Qt5                     DONE  X     X   X   X
-wxWidgets                     X     X   X   X
-WinAPI                  WIP                 X
-Win32 GDI               WIP                 X
-Direct2D                WIP                 X
-.NET WinForms                               X
-.NET WPF                                    X
-Win UWP                                     X
-WinUI 3                                     X
-.NET MAUI                                   X
-Java AWT                      X     X   X   X
-Java Swing                    X     X   X   X
-Webapp                  DONE  X     X   X   X
-Kernel module           DONE  X              
+MAIN TARGET
+                                Linux BSD Mac Win
+    Console (no graphics)   DONE  X     X   X   X
+    ncurses                       X     X   X   X 
+    fbdev                   WIP   X
+    SVGA buffer                   
+    X11 Xlib                DONE  X     X
+    X11 XCB                 WIP   X     X
+    Wayland                 WIP   X     X
+    XForms                  DONE  X     X
+    Motif                   WIP   X     X
+    Tcl/Tk                        X     X       X
+    raylib                  NO    X     X   X   X  Redefines GLAD
+    SDL2                    DONE  X     X   X   X
+    SDL1.2                  WIP   X     X   X   X
+    GLIDE (with Voodoo)           X     X       X
+    OpenGL 2.x FFP/FreeGLUT DONE  X     X   X   X
+    OpenGL 3.3/GLFW/GLAD    WIP   X     X   X   X
+    ImGui                         X     X   X   X
+    Vulkan/GLFW             WIP   X     X   X   X
+    Metal                                       X
+    Gtk3                    DONE  X     X
+    Qt5                     DONE  X     X   X   X
+    wxWidgets                     X     X   X   X
+    WinAPI                  WIP                 X
+    Win32 GDI               WIP                 X
+    Direct2D                WIP                 X
+    .NET WinForms                               X
+    .NET WPF                                    X
+    Win UWP                                     X
+    WinUI 3                                     X
+    .NET MAUI                                   X
+    Java AWT                      X     X   X   X
+    Java Swing                    X     X   X   X
+    Webapp                  DONE  X     X   X   X
+LINUX MODULE TARGET
+    Kernel module           DONE  X              
+KERNEL TARGET
+    VGA text mode console   
+    VGA text mode
+    VGA graphic mode
+    VESA graphic mode
 ```
 I apologize.
 

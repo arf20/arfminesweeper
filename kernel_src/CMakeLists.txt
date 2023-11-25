@@ -1,7 +1,7 @@
 set (NASM_PROGRAM "nasm")
 
 # MBR bootloader
-file (GLOB BOOT_SRC "mbr_boot.s")
+file (GLOB BOOT_SRC "mbr_boot.asm")
 set (BOOT_BIN "mbr_boot.bin")
 
 add_custom_command(
@@ -12,5 +12,40 @@ add_custom_command(
 )
 
 add_custom_target(bootloader ALL DEPENDS ${BOOT_BIN})
+
+# kernel
+
+#set(CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS ${CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS} s S) # doesn't work
+#set(CMAKE_ASM_NASM_LINK_EXECUTABLE "ld <CMAKE_ASM_NASM_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>") # CMake bug
+#set(CMAKE_ASM_NASM_OBJECT_FORMAT elf32) # doesn't work
+set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> <FLAGS> -o <OBJECT> <SOURCE>") # workaround
+
+add_compile_options(
+    "$<$<COMPILE_LANGUAGE:ASM_NASM>:-f $<IF:$<BOOL:$<TARGET_PROPERTY:NASM_OBJ_FORMAT>>, \
+    $<TARGET_PROPERTY:NASM_OBJ_FORMAT>, ${CMAKE_ASM_NASM_OBJECT_FORMAT}>>"
+)
+
+file (GLOB KERN_SRC "kernel_entry.asm" "kernel.c")
+
+add_executable(kernel ${KERN_SRC})
+
+#target_compile_options(kernel PRIVATE
+#    -Wall -Wextra -Wpedantic -Werror
+#    -m32 -ffreestanding)
+
+target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:C>:
+    -Wall -Wextra -Wpedantic -Werror
+    -m32 -ffreestanding>
+)
+
+set_target_properties(kernel PROPERTIES NASM_OBJ_FORMAT elf32)
+
+#target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:ASM_NASM>:
+#    -felf32>
+#)
+
+target_link_options(kernel PRIVATE 
+    -m32 -ffreestanding -nostdlib
+)
 
 message(STATUS "Building bootable image")

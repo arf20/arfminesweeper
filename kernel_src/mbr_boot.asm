@@ -11,31 +11,31 @@ mov bp, 0x9000
 mov sp, bp
 ; NOTE: 32K between kernel begin and stack end
 
-call load_kernel ; read the kernel from disk
-call switch_to_32bit ; disable interrupts, load GDT,  etc. Finally jumps to 'BEGIN_PM'
-jmp $ ; Never executed
+call load_kernel        ; read the kernel from disk
+call switch_to_32bit    ; disable interrupts, load GDT,  etc. Finally jumps to 'BEGIN_PM'
+jmp $                   ; never executed
 
 ; =========================== BIOS disk loading helpers ========================
 ; load 'dh' sectors from drive 'dl' into ES:BX
 disk_load:
     pusha
-    push dx ; save dx
+    push dx         ; save dx
 
-    mov ah, 0x02 ; ah <- int 0x13 function 0x02 = 'read'
-    mov al, dh   ; al <- number of sectors to read (0x01 .. 0x80)
+    mov ah, 0x02    ; ah <- int 0x13 function 0x02 = 'read'
+    mov al, dh      ; al <- number of sectors to read (0x01 .. 0x80)
     ; CHR
-    mov cl, 0x02 ; cl <- sector (0x01 .. 0x11)
-                 ; 0x01 is our boot sector, 0x02 is the first 'available' sector
-    mov ch, 0x00 ; ch <- cylinder (0x0 .. 0x3FF, upper 2 bits in 'cl')
-    mov dh, 0x00 ; dh <- head number (0x0 .. 0xF)
+    mov cl, 0x02    ; cl <- sector (0x01 .. 0x11)
+                    ; 0x01 is our boot sector, 0x02 is the first 'available' sector
+    mov ch, 0x00    ; ch <- cylinder (0x0 .. 0x3FF, upper 2 bits in 'cl')
+    mov dh, 0x00    ; dh <- head number (0x0 .. 0xF)
 
     ; [es:bx] <- pointer to buffer where the data will be stored
     ; caller sets it up for us, and it is actually the standard location for int 13h
-    int 0x13      ; BIOS interrupt
-    jc infinite_loop ; if error (stored in the carry bit)
+    int 0x13        ; BIOS interrupt
+    jc infinite_loop; if error (stored in the carry bit)
 
     pop dx
-    cmp al, dh    ; BIOS also sets 'al' to the # of sectors read. Compare it.
+    cmp al, dh      ; BIOS also sets 'al' to the # of sectors read. Compare it.
     jne infinite_loop
     popa
     ret
@@ -74,8 +74,8 @@ gdt_end:
 
 ; GDT descriptor
 gdt_descriptor:
-    dw gdt_end - gdt_start - 1 ; size (16 bit), always one less of its true size
-    dd gdt_start ; address (32 bit)
+    dw gdt_end - gdt_start - 1  ; size (16 bit), always one less of its true size
+    dd gdt_start                ; address (32 bit)
 
 ; define some constants for later use
 CODE_SEG equ gdt_code - gdt_start
@@ -92,32 +92,32 @@ switch_to_32bit:
     jmp CODE_SEG:init_32bit ; 4. far jump by using a different segment
 
 [bits 32]
-init_32bit: ; we are now using 32-bit instructions
-    mov ax, DATA_SEG ; 5. update the segment registers
+init_32bit:                 ; we are now using 32-bit instructions
+    mov ax, DATA_SEG        ; 5. update the segment registers
     mov ds, ax
     mov ss, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
 
-    mov ebp, 0x90000 ; 6. update the stack right at the top of the free space
+    mov ebp, 0x90000        ; 6. update the stack right at the top of the free space
     mov esp, ebp
 
-    call begin_32bit ; 7. Call a well-known label with useful code
+    call begin_32bit        ; 7. Call a well-known label with useful code
 
 ; =========================== 32-bit protected switch ===========================
 [bits 16]
 load_kernel:
-    mov bx, KERNEL_OFFSET ; read from boot drive to kernel location
-    mov dh, 2
-    mov dl, [bios_boot_drive]
+    mov bx, KERNEL_OFFSET       ; write to kernel location
+    mov dh, 2                   ; 2 sectors
+    mov dl, [bios_boot_drive]   ; from BIOS boot drive
     call disk_load
     ret
 
 [bits 32]
 begin_32bit:
-    call KERNEL_OFFSET ; Give control to the kernel
-    jmp $ ; hang on kernel return
+    call KERNEL_OFFSET  ; Give control to the kernel
+    jmp $               ; hang on kernel return
 
 
 bios_boot_drive db 0    ; BIOS boot drive number
