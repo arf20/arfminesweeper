@@ -47,11 +47,11 @@
 #define STATE_WON           2
 
 int gameInit(int size, int mines);
-void gameDestroy();
-const int * gameGetBoard();
-int gameGetState();
+void gameDestroy(void);
+const int * gameGetBoard(void);
+int gameGetState(void);
 int gameGetSurroundingMines(int x, int y);
-int gameGetFlagsLeft();
+int gameGetFlagsLeft(void);
 void gameClearCell(int x, int y);
 void gameFlagCell(int x, int y);
 

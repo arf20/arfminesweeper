@@ -1,36 +1,41 @@
-
-
+# find release
 execute_process(
-    COMMAND uname -r
-    OUTPUT_VARIABLE KERNEL_RELEASE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
+        COMMAND uname -r
+        OUTPUT_VARIABLE KERNEL_RELEASE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-set (KERNELHEADERSAMD64_DIR /usr/src/linux-headers-${KERNEL_RELEASE})
-string(REPLACE amd64 common KERNELHEADERSCOMMON_DIR ${KERNELHEADERSAMD64_DIR})
+set(KERNELHEADERS_DIR /usr/src/linux-headers-${KERNEL_RELEASE})
 
 message(STATUS "Kernel release: ${KERNEL_RELEASE}")
-message(STATUS "Kernel headers arch: ${KERNELHEADERSAMD64_DIR}")
-message(STATUS "Kernel headers common: ${KERNELHEADERSCOMMON_DIR}")
+message(STATUS "Kernel headers: ${KERNELHEADERS_DIR}")
 
-include_directories("${KERNELHEADERSAMD64_DIR}/include")
-include_directories("${KERNELHEADERSAMD64_DIR}/arch/x86/generated/include")
-include_directories("${KERNELHEADERSCOMMON_DIR}/include")
+if (KERNELHEADERS_DIR)
+    set(KERNELHEADERS_INCLUDE_DIRS
+            ${KERNELHEADERS_DIR}/include
+            ${KERNELHEADERS_DIR}/arch/x86/include
+            CACHE PATH "Kernel headers include dirs"
+            )
+    set(KERNELHEADERS_FOUND 1 CACHE STRING "Set to 1 if kernel headers were found")
+else (KERNELHEADERS_DIR)
+    set(KERNELHEADERS_FOUND 0 CACHE STRING "Set to 1 if kernel headers were found")
+endif (KERNELHEADERS_DIR)
 
+mark_as_advanced(KERNELHEADERS_FOUND)
+
+# include headers
+include_directories(${KERNELHEADERS_INCLUDE_DIRS})
+
+# make module
 set(MODULE_FILE "arfminesweeper.ko")
-set(KBUILD_CMD $(MAKE) -C ${KERNELHEADERSAMD64_DIR} modules M=${CMAKE_CURRENT_BINARY_DIR} src=${CMAKE_CURRENT_SOURCE_DIR})
-
-FILE(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Kbuild "obj-m := module.o")
+set(BUILD_CMD ${CMAKE_MAKE_PROGRAM} -C ${KERNELHEADERS_DIR} modules M=${CMAKE_CURRENT_BINARY_DIR} src=${CMAKE_CURRENT_SOURCE_DIR})
+FILE(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Kbuild "obj-m := arfminesweeper.o
+arfminesweeper-y := module.o ../common/game.o
+")
 
 add_custom_command(OUTPUT ${MODULE_FILE}
-    COMMAND ${KBUILD_CMD}
+    COMMAND ${BUILD_CMD}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS module.c VERBATIM)
 
-add_custom_target(driver ALL DEPENDS ${MODULE_FILE})
-
-add_library(dummy_target module.c)
-
-target_compile_definitions(dummy_target PUBLIC __KERNEL__ MODULE)
-
-
+add_custom_target(module ALL DEPENDS ${MODULE_FILE})

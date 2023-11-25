@@ -1,1 +1,2 @@
-obj-m := module.o
+obj-m := arfminesweeper.o
+arfminesweeper-y := module.o ../common/game.o

@@ -19,8 +19,16 @@
 
 */
 
-#include <stdlib.h>
-#include <time.h>
+#ifndef __KERNEL__
+    #include <stdlib.h>
+    #include <time.h>
+#else
+    #include <linux/module.h>
+    #include <linux/kernel.h>
+    #include <linux/slab.h>  /* kmalloc */
+    #define malloc(size)    kmalloc(size, GFP_KERNEL)
+    #define free            kfree
+#endif
 
 #include "game.h"
 
@@ -55,12 +63,20 @@ gameInit(int lsize, int lmines) {
     /* Add mines at random locations */
     /* Seed the rand(3) pseudorandom number generator with time(2), good
         enough entropy */
+    #ifndef __KERNEL__
     srand(time(NULL));
+    #endif
 
     int x = 0, y = 0, n = 0;
     while (n < mines) {
+        #ifndef __KERNEL__
         x = rand() % size;
         y = rand() % size;
+        #else
+        get_random_bytes(&x, sizeof(x));
+        get_random_bytes(&y, sizeof(y));
+        x %= size;  y %= size;
+        #endif
 
         /* If there is already a mine, regenerate location */
         if (CHECK_MINE(BOARDXY(x, y)))
@@ -103,7 +119,7 @@ gameGetSurroundingMines(int x, int y) {
 }
 
 int
-checkWin() {
+checkWin(void) {
     for (int i = 0; i < size * size; i++)
         if ((!CHECK_CLEAR(board[i]) && !CHECK_MINE(board[i]))
             || (!CHECK_FLAG(board[i]) && CHECK_MINE(board[i]))) return 0;

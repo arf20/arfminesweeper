@@ -65,6 +65,7 @@ WinUI 3                                     X
 Java AWT                      X     X   X   X
 Java Swing                    X     X   X   X
 Webapp                  DONE  X     X   X   X
+Kernel module           WIP   X              
 ```
 I apologize.
 
