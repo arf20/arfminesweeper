@@ -27,6 +27,7 @@
 #include <linux/fs.h>
 #include <linux/device.h>
 #include <linux/uaccess.h>
+#include <linux/moduleparam.h>
 
 #include "../common/game.h"
 #include "../frontends/common.h"
@@ -51,8 +52,16 @@ static char read_buff[RBUF_SIZE] = { 0 };
 static size_t read_size = 0;
 
 /* Game stuff */
-static int size = 0;
+static int size = 8;
+static int mines = 10;
+
 static const int *board = NULL;
+
+/* Module parameters */
+module_param(size, int, 0);
+MODULE_PARM_DESC(size, "Board side size");
+module_param(mines, int, 0);
+MODULE_PARM_DESC(mines, "Number of mines");
 
 /* File operations */
 static int
@@ -214,14 +223,14 @@ arfmm_start(void) {
     }
 
 
-    gameInit(8, 10);
+    gameInit(size, mines);
 
     board = gameGetBoard();
-    size = 8;
 
     read_size = render_rbuf();
 
-    printk(KERN_INFO "arfminesweeper: ok\n");
+    printk(KERN_INFO "arfminesweeper: Starting game with module frontend, "
+        "%dx%d in size with %d mines\n", size, size, mines);
 
     return 0;
 }
