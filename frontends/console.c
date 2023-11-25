@@ -26,7 +26,7 @@
 
 #include "common.h"
 #include "console.h"
-#include "../game.h"
+#include <common/game.h>
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 

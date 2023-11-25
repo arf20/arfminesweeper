@@ -26,7 +26,7 @@
 
 #include "common.h"
 #include "sdl2.h"
-#include "../game.h"
+#include <common/game.h>
 
 
 static const int *board = NULL;

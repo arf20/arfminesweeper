@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "game.h"
+#include <common/game.h>
 
 #include "frontends/console.h"
 #include "frontends/fbdev.h"

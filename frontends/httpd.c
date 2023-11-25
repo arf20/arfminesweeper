@@ -40,7 +40,7 @@
 
 #include "common.h"
 #include "httpd.h"
-#include "../game.h"
+#include <common/game.h>
 
 #define BUFF_SIZE 65535
 

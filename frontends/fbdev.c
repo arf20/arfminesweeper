@@ -34,7 +34,7 @@
 #include <termios.h>
 
 #include "common.h"
-#include "../game.h"
+#include <common/game.h>
 #include "fbdev.h"
 
 #define STB_IMAGE_IMPLEMENTATION

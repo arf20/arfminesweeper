@@ -29,7 +29,7 @@
 #include <xcb/xcb.h>
 
 #include "common.h"
-#include "../game.h"
+#include <common/game.h>
 #include "xcb.h"
 
 #define TXT_OFFX    5

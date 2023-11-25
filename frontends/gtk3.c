@@ -23,7 +23,7 @@
 #include <gtk/gtk.h>
 
 #include "common.h"
-#include "../game.h"
+#include <common/game.h>
 
 static const int *board = NULL;
 static int size = 0;

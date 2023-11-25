@@ -19,6 +19,6 @@ Usability by developer from most to least
 11. motif:      simple but broken and weird behaviour
 12. wayland:    it just sucks, and its broken
 13. xcb:        useless documentation and unexpected behaviour (might be me)
-14. Vulkan:     a thousend lines for the initialization...
+14. Vulkan:     a thousend lines for the initialization, and bugs probably my fault
 15. Win32 ComCtl: jesus christ how does this still exist
 ```

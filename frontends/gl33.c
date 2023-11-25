@@ -29,7 +29,7 @@
 
 #include "common.h"
 #include "gl33.h"
-#include "../game.h"
+#include <common/game.h>
 
 #define C_WHITE  1.0f, 1.0f, 1.0f
 #define C_BLACK  0.0f, 0.0f, 0.0f

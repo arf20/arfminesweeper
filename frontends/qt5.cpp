@@ -24,7 +24,7 @@
 #include "qt5.hpp"
 
 extern "C" {
-#include "../game.h"
+#include <common/game.h>
 }
 
 #include <QtWidgets>

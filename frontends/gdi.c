@@ -27,7 +27,7 @@
 
 #include "common.h"
 #include "gdi.h"
-#include "../game.h"
+#include <common/game.h>
 
 
 static const int* board = NULL;

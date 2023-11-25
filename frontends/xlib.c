@@ -27,7 +27,7 @@
 #include <X11/Xlib.h>
 
 #include "common.h"
-#include "../game.h"
+#include <common/game.h>
 #include "xlib.h"
 
 #define TXT_OFFX    5
