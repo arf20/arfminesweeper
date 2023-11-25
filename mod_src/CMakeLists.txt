@@ -33,9 +33,17 @@ FILE(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Kbuild "obj-m := arfminesweeper.o
 arfminesweeper-y := module.o ../common/game.o
 ")
 
-add_custom_command(OUTPUT ${MODULE_FILE}
+add_custom_command(
+    OUTPUT ${MODULE_FILE}
     COMMAND ${BUILD_CMD}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS module.c VERBATIM)
+    DEPENDS module.c VERBATIM
+)
 
-add_custom_target(module ALL DEPENDS ${MODULE_FILE})
+if (KERNELHEADERS_FOUND)
+    add_custom_target(module ALL DEPENDS ${MODULE_FILE})
+    message(STATUS "Building linux kernel module")
+else()
+    message(STATUS "Kernel headers required to build module")
+    message(STATUS "Not building linux kernel module")
+endif()

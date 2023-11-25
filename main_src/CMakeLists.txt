@@ -230,7 +230,7 @@ add_executable(arfminesweeper ${SRC})
 
 # link libraries
 
-target_link_libraries(arfminesweeper Threads::Threads)
+target_link_libraries(arfminesweeper Threads::Threads m)
 
 if (WIN32)
     target_link_libraries(arfminesweeper ws2_32 msimg32 D2d1)

@@ -51,20 +51,21 @@ Bug: flag bitmap again
 ## Direct2D
 Broken: Direct2D from C broken
 ## .NET WinForms
-Theorical C# interface
+Theoretical C# interface
 ## .NET WPF
-Theorical C# interface
+Theoretical C# interface
 ## Win UWP
-Theorical C# interface
+Theoretical C# interface
 ## WinUI 3
-Theorical C# interface
+Theoretical C# interface
 ## .NET MAUI
-Theorical C# interface
+Theoretical C# interface
 ## Java AWT
-Theorical Java interface
+Theoretical Java JNI interface
 ## Java Swing
-Theorical Java interface
+Theoretical Java JNI interface
 ## Webapp
 Done
 ## Linux Kernel Module
 Done
+Bug: Sometimes makes the computer freeze lol
