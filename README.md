@@ -68,8 +68,8 @@ MAIN TARGET
     Webapp                  DONE  X     X   X   X
 LINUX MODULE TARGET
     Kernel module           DONE  X              
-KERNEL TARGET
-    VGA text mode console   
+KERNEL TARGET               
+    VGA text mode console   WIP
     VGA text mode
     VGA graphic mode
     VESA graphic mode

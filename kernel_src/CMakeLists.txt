@@ -25,7 +25,12 @@ add_compile_options(
     $<TARGET_PROPERTY:NASM_OBJ_FORMAT>, ${CMAKE_ASM_NASM_OBJECT_FORMAT}>>"
 )
 
-file (GLOB KERN_SRC "kernel_entry.asm" "kernel.c")
+file (GLOB KERN_SRC
+    "kernel_entry.asm"
+    "kernel.c"
+    "port.c"
+    "vgaterm.c"
+)
 
 add_executable(kernel ${KERN_SRC})
 
@@ -40,13 +45,15 @@ target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:C>:
 
 set_target_properties(kernel PROPERTIES NASM_OBJ_FORMAT elf32)
 
+#set_property(TARGET kernel PROPERTY C_STANDARD 90)
+
 #target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:ASM_NASM>:
 #    -felf32>
 #)
 
 target_link_options(kernel PRIVATE 
     -m32 -ffreestanding -nostdlib -fno-pie
-    -Wl,-m,elf_i386 -Wl,-Ttext,0x1000 -Wl,--oformat=binary
+    -Wl,-m,elf_i386 -Wl,-T,${PROJECT_SOURCE_DIR}/kernel_src/linker.ld -Wl,--oformat=binary
     #-m elf_i386 -Ttext 0x1000 --oformat binary
 )
 
@@ -55,7 +62,7 @@ set(IMAGE_BIN "arfminesweeper.bin")
 
 add_custom_command(
     OUTPUT ${IMAGE_BIN}
-    COMMAND cat ${BOOT_BIN} kernel > ${IMAGE_BIN}
+    COMMAND cat ${BOOT_BIN} kernel > ${IMAGE_BIN} && truncate -s 64K ${IMAGE_BIN} 
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS ${BOOT_BIN} kernel VERBATIM
 )

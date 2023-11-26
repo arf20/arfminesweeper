@@ -16,20 +16,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel entry point
-
 */
 
-#include "vgaterm.h"
-#include "textdefs.h"
+#ifndef _TEXTDEFS_H
+#define _TEXTDEFS_H
 
-void
-kmain() {
-    vga_init();
-    vga_write_string(TXT_HELLO, -1); 
-    vga_write_string(TXT_MENU, -1);
+#define TXT_HELLO \
+    "arfminesweeper by arf20\n"\
+    "Copyright 2023 Angel Ruiz Fernandez\n"\
+    "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n"
 
-    for (int i = 0; i < 22; i++)
-        vga_write_string("asdf\n", -1);
+#define TXT_MENU \
+    "\nAvailable frontends:\n"\
+    "    [1] VGA text mode console\n"
 
-}
+#endif /* _TEXTDEFS_H */

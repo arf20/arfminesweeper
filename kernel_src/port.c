@@ -16,20 +16,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel entry point
+    port.c: C port interface
 
 */
 
-#include "vgaterm.h"
-#include "textdefs.h"
+unsigned char
+port_byte_in(unsigned short port) {
+    unsigned char result;
+    __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
+    return result;
+}
 
 void
-kmain() {
-    vga_init();
-    vga_write_string(TXT_HELLO, -1); 
-    vga_write_string(TXT_MENU, -1);
-
-    for (int i = 0; i < 22; i++)
-        vga_write_string("asdf\n", -1);
-
+port_byte_out(unsigned short port, unsigned char data) {
+    __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
 }

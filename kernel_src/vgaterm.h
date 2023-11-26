@@ -16,20 +16,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel entry point
-
 */
 
-#include "vgaterm.h"
-#include "textdefs.h"
+#ifndef _VGATERM_H
+#define _VGATERM_H
 
-void
-kmain() {
-    vga_init();
-    vga_write_string(TXT_HELLO, -1); 
-    vga_write_string(TXT_MENU, -1);
+/* Computation operations */
+int vga_offset_row(int off);
+int vga_row_col_offset(int col, int row);
+/* Cursor operations */
+void vga_set_cursor_off(int offset);
+int vga_get_cursor_off();
+/* Buffer operations */
+void vga_set_char(char c, int off);
+void vga_write_string(const char *str, int off);
+void vga_init();
 
-    for (int i = 0; i < 22; i++)
-        vga_write_string("asdf\n", -1);
-
-}
+#endif /* _VGATERM_H */

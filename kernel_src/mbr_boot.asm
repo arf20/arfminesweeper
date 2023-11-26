@@ -109,7 +109,7 @@ init_32bit:                 ; we are now using 32-bit instructions
 [bits 16]
 load_kernel:
     mov bx, KERNEL_OFFSET       ; write to kernel location
-    mov dh, 2                   ; 2 sectors
+    mov dh, 32                  ; read 32 512B sectors, assume 16K size kernel starting at 1
     mov dl, [bios_boot_drive]   ; from BIOS boot drive
     call disk_load
     ret
