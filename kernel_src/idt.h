@@ -16,25 +16,29 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel main
-
 */
 
-#include "idt.h"
-#include "keyb.h"
-#include "vgaterm.h"
-#include "textdefs.h"
+#ifndef _IDT_H
+#define _IDT_H
 
-void
-kmain() {
-    idt_install_isrs(); 
-    keyb_init();
+#define IRQ0  32
+#define IRQ1  33
+#define IRQ2  34
+#define IRQ3  35
+#define IRQ4  36
+#define IRQ5  37
+#define IRQ6  38
+#define IRQ7  39
+#define IRQ8  40
+#define IRQ9  41
+#define IRQ10 42
+#define IRQ11 43
+#define IRQ12 44
+#define IRQ13 45
+#define IRQ14 46
+#define IRQ15 47
+#define IRQ16 48
 
-    vga_init();
-    vga_write_string(TXT_HELLO, -1); 
-    vga_write_string(TXT_MENU, -1);
+void idt_install_isrs();
 
-    /*for (int i = 0; i < 10; i++)
-        vga_write_string("asdf\n", -1);*/
-
-}
+#endif /* _IDT_H */

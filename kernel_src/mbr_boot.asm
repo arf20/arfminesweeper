@@ -1,8 +1,30 @@
+;
+;   arfminesweeper: Cross-plataform multi-frontend game
+;   Copyright (C) 2023 arf20 (Ángel Ruiz Fernandez)
+;
+;   This program is free software: you can redistribute it and/or modify
+;   it under the terms of the GNU General Public License as published by
+;   the Free Software Foundation, either version 3 of the License, or
+;   (at your option) any later version.
+;
+;   This program is distributed in the hope that it will be useful,
+;   but WITHOUT ANY WARRANTY; without even the implied warranty of
+;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;   GNU General Public License for more details.
+;
+;   You should have received a copy of the GNU General Public License
+;   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;
+;   mbr_boot.asm: MBR boot sector bootloader
+;
+
 [bits 16]
 [org 0x7c00]
 
 ; kernel load address
-KERNEL_OFFSET equ 0x1000
+KERNEL_OFFSET   equ 0x1000
+; kernel size in sectors
+KERNEL_SIZE     equ 48  ; NOTE IMPORTANT FUCK: always the culprit 
 
 ; BIOS boot drive we were booted from
 mov [bios_boot_drive], dl
@@ -109,7 +131,7 @@ init_32bit:                 ; we are now using 32-bit instructions
 [bits 16]
 load_kernel:
     mov bx, KERNEL_OFFSET       ; write to kernel location
-    mov dh, 32                  ; read 32 512B sectors, assume 16K size kernel starting at 1
+    mov dh, KERNEL_SIZE         ; numer of sectors to read
     mov dl, [bios_boot_drive]   ; from BIOS boot drive
     call disk_load
     ret

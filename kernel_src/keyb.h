@@ -16,25 +16,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel main
-
 */
 
-#include "idt.h"
-#include "keyb.h"
-#include "vgaterm.h"
-#include "textdefs.h"
+#ifndef _KEYB_H
+#define _KEYB_H
 
-void
-kmain() {
-    idt_install_isrs(); 
-    keyb_init();
+void keyb_init();
 
-    vga_init();
-    vga_write_string(TXT_HELLO, -1); 
-    vga_write_string(TXT_MENU, -1);
-
-    /*for (int i = 0; i < 10; i++)
-        vga_write_string("asdf\n", -1);*/
-
-}
+#endif /* _KEYB_H */

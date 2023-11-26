@@ -5,7 +5,7 @@ SECTIONS
    . = 1K;
    .text BLOCK(4K) : ALIGN(4K)
    {
-       *(.multiboot)
+       CMakeFiles/kernel.dir/kernel_entry.asm.o(.text)
        *(.text)
    }
    .data : { *(.data) }

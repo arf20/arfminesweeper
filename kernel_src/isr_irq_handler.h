@@ -16,25 +16,26 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel main
-
 */
 
-#include "idt.h"
-#include "keyb.h"
-#include "vgaterm.h"
-#include "textdefs.h"
+#ifndef _IDT_ISR_HANDLER_H
+#define _IDT_ISR_HANDLER_H
 
-void
-kmain() {
-    idt_install_isrs(); 
-    keyb_init();
+#include <stdint.h>
 
-    vga_init();
-    vga_write_string(TXT_HELLO, -1); 
-    vga_write_string(TXT_MENU, -1);
+typedef struct {
+    /* data segment selector */
+    uint32_t ds;
+    /* general purpose registers pushed by pusha */
+    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    /* pushed by isr procedure */
+    uint32_t int_no, err_code;
+    /* pushed by CPU automatically */
+    uint32_t eip, cs, eflags, useresp, ss;
+} registers_t;
 
-    /*for (int i = 0; i < 10; i++)
-        vga_write_string("asdf\n", -1);*/
+typedef void (*isr_t)(registers_t *);
 
-}
+void register_interrupt_handler(uint8_t n, isr_t handler);
+
+#endif /* _IDT_ISR_HANDLER_H */

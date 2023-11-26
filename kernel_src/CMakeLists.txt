@@ -30,6 +30,10 @@ file (GLOB KERN_SRC
     "kernel.c"
     "port.c"
     "vgaterm.c"
+    "idt.c"
+    "isr_irq.asm"
+    "isr_irq_handler.c"
+    "keyb.c"
 )
 
 add_executable(kernel ${KERN_SRC})
@@ -68,5 +72,17 @@ add_custom_command(
 )
 
 add_custom_target(image ALL DEPENDS ${IMAGE_BIN})
+
+#add_executable(kernel_dbg ${KERN_SRC})
+#target_compile_options(kernel_dbg PUBLIC $<$<COMPILE_LANGUAGE:C>:
+#    -Wall -Wextra -Wpedantic -Werror
+#    -m32 -ffreestanding -nostdlib -fno-pie>
+#)
+#set_target_properties(kernel_dbg PROPERTIES NASM_OBJ_FORMAT elf32)
+#target_link_options(kernel PRIVATE 
+#    -m32 -ffreestanding -nostdlib -fno-pie
+#    -Wl,-m,elf_i386 -Wl,--oformat=elf32-i386
+#    #-m elf_i386 -Ttext 0x1000 --oformat binary
+#)
 
 message(STATUS "Building bootable image")
