@@ -106,8 +106,30 @@ vga_scroll_line(int off) {
 }
 
 void
-vga_write_string(const char *str, int off) {
+vga_print_char(char c, int off) {
+    /* if off < 0, place at cursor, else use given offset */
     if (off < 0)
+        off = vga_get_cursor_off();
+    
+    /* handle control characters */
+    if (c == '\n') off = vga_row_col_offset(0, vga_offset_row(off) + 1);
+    else if (c == '\b') off -= 2;
+    else {
+        vga_set_char(c, off);
+        off += 2;
+    }
+
+    /* if after printing, cursor is ouside the screen, do scroll */
+    if (off >= TXTMODE_ROWS * TXTMODE_COLS * 2)
+        off = vga_scroll_line(off);
+    if (off < 0) off = 0;
+
+    vga_set_cursor_off(off);
+}
+
+void
+vga_print_string(const char *str, int off) {
+    /*if (off < 0)
         off = vga_get_cursor_off();
     int i = 0;
     while (str[i] != '\0') {
@@ -122,7 +144,15 @@ vga_write_string(const char *str, int off) {
         }
         i++;
     }
-    vga_set_cursor_off(off);
+    vga_set_cursor_off(off);*/
+    if (off < 0)
+        off = vga_get_cursor_off();
+    else vga_set_cursor_off(off);
+    int i = 0;
+    while (str[i] != '\0') {
+        vga_print_char(str[i], -1);
+        i++;
+    }
 }
 
 

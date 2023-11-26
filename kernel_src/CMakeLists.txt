@@ -30,10 +30,8 @@ file (GLOB KERN_SRC
     "kernel.c"
     "port.c"
     "vgaterm.c"
-    "idt.c"
-    "isr_irq.asm"
-    "isr_irq_handler.c"
     "keyb.c"
+    "common.c"
 )
 
 add_executable(kernel ${KERN_SRC})

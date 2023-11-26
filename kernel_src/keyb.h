@@ -21,6 +21,8 @@
 #ifndef _KEYB_H
 #define _KEYB_H
 
-void keyb_init();
+unsigned char keyb_poll();
+char keyb_scancode_char(unsigned char scancode);
+char keyb_getc();
 
 #endif /* _KEYB_H */

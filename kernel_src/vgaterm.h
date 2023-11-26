@@ -29,7 +29,8 @@ void vga_set_cursor_off(int offset);
 int vga_get_cursor_off();
 /* Buffer operations */
 void vga_set_char(char c, int off);
-void vga_write_string(const char *str, int off);
+void vga_print_char(char c, int off);
+void vga_print_string(const char *str, int off);
 void vga_init();
 
 #endif /* _VGATERM_H */

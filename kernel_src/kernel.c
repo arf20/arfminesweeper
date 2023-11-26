@@ -20,21 +20,19 @@
 
 */
 
-#include "idt.h"
+#include "common.h"
 #include "keyb.h"
 #include "vgaterm.h"
 #include "textdefs.h"
 
 void
 kmain() {
-    idt_install_isrs(); 
-    keyb_init();
-
     vga_init();
-    vga_write_string(TXT_HELLO, -1); 
-    vga_write_string(TXT_MENU, -1);
+    vga_print_string(TXT_HELLO, -1); 
+    vga_print_string(TXT_MENU, -1);
 
-    /*for (int i = 0; i < 10; i++)
-        vga_write_string("asdf\n", -1);*/
-
+    /* print input */
+    while (1) {
+        vga_print_char(keyb_getc(), -1);
+    } 
 }
