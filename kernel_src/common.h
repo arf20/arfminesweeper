@@ -23,4 +23,6 @@
 
 char *itoan(int num, char* str, int n, int base);
 
+int kprintf(char *format, ...);
+
 #endif /* _COMMON_H */

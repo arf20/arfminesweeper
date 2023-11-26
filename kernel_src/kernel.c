@@ -28,11 +28,21 @@
 void
 kmain() {
     vga_init();
-    vga_print_string(TXT_HELLO, -1); 
-    vga_print_string(TXT_MENU, -1);
 
-    /* print input */
-    while (1) {
-        vga_print_char(keyb_getc(), -1);
-    } 
+    kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
+
+    char sel = 0;
+    do {
+        sel = keyb_getc();
+    } while (!(sel >= '0' && sel <= '2'));
+    
+    if (sel == '0') {
+        return;
+    }
+    else if (sel == '1') {
+        kprintf("Starting game with vgacon frontend\n");
+    }
+    else if (sel == '2') {
+        kprintf("Starting game with vgatxt frontend\n");
+    }
 }

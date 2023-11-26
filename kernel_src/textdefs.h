@@ -27,7 +27,9 @@
     "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n"
 
 #define TXT_MENU \
-    "\nAvailable frontends:\n"\
-    "    [1] VGA text mode console\n"
+    "Available frontends:\n"\
+    "    [1] vgacon: VGA text mode console\n"\
+    "    [2] vgatxt: VGA text mode\n"\
+    "    [0] Halt CPU\n"
 
 #endif /* _TEXTDEFS_H */

@@ -20,6 +20,13 @@
 
 */
 
+#include "common.h"
+
+#include <stdarg.h>
+
+#include "vgaterm.h"
+#include "keyb.h"
+
 void
 reverse(char *str, int length) {
     int start = 0;
@@ -34,16 +41,16 @@ reverse(char *str, int length) {
 }
 
 char *
-itoan(int num, char* str, int n, int base) {
+itoan(int num, char* buff, int n, int base) {
     int i = 0;
     int neg = 0;
 
     if (!n) return 0;
 
     if (num == 0) {
-        str[i++] = '0';
-        str[i] = '\0';
-        return str;
+        buff[i++] = '0';
+        buff[i] = '\0';
+        return buff;
     }
  
     if (num < 0 && base == 10) {
@@ -53,16 +60,95 @@ itoan(int num, char* str, int n, int base) {
 
     while (num != 0 && i < n) {
         int rem = num % base;
-        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        buff[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
         num = num / base;
     }
  
     if (neg)
-        str[i++] = '-';
+        buff[i++] = '-';
  
-    str[i] = '\0'; 
+    buff[i] = '\0'; 
  
-    reverse(str, i);
+    reverse(buff, i);
  
-    return str;
+    return buff;
+}
+
+int
+strlen(const char *str) {
+    int i = 0;
+    while (str[i]) { i++; }
+    return i;
+}
+
+char
+putchar(char c) {
+    vga_print_char(c, -1);
+    return c;
+}
+
+int
+puts(const char *s) {
+    int i = 0;
+    while (s[i]) {
+        putchar(s[i]);
+        i++;
+    }
+    return i;
+}
+
+char
+getchar() {
+    return keyb_getc();
+}
+
+int
+kprintf(char *format, ...) {
+    char *p;
+    char intbuff[64];
+
+    va_list arg;
+    va_start(arg, format);
+    p = format;
+
+    int n = 0;
+
+    for (p = format; *p != '\0'; p++) {
+        if(*p != '%') {
+            putchar(*p); continue;
+        }
+        p++;
+        switch(*p) {
+            case 'c': putchar(va_arg(arg, int)); n++; break;
+            case 'd': /* fall down */
+            case 'i': n += puts(itoan(va_arg(arg, int), intbuff, 64, 10));
+                break;
+            case 'o': n += puts(itoan(va_arg(arg, unsigned int), intbuff, 64, 8));
+                break;
+            case 's': n += puts(va_arg(arg, char *)); break;
+            case 'u': n += puts(itoan(va_arg(arg, unsigned int), intbuff, 64, 10));
+                break;
+            case 'x': n += puts(itoan(va_arg(arg, unsigned int), intbuff, 64, 16));
+                break;
+
+            /*case 'f':
+            case 'F': */
+            /*case 'e': f = va_arg(arg, float); puts(); break;
+            case 'E': f = va_arg(arg, float); puts(); break;
+            case 'g': f = va_arg(arg, float); puts(); break;
+            case 'G': f = va_arg(arg, float); puts(); break;
+            case 'F': f = va_arg(arg, float); puts(); break;
+            case 'a': f = va_arg(arg, float); puts(); break;
+            case 'A': f = va_arg(arg, float); puts(); break;
+            case 'p': u = va_arg(arg, unsigned int); puts(uintstr(u, 16)); break;
+            case 'n': */
+            case '%': putchar('%'); break;
+            default: {
+                puts("kprintf: unsupported format\n");
+            } break;
+        }
+    }
+    va_end(arg);
+
+    return n;
 }
