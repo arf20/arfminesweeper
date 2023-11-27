@@ -19,18 +19,27 @@
 
 */
 
-#ifndef __KERNEL__
-    #include <stdlib.h>
-    #include <time.h>
-#else
+#include "game.h"
+
+#ifdef __KERNEL__
     #include <linux/module.h>
     #include <linux/kernel.h>
     #include <linux/slab.h>  /* kmalloc */
     #define malloc(size)    kmalloc(size, GFP_KERNEL)
     #define free            kfree
+#elif FRONTENDS_KERNEL
+    #include <stddef.h>
+    #include "../kernel_src/alloc.h"
+    #include "../kernel_src/random.h"
+    #define rand    prng_rand
+    #define srand   prng_srand
+    #define malloc  kmalloc
+    #define free    kfree
+    #define time    rtc_time
+#else
+    #include <stdlib.h>
+    #include <time.h>
 #endif
-
-#include "game.h"
 
 static int *board = NULL;
 

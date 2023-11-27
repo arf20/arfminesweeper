@@ -6,5 +6,5 @@
 0x00090000  stack top (grows downwards)
 0x000a0000  heap bottom (grows upwards)
     393K    heap
-0x00100000  1MB mark
+0x000fffff  1MB mark
 ```

@@ -20,42 +20,17 @@
 
 */
 
-#include "common.h"
-#include "keyb.h"
-#include "vgaterm.h"
-#include "textdefs.h"
-#include "alloc.h"
+#include "vgacon.h"
 
-#include "../common/game.h"
-#include "kfrontends/vgacon.h"
+#define ARF_KERNEL
+#include "../../common/game.h"
 
-void
-kmain() {
-    vga_init();
+#include "../common.h"
 
-    alloc_init((void*)0x000a0000, (void*)0x000fffff);
-
-    kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
-
-    /* Defaults */
-    int size = 8, mines = 10;
-
-    char sel = 0;
-    do {
-        sel = keyb_getc();
-    } while (!(sel >= '0' && sel <= '2'));
-
+int vgacon_start(const int *lboard, int lsize) {
     
-    
-    if (sel == '0') {
-        return;
-    }
-    else if (sel == '1') {
-        kprintf("Starting game with vgacon frontend\n");
-        gameInit(size, mines);
-        vgacon_start(gameGetBoard(), mines);
-    }
-    else if (sel == '2') {
-        kprintf("Starting game with vgatxt frontend\n");
-    }
+}
+
+void vgacon_destroy() {
+
 }

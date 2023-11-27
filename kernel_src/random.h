@@ -16,46 +16,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel main
-
 */
 
-#include "common.h"
-#include "keyb.h"
-#include "vgaterm.h"
-#include "textdefs.h"
-#include "alloc.h"
+#ifndef _RANDOM_H
+#define _RANDOM_H
 
-#include "../common/game.h"
-#include "kfrontends/vgacon.h"
+#define RAND_MAX    32767
 
-void
-kmain() {
-    vga_init();
+#include <stdint.h>
 
-    alloc_init((void*)0x000a0000, (void*)0x000fffff);
+int prng_rand(void);
+void prng_srand(uint32_t seed);
 
-    kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
-
-    /* Defaults */
-    int size = 8, mines = 10;
-
-    char sel = 0;
-    do {
-        sel = keyb_getc();
-    } while (!(sel >= '0' && sel <= '2'));
-
-    
-    
-    if (sel == '0') {
-        return;
-    }
-    else if (sel == '1') {
-        kprintf("Starting game with vgacon frontend\n");
-        gameInit(size, mines);
-        vgacon_start(gameGetBoard(), mines);
-    }
-    else if (sel == '2') {
-        kprintf("Starting game with vgatxt frontend\n");
-    }
-}
+#endif /* _RANDOM_H */

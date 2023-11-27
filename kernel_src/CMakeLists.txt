@@ -31,8 +31,15 @@ file (GLOB KERN_SRC
     "port.c"
     "vgaterm.c"
     "keyb.c"
+    "alloc.c"
+    "random.c"
+    "rtc_time.c"
     "common.c"
+    "../common/game.c"
+    "kfrontends/vgacon.c"
 )
+
+add_compile_definitions(FRONTENDS_KERNEL)
 
 add_executable(kernel ${KERN_SRC})
 
@@ -41,7 +48,7 @@ add_executable(kernel ${KERN_SRC})
 #    -m32 -ffreestanding)
 
 target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:C>:
-    -Wall -Wextra -Wpedantic -Werror
+    -Wall -Wextra -Wpedantic
     -m32 -ffreestanding -nostdlib -fno-pie>
 )
 

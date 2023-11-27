@@ -16,46 +16,31 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel main
+    alloc.c: basic watermark allocator
 
 */
 
-#include "common.h"
-#include "keyb.h"
-#include "vgaterm.h"
-#include "textdefs.h"
 #include "alloc.h"
 
-#include "../common/game.h"
-#include "kfrontends/vgacon.h"
+static void *heap_bottom, *heap_top, *freebase;
+
 
 void
-kmain() {
-    vga_init();
+alloc_init(void *bottom, void *top) {
+    heap_bottom = bottom;
+    heap_top = top;
+    freebase = heap_bottom;
+}
 
-    alloc_init((void*)0x000a0000, (void*)0x000fffff);
+void *
+kmalloc(size_t size) {
+    if (freebase + size > heap_top) return NULL;
+    void *objp = freebase;
+    freebase += size;
+    return objp;
+}
 
-    kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
-
-    /* Defaults */
-    int size = 8, mines = 10;
-
-    char sel = 0;
-    do {
-        sel = keyb_getc();
-    } while (!(sel >= '0' && sel <= '2'));
-
-    
-    
-    if (sel == '0') {
-        return;
-    }
-    else if (sel == '1') {
-        kprintf("Starting game with vgacon frontend\n");
-        gameInit(size, mines);
-        vgacon_start(gameGetBoard(), mines);
-    }
-    else if (sel == '2') {
-        kprintf("Starting game with vgatxt frontend\n");
-    }
+void
+kfree(const void *objp) {
+    /* yikes */
 }
