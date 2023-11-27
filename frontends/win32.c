@@ -24,7 +24,7 @@
 
 #include <windows.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "win32.h"
 #include <common/game.h>
 

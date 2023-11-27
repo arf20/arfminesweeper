@@ -25,7 +25,7 @@
 
 #include <GL/freeglut.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "gl11.h"
 #include <common/game.h>
 

@@ -45,7 +45,7 @@
 #include "frontends/gdi.h"
 #include "frontends/d2d.h"
 
-#include "frontends/common.h"
+#include <common/frontconf.h>
 
 #ifdef _WIN32
     #include <windows.h>

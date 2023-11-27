@@ -33,7 +33,7 @@
 #include <errno.h>
 #include <termios.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include <common/game.h>
 #include "fbdev.h"
 

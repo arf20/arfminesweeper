@@ -20,7 +20,7 @@
 
 */
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "qt5.hpp"
 
 extern "C" {

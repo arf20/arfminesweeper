@@ -27,7 +27,7 @@
 
 #include "glutil.h"
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "gl33.h"
 #include <common/game.h>
 

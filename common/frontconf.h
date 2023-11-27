@@ -18,8 +18,8 @@
 
 */
 
-#ifndef _COMMON_H
-#define _COMMON_H
+#ifndef _FRONTCONF_H
+#define _FRONTCONF_H
 
 #define FLAG_PNG_PATH "../assets/flag.png"
 #define FLAG_BMP_PATH "../assets/flag.bmp"
@@ -56,4 +56,4 @@
 #define TXT_QUIT "\n\nYou tried sneaking out of the POW camp, how clever\n" \
     "You were caught 5km away from it, and shot in situ.\n"
 
-#endif
+#endif /* _FRONTCONF_H */

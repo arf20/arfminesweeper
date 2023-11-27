@@ -24,7 +24,7 @@
 #include <SDL/SDL_ttf.h>
 //#include <SDL/SDL_image.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "sdl1.h"
 #include <common/game.h>
 

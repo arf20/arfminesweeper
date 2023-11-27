@@ -25,7 +25,7 @@
 #include <windows.h>
 #include <Windowsx.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "gdi.h"
 #include <common/game.h>
 

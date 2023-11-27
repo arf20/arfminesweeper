@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "console.h"
 #include <common/game.h>
 
@@ -94,12 +94,12 @@ conStart(const int *lboard, int lsize) {
     printf("Type `help` to get help\n");
 
     /* Console game loop */
-    int x = 0, y = 0, r = 0;
+    int x = 0, y = 0;
     while (1) {
         /* Print state and prompt */
         printBoard();
         printf("> ");
-        memset(buffin, 256, 0);
+        memset(buffin, 0, 256);
         fgets(buffin, 256, stdin); /* safe */
        
         if (!strncmp(buffin, "help", 4) || !strncmp(buffin, "h", 1)) {

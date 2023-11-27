@@ -26,7 +26,7 @@
 
 #include <X11/Xlib.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include <common/game.h>
 #include "xlib.h"
 

@@ -26,7 +26,7 @@
 
 #include <forms.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include <common/game.h>
 
 static const int *board = NULL;

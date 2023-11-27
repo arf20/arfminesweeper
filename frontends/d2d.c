@@ -27,7 +27,7 @@
 
 #include <d2d1.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "gdi.h"
 #include <common/game.h>
 

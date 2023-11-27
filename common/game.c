@@ -29,16 +29,24 @@
     #define free            kfree
 #elif FRONTENDS_KERNEL
     #include <stddef.h>
+    #include <stdint.h>
     #include "../kernel_src/alloc.h"
     #include "../kernel_src/random.h"
+    #include "../kernel_src/plibc.h"
+    #include "../kernel_src/rtc_time.h"
     #define rand    prng_rand
     #define srand   prng_srand
     #define malloc  kmalloc
     #define free    kfree
     #define time    rtc_time
+    #define printf  kprintf
 #else
     #include <stdlib.h>
     #include <time.h>
+    /* debug */
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdint.h>
 #endif
 
 static int *board = NULL;
@@ -63,7 +71,8 @@ gameInit(int lsize, int lmines) {
     flagsLeft = 10;
     
     /* Allocate square board */
-    board = malloc(sizeof(int) * size * size); 
+    board = malloc(sizeof(int) * size * size);
+    memset(board, 0, 256);
 
     /* Initialise clear */
     for (int i = 0; i < size * size; i++)
@@ -76,6 +85,8 @@ gameInit(int lsize, int lmines) {
     srand(time(NULL));
     #endif
 
+    printf("debug: board at %u\n", (uint32_t)board);
+
     int x = 0, y = 0, n = 0;
     while (n < mines) {
         #ifndef __KERNEL__
@@ -87,6 +98,8 @@ gameInit(int lsize, int lmines) {
         x %= size;  y %= size;
         #endif
 
+        /*printf("debug: place mine at %d,%d\n", x, y);*/
+
         /* If there is already a mine, regenerate location */
         if (CHECK_MINE(BOARDXY(x, y)))
             continue;
@@ -96,6 +109,8 @@ gameInit(int lsize, int lmines) {
 
         n++;
     }
+
+    /*printf("point2\n");*/
 
     return 0;
 }

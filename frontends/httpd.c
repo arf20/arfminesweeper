@@ -38,7 +38,7 @@
 
 #include <pthread.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "httpd.h"
 #include <common/game.h>
 

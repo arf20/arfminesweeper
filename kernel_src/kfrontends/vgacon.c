@@ -24,11 +24,124 @@
 
 #define ARF_KERNEL
 #include "../../common/game.h"
+#include "../../common/frontconf.h"
 
-#include "../common.h"
+#include <stddef.h>
 
-int vgacon_start(const int *lboard, int lsize) {
-    
+#include "../vgaterm.h"
+#include "../plibc.h"
+
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+
+#define printf  kprintf
+
+static int size = 0;
+static const int *board = NULL;
+
+static void
+printBoard() {
+    printf("+");
+    for (int x = 0; x < size; x++)
+        printf("-");
+    printf("+\n");
+
+    for (int y = 0; y < size; y++) {
+        printf("|");
+        for (int x = 0; x < size; x++) {
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
+                /* If clear, count surrounding cells and print n of mines */
+                int n = gameGetSurroundingMines(x, y);
+                n ? printf("%d", n) : printf(" ");
+            }
+            else if (CHECK_FLAG(BOARDXY(x, y))) {
+                printf("F");
+            }
+            else printf("#"); /* uncleared */
+        }
+        printf("|\n");
+    }
+
+    printf("+");
+    for (int x = 0; x < size; x++)
+        printf("-");
+    printf("+\n");
+}
+
+static void
+printHelp() {
+    printf("\thelp:             Get this message\n"
+           "\tclear | c <x, y>: Clear cell\n"
+           "\tflag  | f <x, y>: Place flag\n"
+           "\tquit  | q:        Quit\n");
+}
+
+static int
+parseXYCommand(char *buff, int *x, int *y) {
+    strtok(buff, " ");
+    char *xstr = strtok(NULL, " ");
+    char *ystr = strtok(NULL, " ");
+
+    if (!xstr) { printf("?Missing operand\n"); return -1; }
+
+    *x = atoi(xstr);
+    *y = atoi(ystr);
+
+    return 0;
+}
+
+int
+vgacon_start(const int *lboard, int lsize) {
+    board = lboard;
+    size = lsize;
+
+    char buffin[256];
+
+    printf("Type `help` to get help\n");
+
+    /* Console game loop */
+    int x = 0, y = 0;
+    while (1) {
+        /* Print state and prompt */
+        printBoard();
+        printf("> ");
+        memset(buffin, 0, 256);
+        getsn(buffin, 256); /* safe */
+
+       
+        if (!strncmp(buffin, "help", 4) || !strncmp(buffin, "h", 1)) {
+            printHelp();
+        }
+        else if (!strncmp(buffin, "clear", 5) || !strncmp(buffin, "c", 1)) {
+            if (parseXYCommand(buffin, &x, &y)) continue;
+            if (x < 0 || y < 0 || x >= size || y >= size) {
+                printf("?Out of board bounds\n"); continue;
+            }
+            printf("Cleared (%d, %d)\n", x, y);
+            gameClearCell(x, y);
+        }
+        else if (!strncmp(buffin, "flag", 4) || !strncmp(buffin, "f", 1)) {
+            if (parseXYCommand(buffin, &x, &y)) continue;
+            if (x < 0 || y < 0 || x >= size || y >= size) {
+                printf("?Out of board bounds\n"); continue;
+            }
+            printf("Flagged (%d, %d)\n", x, y);
+            gameFlagCell(x, y);
+        }
+        else if (!strncmp(buffin, "quit", 4) || !strncmp(buffin, "q", 1)) {
+            return 0;
+        }
+        else printf("?\n");
+
+        if (gameGetState() == STATE_LOST) {
+            printf(TXT_LOST);
+            return 0;
+        }
+
+        if (gameGetState() == STATE_WON) {
+            printf(TXT_WON);
+            return 0;
+        }
+    }
 }
 
 void vgacon_destroy() {

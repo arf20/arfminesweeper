@@ -94,6 +94,7 @@ keyb_scancode_char(unsigned char scancode) {
     else return '\0';
 }
 
+/* Blocks until valid key is pressed */
 char
 keyb_getc() {
     unsigned char scancode = 0;

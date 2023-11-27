@@ -24,7 +24,7 @@
 ; kernel load address
 KERNEL_OFFSET   equ 0x1000
 ; kernel size in sectors
-KERNEL_SIZE     equ 48  ; NOTE IMPORTANT FUCK: always the culprit 
+KERNEL_SIZE     equ 48  ; 24K kernel NOTE IMPORTANT FUCK: always the culprit 
 
 ; BIOS boot drive we were booted from
 mov [bios_boot_drive], dl

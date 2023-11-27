@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 #include "vk.h"
 #include <common/game.h>
 

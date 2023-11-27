@@ -30,7 +30,7 @@
 #include <Xm/RowColumn.h>
 #include <Xm/Form.h>
 
-#include "common.h"
+#include <common/frontconf.h>
 
 static const int *board = NULL;
 static int size = 0;
