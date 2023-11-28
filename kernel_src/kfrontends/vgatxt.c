@@ -98,7 +98,7 @@ render() {
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 vga_set_char_c('F', VGATXTXY(BXOFF + x + 1, BYOFF + y + 1),
-                    RED_ON_BLACK);
+                    DRED_ON_BLACK);
             }
             else vga_set_char('#', VGATXTXY(BXOFF + x + 1, BYOFF + y + 1));
         }

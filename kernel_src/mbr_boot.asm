@@ -26,9 +26,15 @@ KERNEL_OFFSET   equ 0x1000
 ; kernel size in sectors
 KERNEL_SIZE     equ 48  ; 24K kernel NOTE IMPORTANT FUCK: always the culprit 
 
+
+; set segment registers at the first 64K page
+xor ax, ax
+mov ds, ax
+mov ss, ax
+
 ; BIOS boot drive we were booted from
 mov [bios_boot_drive], dl
-; set up stack at 0x9000
+; set up stack at 0x9000 (inside first page)
 mov bp, 0x9000
 mov sp, bp
 ; NOTE: 32K between kernel begin and stack end
