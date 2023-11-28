@@ -25,4 +25,4 @@ global _start
 
 _start:
     call kmain
-    jmp $
+    hlt         ; halt CPU on kernel exit

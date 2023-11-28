@@ -33,12 +33,20 @@ mov bp, 0x9000
 mov sp, bp
 ; NOTE: 32K between kernel begin and stack end
 
+; print 'ARFBOOT' to indicate bootloader execution
+mov si, debugstr
+call print_string
+
 call load_kernel        ; read the kernel from disk
 call switch_to_32bit    ; disable interrupts, load GDT,  etc. Finally jumps to 'BEGIN_PM'
 jmp $                   ; never executed
 
+
+
+
 ; =========================== BIOS disk loading helpers ========================
 ; load 'dh' sectors from drive 'dl' into ES:BX
+; ==============================================================================
 disk_load:
     pusha
     push dx         ; save dx
@@ -66,7 +74,21 @@ disk_load:
 infinite_loop:
     jmp $
 
-; =========================== GDT ===========================
+
+; =============== PRINT ROUTINE ===============
+print_string:
+   lodsb        ; grab a byte from SI
+   or al, al    ; logical or AL by itself
+   jz .done     ; if the result is zero, get ou
+   mov ah, 0x0e
+   int 0x10     ; otherwise, print out the character!
+   jmp print_string
+.done:
+   ret
+
+; ===================================== GDT ====================================
+; set up GDT
+; ==============================================================================
 gdt_start:
     ; the GDT starts with a null 8-byte
     dd 0x0 ; 4 byte
@@ -143,6 +165,7 @@ begin_32bit:
 
 
 bios_boot_drive db 0    ; BIOS boot drive number
+debugstr db 'ARFBOOT', 0x0d, 0x0a, 0
 
 ; padding
 times 510 - ($-$$) db 0

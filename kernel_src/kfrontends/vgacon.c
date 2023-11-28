@@ -16,17 +16,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    kernel.c: kernel main
+    vgacon.c: default kernel console frontend
 
 */
 
 #include "vgacon.h"
 
+#include <stddef.h>
+
 #define ARF_KERNEL
 #include "../../common/game.h"
 #include "../../common/frontconf.h"
-
-#include <stddef.h>
 
 #include "../vgaterm.h"
 #include "../plibc.h"
@@ -133,11 +133,13 @@ vgacon_start(const int *lboard, int lsize) {
 
         if (gameGetState() == STATE_LOST) {
             printf(TXT_LOST);
+            getchar();
             return 0;
         }
 
         if (gameGetState() == STATE_WON) {
             printf(TXT_WON);
+            getchar();
             return 0;
         }
     }

@@ -70,9 +70,9 @@ itoa(int num, int base) {
     if (neg)
         buff[i++] = '-';
  
-    buff[i] = '\0'; 
- 
     reverse(buff, i);
+
+    buff[i] = '\0';
  
     return buff;
 }

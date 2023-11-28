@@ -30,34 +30,59 @@
 
 #include "../common/game.h"
 #include "kfrontends/vgacon.h"
+#include "kfrontends/vgatxt.h"
 
 void
 kmain() {
+    /* Defaults */
+    int size = 8, mines = 10;
+    char ibuf[256];
+    memset(ibuf, 0, 256);
+
+start:
+    /* clear screen, set up terminal */
     vga_init();
 
+    /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
     alloc_init((void*)0x00100000, (void*)0x001fffff);
 
     kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
+    kprintf("Current config: %dx%d size, %d mines\n", size, size, mines);
 
-    /* Defaults */
-    int size = 8, mines = 10;
-
-    char sel = 0;
-    do {
-        sel = keyb_getc();
-    } while (!(sel >= '0' && sel <= '2'));
-    
-    
-    if (sel == '0') {
-        return;
-    }
-    else if (sel == '1') {
-        kprintf("Starting game with vgacon frontend, %dx%d in size with %d mines\n",
-            size, size, mines);
-        gameInit(size, mines);
-        vgacon_start(gameGetBoard(), size);
-    }
-    else if (sel == '2') {
-        kprintf("Starting game with vgatxt frontend\n");
+    while (1) {
+        char sel = keyb_getc();
+        
+        switch (sel) {
+            case '0': return;
+            case 's': {
+                kprintf("new size> ");
+                getsn(ibuf, 256);
+                size = atoi(ibuf);
+                goto start;
+            } break;
+            case 'm': {
+                kprintf("new mines> ");
+                getsn(ibuf, 256);
+                mines = atoi(ibuf);
+                goto start;
+            } break;
+            case '1': {
+                kprintf("Starting game with vgacon frontend, %dx%d in size with %d mines\n",
+                    size, size, mines);
+                gameInit(size, mines);
+                gameSetState(STATE_GOING);
+                vgacon_start(gameGetBoard(), size);
+                goto start;
+            } break;
+            case '2': {
+                kprintf("Starting game with vgatxt frontend, %dx%d in size with %d mines\n",
+                    size, size, mines);
+                gameInit(size, mines);
+                gameSetState(STATE_GOING);
+                vgatxt_start(gameGetBoard(), size);
+                goto start;
+            } break;
+            default: kprintf("Wrong key "); break;
+        }
     }
 }

@@ -30,7 +30,7 @@
 #include <linux/moduleparam.h>
 
 #include "../common/game.h"
-#include "../frontends/common.h"
+#include "../common/frontconf.h"
 
 /* Module data */
 MODULE_LICENSE("GPL");

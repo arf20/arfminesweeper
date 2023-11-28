@@ -37,6 +37,7 @@ file (GLOB KERN_SRC
     "plibc.c"
     "../common/game.c"
     "kfrontends/vgacon.c"
+    "kfrontends/vgatxt.c"
 )
 
 add_compile_definitions(FRONTENDS_KERNEL)

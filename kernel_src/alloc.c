@@ -22,6 +22,8 @@
 
 #include "alloc.h"
 
+#include "plibc.h"
+
 static void *heap_bottom, *heap_top, *freebase;
 
 
@@ -34,9 +36,12 @@ alloc_init(void *bottom, void *top) {
 
 void *
 kmalloc(size_t size) {
-    if (freebase + size > heap_top) return NULL;
+    if ((char*)freebase + size > (char*)heap_top) {
+        kprintf("kmalloc: ran out of heap\n");
+        return NULL;
+    }
     void *objp = freebase;
-    freebase += size;
+    freebase = (char*)freebase + size;
     return objp;
 }
 

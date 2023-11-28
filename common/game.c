@@ -118,6 +118,11 @@ gameGetState() {
     return state;
 }
 
+void
+gameSetState(int s) {
+    state = s;
+}
+
 int
 gameGetFlagsLeft() {
     return flagsLeft;

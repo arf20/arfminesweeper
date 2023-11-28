@@ -20,19 +20,18 @@
 
 */
 
+#include "vgaterm.h"
+
 #include "port.h"
 
 /* VGA registers */
-#define VGA_CTRL_REGISTER 0x3d4
-#define VGA_DATA_REGISTER 0x3d5
-#define VGA_OFFSET_LOW 0x0f
-#define VGA_OFFSET_HIGH 0x0e
+#define VGA_CTRL_REGISTER   0x3d4
+#define VGA_DATA_REGISTER   0x3d5
+#define VGA_OFFSET_LOW      0x0f
+#define VGA_OFFSET_HIGH     0x0e
 
 /* VGA buffer */
 #define VGA_ADDRESS 0xb8000
-#define TXTMODE_ROWS 25
-#define TXTMODE_COLS 80
-#define WHITE_ON_BLACK 0x0f
 
 unsigned char *buff = (unsigned char*)VGA_ADDRESS;
 
@@ -41,7 +40,7 @@ void memcpy(const char *src, char *dst, int n) {
         *(dst + i) = *(src + i);
 }
 
-/* Computation operations */
+/* ====== Computation operations ====== */
 int
 vga_offset_row(int off) {
     return off / (2 * TXTMODE_COLS);
@@ -52,7 +51,17 @@ vga_row_col_offset(int col, int row) {
     return 2 * (row * TXTMODE_COLS + col);
 }
 
-/* Cursor operations */
+/* ====== Register operations ====== */
+/* credit: https://www.reddit.com/r/osdev/comments/70fcig/blinking_text/ */
+void
+vga_enable_blink() {
+    port_byte_in(0x3da);    /* address mode */
+    port_byte_out(0x3c0, 0x30); /* set address 0x30 */
+    unsigned char am = port_byte_in(0x3c1); /* read AMCR */
+    am |= 0x80; /* blink enable bit */
+    port_byte_out(0x4c0, am);
+}
+
 void
 vga_set_cursor_off(int off) {
     off /= 2;
@@ -72,11 +81,16 @@ vga_get_cursor_off() {
     return off * 2;
 }
 
-/* Buffer operations */
+/* ====== Buffer operations ====== */
+void
+vga_set_char_c(char c, int off, unsigned char color) {
+    buff[off] = c;
+    buff[off + 1] = color;
+}
+
 void
 vga_set_char(char c, int off) {
-    buff[off] = c;
-    buff[off + 1] = WHITE_ON_BLACK;
+    vga_set_char_c(c, off, WHITE_ON_BLACK);
 }
 
 void
@@ -106,7 +120,7 @@ vga_scroll_line(int off) {
 }
 
 void
-vga_print_char(char c, int off) {
+vga_print_char_c(char c, int off, unsigned char color) {
     /* if off < 0, place at cursor, else use given offset */
     if (off < 0)
         off = vga_get_cursor_off();
@@ -115,7 +129,7 @@ vga_print_char(char c, int off) {
     if (c == '\n') off = vga_row_col_offset(0, vga_offset_row(off) + 1);
     else if (c == '\b') off -= 2;
     else {
-        vga_set_char(c, off);
+        vga_set_char_c(c, off, color);
         off += 2;
     }
 
@@ -128,35 +142,30 @@ vga_print_char(char c, int off) {
 }
 
 void
-vga_print_string(const char *str, int off) {
-    /*if (off < 0)
-        off = vga_get_cursor_off();
-    int i = 0;
-    while (str[i] != '\0') {
-        if (off >= TXTMODE_ROWS * TXTMODE_COLS * 2)
-            off = vga_scroll_line(off);
-        if (str[i] == '\n') {
-            off = vga_row_col_offset(0, vga_offset_row(off) + 1);
-        } 
-        else {
-            vga_set_char(str[i], off);
-            off += 2;
-        }
-        i++;
-    }
-    vga_set_cursor_off(off);*/
+vga_print_char(char c, int off) {
+    vga_print_char_c(c, off, WHITE_ON_BLACK);
+}
+
+void
+vga_print_string_c(const char *str, int off, unsigned char color) {
     if (off < 0)
         off = vga_get_cursor_off();
     else vga_set_cursor_off(off);
     int i = 0;
     while (str[i] != '\0') {
-        vga_print_char(str[i], -1);
+        vga_print_char_c(str[i], -1, color);
         i++;
     }
+}
+
+void
+vga_print_string(const char *str, int off) {
+    vga_print_string_c(str, off, WHITE_ON_BLACK);
 }
 
 
 void
 vga_init() {
+    vga_enable_blink();
     vga_clear();
 }

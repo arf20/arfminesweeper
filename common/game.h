@@ -24,32 +24,33 @@
 #define BOARDXY(x, y)  board[((y) * size) + (x)]
 
 /* Cell bit field */
-#define CELL_BIT_MINE       0
-#define CELL_BIT_FLAG       1
-#define CELL_BIT_CLEAR      2
+#define CELL_BIT_MINE       0u
+#define CELL_BIT_FLAG       1u
+#define CELL_BIT_CLEAR      2u
 
 /* Permutations */
-#define CELL_EMPTY          0
-#define CELL_MINED          0b001
-#define CELL_FLAGGED        0b010
-#define CELL_MINED_FLAGGED  0b011
-#define CELL_CLEARED        0b100
+#define CELL_EMPTY          0u
+#define CELL_MINED          1u
+#define CELL_FLAGGED        2u
+#define CELL_MINED_FLAGGED  3u
+#define CELL_CLEARED        4u
 /*  A cleared cell can neither be mined or flagged */
 
 /* Bit field check macros */
-#define CHECK_MINE(x)       (((x) >> CELL_BIT_MINE) & 1)
-#define CHECK_FLAG(x)       (((x) >> CELL_BIT_FLAG) & 1)
-#define CHECK_CLEAR(x)      (((x) >> CELL_BIT_CLEAR) & 1)
+#define CHECK_MINE(x)       (((x) >> CELL_BIT_MINE) & 1u)
+#define CHECK_FLAG(x)       (((x) >> CELL_BIT_FLAG) & 1u)
+#define CHECK_CLEAR(x)      (((x) >> CELL_BIT_CLEAR) & 1u)
 
 /* Game state */
-#define STATE_GOING         0
-#define STATE_LOST          1
-#define STATE_WON           2
+#define STATE_GOING         0u
+#define STATE_LOST          1u
+#define STATE_WON           2u
 
 int gameInit(int size, int mines);
 void gameDestroy(void);
 const int * gameGetBoard(void);
 int gameGetState(void);
+void gameSetState(int s);
 int gameGetSurroundingMines(int x, int y);
 int gameGetFlagsLeft(void);
 void gameClearCell(int x, int y);
