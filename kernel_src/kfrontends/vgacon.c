@@ -69,10 +69,10 @@ printBoard() {
 
 static void
 printHelp() {
-    printf("\thelp:             Get this message\n"
-           "\tclear | c <x, y>: Clear cell\n"
-           "\tflag  | f <x, y>: Place flag\n"
-           "\tquit  | q:        Quit\n");
+    printf("    help:             Get this message\n"
+           "    clear | c <x, y>: Clear cell\n"
+           "    flag  | f <x, y>: Place flag\n"
+           "    quit  | q:        Quit\n");
 }
 
 static int
@@ -106,7 +106,6 @@ vgacon_start(const int *lboard, int lsize) {
         printf("> ");
         memset(buffin, 0, 256);
         getsn(buffin, 256); /* safe */
-
        
         if (!strncmp(buffin, "help", 4) || !strncmp(buffin, "h", 1)) {
             printHelp();
@@ -130,7 +129,7 @@ vgacon_start(const int *lboard, int lsize) {
         else if (!strncmp(buffin, "quit", 4) || !strncmp(buffin, "q", 1)) {
             return 0;
         }
-        else printf("?\n");
+        else printf("?Syntax error\n");
 
         if (gameGetState() == STATE_LOST) {
             printf(TXT_LOST);

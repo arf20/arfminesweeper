@@ -35,15 +35,9 @@ void
 kmain() {
     vga_init();
 
-    alloc_init((void*)0x000a0000, (void*)0x000fffff);
+    alloc_init((void*)0x00100000, (void*)0x001fffff);
 
     kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
-
-    int *memtestmem = kmalloc(4);
-    kprintf("memtest loc: %x\n", (uint32_t)memtestmem);
-    kprintf("memtest val before: %x\n", *memtestmem);
-    *memtestmem = 0x12345678;
-    kprintf("memtest val after : %x\n", *memtestmem);
 
     /* Defaults */
     int size = 8, mines = 10;
@@ -61,7 +55,7 @@ kmain() {
         kprintf("Starting game with vgacon frontend, %dx%d in size with %d mines\n",
             size, size, mines);
         gameInit(size, mines);
-        vgacon_start(gameGetBoard(), mines);
+        vgacon_start(gameGetBoard(), size);
     }
     else if (sel == '2') {
         kprintf("Starting game with vgatxt frontend\n");

@@ -122,7 +122,7 @@ init_32bit:                 ; we are now using 32-bit instructions
     mov fs, ax
     mov gs, ax
 
-    mov ebp, 0x90000        ; 6. update the stack right at the top of the free space
+    mov ebp, 0x70000        ; 6. update the stack right at the top of the free space
     mov esp, ebp
 
     call begin_32bit        ; 7. Call a well-known label with useful code

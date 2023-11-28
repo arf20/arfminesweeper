@@ -180,8 +180,8 @@ strstr(const char *haystack, const char *needle) {
     size_t off = 0;
     while (haystack + off < haystack + haystacklen) {
         if (strncmp(haystack + off, needle, strlen(needle)) == 0)
-            return (char*)haystack;
-        off += needlelen;
+            return (char*)haystack + off;
+        off++;
     }
 
     return NULL;
@@ -219,11 +219,13 @@ strtok(char *str, const char *delim) {
     char *delimocc = strstr(istr, delim);
     if (delimocc) { /* delim found */
         *delimocc = '\0';
+        str = istr;
         istr = delimocc + strlen(delim);
         return str;
     } else { /* not found, strtok sequence end */
+        str = istr;
         istr = NULL;
-        return NULL;
+        return str;
     }
 }
 
