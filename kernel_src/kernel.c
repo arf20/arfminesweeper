@@ -53,7 +53,7 @@ start:
         char sel = keyb_getc();
         
         switch (sel) {
-            case '0': return;
+            case 'h': return;
             case 's': {
                 kprintf("new size> ");
                 getsn(ibuf, 256);

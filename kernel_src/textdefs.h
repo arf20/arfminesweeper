@@ -27,11 +27,11 @@
     "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n"
 
 #define TXT_MENU \
+    "    [h] Halt CPU\n"\
+    "    [s] Set board size\n"\
+    "    [m] Set number of mines\n"\
     "Available frontends:\n"\
-    "    [s] set board size\n"\
-    "    [m] set number of mines\n"\
     "    [1] vgacon: VGA text mode console\n"\
-    "    [2] vgatxt: VGA text mode\n"\
-    "    [0] Halt CPU\n"
+    "    [2] vgatxt: VGA text mode\n"
 
 #endif /* _TEXTDEFS_H */

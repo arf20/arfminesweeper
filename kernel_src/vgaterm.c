@@ -163,6 +163,11 @@ vga_print_string(const char *str, int off) {
     vga_print_string_c(str, off, WHITE_ON_BLACK);
 }
 
+void
+vga_set_mode(unsigned char mode) {
+    /* default 3 */
+    
+}
 
 void
 vga_init() {
