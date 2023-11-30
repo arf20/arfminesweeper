@@ -34,7 +34,7 @@ file (GLOB KERN_SRC
     "alloc.c"
     "random.c"
     "rtc_time.c"
-    "int86.asm"
+    "int32.asm"
     "plibc.c"
     "../common/game.c"
     "kfrontends/vgacon.c"

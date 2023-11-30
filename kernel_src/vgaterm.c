@@ -23,6 +23,7 @@
 #include "vgaterm.h"
 
 #include "port.h"
+#include "int32.h"
 
 /* VGA registers */
 #define VGA_CTRL_REGISTER   0x3d4
@@ -166,11 +167,14 @@ vga_print_string(const char *str, int off) {
 void
 vga_set_mode(unsigned char mode) {
     /* default 3 */
-    
+    regs16_t regs;
+    regs.ax = 0x0000;
+    int32(0x10, &regs);
 }
 
 void
 vga_init() {
+    vga_set_mode(0);
     vga_enable_blink();
     vga_clear();
 }
