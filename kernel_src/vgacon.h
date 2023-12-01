@@ -18,13 +18,10 @@
 
 */
 
-#ifndef _VGATERM_H
-#define _VGATERM_H
+#ifndef _VGACON_H
+#define _VGACON_H
 
-#define TXTMODE_ROWS    25
-#define TXTMODE_COLS    80
-#define VGATXTXY(x, y)  (2 * ((TXTMODE_COLS * (y)) + (x)))
-
+/* text mode colors */
 #define WHITE_ON_BLACK  0x0f
 #define WHITE_ON_BLACK_BLINK  0x8f
 #define BLACK_ON_BLACK  0x00
@@ -37,6 +34,11 @@
 #define CYAN_ON_BLACK   0x0b
 #define DCYAN_ON_BLACK  0x03
 #define DGREY_ON_BLACK  0x08
+
+
+extern int vgatxt_rows;
+extern int vgatxt_cols;
+#define VGATXTXY(x, y)  (2 * ((vgatxt_cols * (y)) + (x)))
 
 /* Computation operations */
 int vga_offset_row(int off);
@@ -52,6 +54,6 @@ void vga_print_string(const char *str, int off);
 void vga_set_char_c(char c, int off, unsigned char color);
 void vga_print_char_c(char c, int off, unsigned char color);
 void vga_print_string_c(const char *str, int off, unsigned char color);
-void vga_init();
+void vga_init(unsigned char mode, unsigned char font);
 
-#endif /* _VGATERM_H */
+#endif /* _VGACON_H */

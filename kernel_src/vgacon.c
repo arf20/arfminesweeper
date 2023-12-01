@@ -20,7 +20,7 @@
 
 */
 
-#include "vgaterm.h"
+#include "vgacon.h"
 
 #include "port.h"
 #include "int32.h"
@@ -31,8 +31,11 @@
 #define VGA_OFFSET_LOW      0x0f
 #define VGA_OFFSET_HIGH     0x0e
 
-/* VGA buffer */
+/* VGA text mode buffer */
 #define VGA_ADDRESS 0xb8000
+
+int vgatxt_rows = 0;
+int vgatxt_cols = 0;
 
 unsigned char *buff = (unsigned char*)VGA_ADDRESS;
 
@@ -44,12 +47,12 @@ void memcpy(const char *src, char *dst, int n) {
 /* ====== Computation operations ====== */
 int
 vga_offset_row(int off) {
-    return off / (2 * TXTMODE_COLS);
+    return off / (2 * vgatxt_cols);
 }
 
 int
 vga_row_col_offset(int col, int row) {
-    return 2 * (row * TXTMODE_COLS + col);
+    return 2 * (row * vgatxt_cols + col);
 }
 
 /* ====== Register operations ====== */
@@ -98,7 +101,7 @@ void
 vga_clear() {
     /* Clear buffer */
     int i;
-    for (i = 0; i < TXTMODE_COLS * TXTMODE_ROWS; i++)
+    for (i = 0; i < vgatxt_cols * vgatxt_rows; i++)
         vga_set_char(' ', i * 2);
     /* Reset cursor to top left */
     vga_set_cursor_off(0);
@@ -110,14 +113,14 @@ vga_scroll_line(int off) {
     memcpy(
         (char *)(vga_row_col_offset(0, 1) + VGA_ADDRESS),
         (char *)(vga_row_col_offset(0, 0) + VGA_ADDRESS),
-        TXTMODE_COLS * (TXTMODE_ROWS - 1) * 2
+        vgatxt_cols * (vgatxt_rows - 1) * 2
     );
 
     /* Clear bottom line */
-    for (int col = 0; col < TXTMODE_COLS; col++)
-        vga_set_char(' ', vga_row_col_offset(col, TXTMODE_ROWS - 1));
+    for (int col = 0; col < vgatxt_cols; col++)
+        vga_set_char(' ', vga_row_col_offset(col, vgatxt_rows - 1));
     
-    return off - 2 * TXTMODE_COLS;
+    return off - 2 * vgatxt_cols;
 }
 
 void
@@ -135,7 +138,7 @@ vga_print_char_c(char c, int off, unsigned char color) {
     }
 
     /* if after printing, cursor is ouside the screen, do scroll */
-    if (off >= TXTMODE_ROWS * TXTMODE_COLS * 2)
+    if (off >= vgatxt_rows * vgatxt_cols * 2)
         off = vga_scroll_line(off);
     if (off < 0) off = 0;
 
@@ -164,17 +167,50 @@ vga_print_string(const char *str, int off) {
     vga_print_string_c(str, off, WHITE_ON_BLACK);
 }
 
+/* default 3 */
 void
-vga_set_mode(unsigned char mode) {
-    /* default 3 */
-    regs16_t regs;
-    regs.ax = 0x0000;
+vga_set_mode(unsigned char al) {
+    regs16_t regs = { 0 };
+    regs.al = al;
     int32(0x10, &regs);
 }
 
+/* default 3 */
 void
-vga_init() {
-    vga_set_mode(0);
+vga_set_font(unsigned char al) {
+    regs16_t regs = { 0 };
+    regs.ah = 0x11;
+    regs.al = al;
+    int32(0x10, &regs);
+}
+
+/* text modes only*/
+void
+vga_init(unsigned char mode, unsigned char font) {
+    vga_set_mode(mode);
+    vga_set_font(font);
+
+    switch (mode) {
+        case 0x00: /* 320x200, 8x8 */
+        case 0x01: /* 320x200, 8x8 */
+            vgatxt_cols = 40; vgatxt_rows = 25;
+        break;
+        case 0x02: /* 720x400, 9x16 */
+        case 0x03: /* 720x400, 9x16 */
+        case 0x07: /* 720x350, 9x14 */
+            vgatxt_cols = 80; vgatxt_rows = 25;
+        break;
+        case 0x17: /* 640x320, 8x8 */
+        case 0x58: /* 640x348, 8x8 */
+            vgatxt_cols = 80; vgatxt_rows = 43;
+        break;
+        case 0x66: /* 640x400, 8x8 */
+            vgatxt_cols = 80; vgatxt_rows = 50;
+        break;
+    }
+
+    if (font == 0x02 || font == 0x012) vgatxt_rows *= 2; /* 8x8 */
+    
     vga_enable_blink();
     vga_clear();
 }

@@ -18,10 +18,33 @@
 
 */
 
-#ifndef _VGACON_H
-#define _VGACON_H
+#ifndef _INT86_H
+#define _INT86_H
 
-int vgacon_start(const int *lboard, int lsize);
-void vgacon_destroy();
+#include <stdint.h>
 
-#endif /* _VGACON_H */
+typedef struct {
+    union {
+        uint32_t edi;
+        uint16_t di;
+    };
+    union {
+        uint32_t esi;
+        uint16_t si;
+    };
+    union {
+        uint32_t ebp;
+        uint16_t bp;
+    };
+    union { 
+        uint32_t esp;
+        uint16_t sp;
+    };
+    uint32_t ebx, edx, ecx, eax;
+    uint16_t flags;
+    uint16_t es, ds, fs, gs;
+} __attribute__ ((packed)) int86regs;
+
+void int86(int inum, int86regs *regs);
+
+#endif /* _INT86_H */

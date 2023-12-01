@@ -23,7 +23,7 @@
 #include "keyb.h"
 
 #include "port.h"
-#include "vgaterm.h"
+#include "vgacon.h"
 
 #define UNUSED(x) (void)(x)
 

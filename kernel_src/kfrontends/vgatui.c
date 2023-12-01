@@ -20,7 +20,7 @@
 
 */
 
-#include "vgatxt.h"
+#include "vgatui.h"
 
 #include <stddef.h>
 
@@ -28,7 +28,7 @@
 #include "../../common/game.h"
 #include "../../common/frontconf.h"
 
-#include "../vgaterm.h"
+#include "../vgacon.h"
 #include "../plibc.h"
 
 static int size = 0;
@@ -108,13 +108,13 @@ render() {
 }
 
 int
-vgatxt_start(const int *lboard, int lsize) {
+vgatui_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
     curx = cury = 0;
 
-    vga_init();
+    vga_clear();
     render();
 
     char c = 0;
@@ -139,6 +139,6 @@ vgatxt_start(const int *lboard, int lsize) {
 }
 
 void
-vgatxt_destroy() {
+vgatui_destroy() {
 
 }

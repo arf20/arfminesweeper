@@ -18,31 +18,10 @@
 
 */
 
-#ifndef _PLIBC_H
-#define _PLIBC_H
+#ifndef _VGATUI_H
+#define _VGATUI_H
 
-#include <stddef.h>
+int vgatui_start(const int *lboard, int lsize);
+void vgatui_destroy();
 
-#define LONG_MAX ((long)(~0UL>>1))
-#define LONG_MIN (~LONG_MAX)
-
-char *itoa(int num, int base);
-char *utoa(unsigned int num, int base);
-int atoi(const char *str);
-long strtol(const char *nptr, char **endptr, int base);
-
-int strlen(const char *str);
-int strcmp(const char *s1, const char *s2);
-int strncmp(const char *s1, const char *s2, size_t n);
-char *strchr(const char *str, char c);
-char *strstr(const char *haystack, const char *needle);
-char *strtok(char *str, const char *delim);
-void *memset(void *s, char c, size_t n);
-
-char putchar(char c);
-int puts(const char *s);
-int kprintf(char *format, ...);
-char getchar();
-char *getsn(char *buff, size_t n);
-
-#endif /* _PLIBC_H */
+#endif /* _VGATUI_H */

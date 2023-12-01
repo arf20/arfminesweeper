@@ -18,10 +18,10 @@
 
 */
 
-#ifndef _VGATXT_H
-#define _VGATXT_H
+#ifndef _VGACLI_H
+#define _VGACLI_H
 
-int vgatxt_start(const int *lboard, int lsize);
-void vgatxt_destroy();
+int vgacli_start(const int *lboard, int lsize);
+void vgacli_destroy();
 
-#endif /* _VGATXT_H */
+#endif /* _VGACLI_H */

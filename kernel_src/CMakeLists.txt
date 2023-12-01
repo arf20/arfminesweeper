@@ -29,7 +29,7 @@ file (GLOB KERN_SRC
     "kernel_entry.asm"
     "kernel.c"
     "port.c"
-    "vgaterm.c"
+    "vgacon.c"
     "keyb.c"
     "alloc.c"
     "random.c"
@@ -37,8 +37,8 @@ file (GLOB KERN_SRC
     "int32.asm"
     "plibc.c"
     "../common/game.c"
-    "kfrontends/vgacon.c"
-    "kfrontends/vgatxt.c"
+    "kfrontends/vgacli.c"
+    "kfrontends/vgatui.c"
 )
 
 add_compile_definitions(FRONTENDS_KERNEL)

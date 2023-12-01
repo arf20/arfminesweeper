@@ -27,11 +27,34 @@
     "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n"
 
 #define TXT_MENU \
+    "Available frontends:\n"\
+    "    [1] vgacon: VGA text mode console\n"\
+    "    [2] vgatxt: VGA text mode\n"\
+    "\n"\
     "    [h] Halt CPU\n"\
     "    [s] Set board size\n"\
     "    [m] Set number of mines\n"\
-    "Available frontends:\n"\
-    "    [1] vgacon: VGA text mode console\n"\
-    "    [2] vgatxt: VGA text mode\n"
+    "    [v] Set VGA video mode\n"\
+    "    [f] Set VGA video font\n"
+
+#define TXT_VIDEO \
+    "VGA modes (int 10h AH=00h):\n"\
+    "    AL=00h 40x25, 320x200, 8x8\n"\
+    "    AL=01h 40x25, 320x200, 8x8\n"\
+    "    AL=02h 80x25, 720x400, 9x16\n"\
+    "    AL=03h 80x25, 720x400, 9x16\n"\
+    "    AL=07h 80x25, 720x350, 9x14\n"\
+    "    AL=17h 80x43, 640x320, 8x8\n"\
+    "    AL=58h 80x43, 640x348, 8x8\n"\
+    "    AL=66h 80x50, 640x400, 8x8\n"\
+    "AL> "
+
+#define TXT_FONT \
+    "VGA font (int 10h AH=11h):\n"\
+    "    AL=04h,14h LOAD ROM 8x16 CHARACTER SET (VGA)\n"\
+    "    AL=02h,12h LOAD ROM 8x8 DBL-DOT PATTERNS VGA\n"\
+    "    AL=01h,11h MONOCHROME PATTERNS ROM VGA\n"\
+    "AL> "
+    
 
 #endif /* _TEXTDEFS_H */

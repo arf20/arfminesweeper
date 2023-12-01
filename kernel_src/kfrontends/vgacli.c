@@ -20,7 +20,7 @@
 
 */
 
-#include "vgacon.h"
+#include "vgacli.h"
 
 #include <stddef.h>
 
@@ -28,7 +28,7 @@
 #include "../../common/game.h"
 #include "../../common/frontconf.h"
 
-#include "../vgaterm.h"
+#include "../vgacon.h"
 #include "../plibc.h"
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
@@ -90,7 +90,7 @@ parseXYCommand(char *buff, int *x, int *y) {
 }
 
 int
-vgacon_start(const int *lboard, int lsize) {
+vgacli_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -145,6 +145,6 @@ vgacon_start(const int *lboard, int lsize) {
     }
 }
 
-void vgacon_destroy() {
+void vgacli_destroy() {
 
 }

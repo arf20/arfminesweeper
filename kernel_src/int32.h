@@ -23,7 +23,14 @@
 
 /* Registers struct */
 typedef struct __attribute__ ((packed)) {
-    unsigned short di, si, bp, sp, bx, dx, cx, ax;
+    unsigned short di, si, bp, sp, bx, dx, cx;
+    union {
+        unsigned short ax;
+        struct {
+            unsigned char al;
+            unsigned char ah;
+        };
+    };
     unsigned short gs, fs, es, ds, eflags;
 } regs16_t;
  
