@@ -406,7 +406,14 @@ getsn(char *buff, size_t n) {
 
     char c = 1;
     size_t i = 0;
-    while (((c = getchar()) != '\n') && (i < n))  {
+    while (((c = keyb_getc()) != '\n') && (i < n))  {
+        if (c == '\b') {
+            if (i == 0) continue;
+            i--;
+            puts("\b \b");
+            continue;
+        }
+        putchar(c);
         buff[i] = c;
         i++;
     }
