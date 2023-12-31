@@ -32,9 +32,9 @@ make
 ## TODO frontends
 ```
 MAIN TARGET
-                                Linux BSD Mac Win
+                                  Linux BSD Mac Win  BIOS UEFI
     Console (no graphics)   DONE  X     X   X   X
-    ncurses                       X     X   X   X 
+    ncurses                       X     X   X   
     fbdev                   WIP   X
     SVGA buffer                   
     X11 Xlib                DONE  X     X
@@ -68,11 +68,13 @@ MAIN TARGET
     Webapp                  DONE  X     X   X   X
 LINUX MODULE TARGET
     Kernel module           DONE  X              
-KERNEL TARGET               
-    VGA text mode console   WIP
-    VGA text mode
-    VGA graphic mode
-    VESA graphic mode
+BIOS KERNEL TARGET               
+    VGA text mode console   DONE                     X    X
+    VGA text mode           DONE                     X    X
+    VGA graphic mode                                 X    X
+    VESA graphic mode                                     X
+UEFI APPLICATION TARGET
+    UEFI console                                          X
 ```
 I apologize.
 
