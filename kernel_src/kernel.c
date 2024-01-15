@@ -40,13 +40,15 @@ kmain() {
     char ibuf[256];
     memset(ibuf, 0, 256);
 
-start:
+cold_start:
     /* clear screen, set up terminal */
     vga_init(vgamode, vgafont);
 
     /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
     alloc_init((void*)0x00100000, (void*)0x001fffff);
 
+warm_start:
+    vga_clear();
     kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
     kprintf("\nCurrent config: %dx%d size, %d mines\n", size, size, mines);
 
@@ -59,27 +61,27 @@ start:
                 kprintf("size> ");
                 getsn(ibuf, 256);
                 size = atoi(ibuf);
-                goto start;
+                goto warm_start;
             } break;
             case 'm': {
                 kprintf("mines> ");
                 getsn(ibuf, 256);
                 mines = atoi(ibuf);
-                goto start;
+                goto warm_start;
             } break;
             case 'v': {
                 vga_clear();
                 kprintf(TXT_VIDEO);
                 getsn(ibuf, 256);
                 vgamode = strtol(ibuf, NULL, 16);
-                goto start;
+                goto cold_start;
             } break;
             case 'f': {
                 vga_clear();
                 kprintf(TXT_FONT);
                 getsn(ibuf, 256);
                 vgafont = strtol(ibuf, NULL, 16);
-                goto start;
+                goto cold_start;
             } break;
 
             case '1': {
@@ -88,7 +90,7 @@ start:
                 gameInit(size, mines);
                 gameSetState(STATE_GOING);
                 vgacli_start(gameGetBoard(), size);
-                goto start;
+                goto warm_start;
             } break;
             case '2': {
                 kprintf("Starting game with vgatxt frontend, %dx%d in size with %d mines\n",
@@ -96,7 +98,7 @@ start:
                 gameInit(size, mines);
                 gameSetState(STATE_GOING);
                 vgatui_start(gameGetBoard(), size);
-                goto start;
+                goto warm_start;
             } break;
             default: kprintf("Wrong key "); break;
         }
