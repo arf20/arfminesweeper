@@ -50,7 +50,7 @@ cold_start:
 warm_start:
     vga_clear();
     kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
-    kprintf("\nCurrent config: %dx%d size, %d mines, text mode %X, graphic mode %X\n", size, size, mines, vgamode, vgagmode);
+    kprintf("\nCurrent config: %dx%d size, %d mines, text mode %2Xh, graphic mode %2Xh\n", size, size, mines, vgamode, vgagmode);
 
     while (1) {
         char sel = keyb_getc();
@@ -104,17 +104,25 @@ warm_start:
                     size, size, mines);
                 gameInit(size, mines);
                 gameSetState(STATE_GOING);
-                vgatui_start(gameGetBoard(), size);
+                vgatui_start(gameGetBoard(), size, 0);
                 goto warm_start;
             } break;
             case '3': {
+                kprintf("Starting game with vgatgr frontend, %dx%d in size with %d mines\n",
+                    size, size, mines);
+                gameInit(size, mines);
+                gameSetState(STATE_GOING);
+                vgatui_start(gameGetBoard(), size, 1);
+                goto warm_start;
+            } break;
+            case '4': {
                 kprintf("Starting game with vgagra frontend, %dx%d in size with %d mines\n",
                     size, size, mines);
                 gameInit(size, mines);
                 gameSetState(STATE_GOING);
                 vgag_init(vgagmode);
                 /*vgagra_start(gameGetBoard(), size);*/
-                goto warm_start;
+                goto cold_start;
             } break;
             default: kprintf("Wrong key "); break;
         }

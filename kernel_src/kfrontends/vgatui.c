@@ -40,8 +40,33 @@ static const int *board = NULL;
 
 static int curx = 0, cury = 0;
 
+const unsigned char charsets[2][9] = {
+    {   /* ASCII 7-bit */
+        '+',    /* Top left corner*/
+        '+',    /* Top right corner*/
+        '+',    /* Bottom left corner */
+        '+',    /* Bottom right corner */
+        '|',    /* Vertical line */
+        '-',    /* Horizontal line */
+        ' ',    /* Cleared cell */
+        'F',    /* Flagged cell */
+        '#'     /* Uncleared cell */
+    },
+    {   /* CP437 graphic characters */
+        '\xc9', /* Top left corner*/
+        '\xbb', /* Top right corner*/
+        '\xc8', /* Bottom left corner */
+        '\xbc', /* Bottom right corner */
+        '\xba', /* Vertical line */
+        '\xcd', /* Horizontal line */
+        ' ',    /* Cleared cell */
+        '\x14', /* Flagged cell */
+        '\xb1'  /* Uncleared cell */
+    }
+};
+
 static void
-render() {
+render(int charset) {
     vga_clear();
 
     /* Draw title */
@@ -63,18 +88,18 @@ render() {
     vga_print_string_c(itoa(gameGetFlagsLeft(), 10), VGATXTXY(14, 2), WHITE_ON_BLACK_BLINK);
 
     /* Print board */
-    vga_set_char('+', VGATXTXY(BXOFF, BYOFF));
-    vga_set_char('+', VGATXTXY(BXOFF + size + 1, BYOFF));
-    vga_set_char('+', VGATXTXY(BXOFF, BYOFF + size + 1));
-    vga_set_char('+', VGATXTXY(BXOFF + size + 1, BYOFF + size + 1));
+    vga_set_char(charsets[charset][0], VGATXTXY(BXOFF, BYOFF));
+    vga_set_char(charsets[charset][1], VGATXTXY(BXOFF + size + 1, BYOFF));
+    vga_set_char(charsets[charset][2], VGATXTXY(BXOFF, BYOFF + size + 1));
+    vga_set_char(charsets[charset][3], VGATXTXY(BXOFF + size + 1, BYOFF + size + 1));
 
     for (int x = 0; x < size + 2; x += size + 1)
         for (int y = 1; y < size + 1; y++)
-            vga_set_char('|', VGATXTXY(BXOFF + x, BYOFF + y));
+            vga_set_char(charsets[charset][4], VGATXTXY(BXOFF + x, BYOFF + y));
 
     for (int y = 0; y < size + 2; y += size + 1)
         for (int x = 1; x < size + 1; x++)
-            vga_set_char('-', VGATXTXY(BXOFF + x, BYOFF + y));
+            vga_set_char(charsets[charset][5], VGATXTXY(BXOFF + x, BYOFF + y));
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
@@ -94,13 +119,13 @@ render() {
                 }
                 n ? vga_set_char_c(itoa(n, 10)[0],
                     VGATXTXY(BXOFF + x + 1,  BYOFF + y + 1), color)
-                    : vga_set_char(' ', VGATXTXY(BXOFF + x + 1, BYOFF + y + 1));
+                    : vga_set_char(charsets[charset][6], VGATXTXY(BXOFF + x + 1, BYOFF + y + 1));
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                vga_set_char_c('F', VGATXTXY(BXOFF + x + 1, BYOFF + y + 1),
+                vga_set_char_c(charsets[charset][7], VGATXTXY(BXOFF + x + 1, BYOFF + y + 1),
                     DRED_ON_BLACK);
             }
-            else vga_set_char('#', VGATXTXY(BXOFF + x + 1, BYOFF + y + 1));
+            else vga_set_char(charsets[charset][8], VGATXTXY(BXOFF + x + 1, BYOFF + y + 1));
         }
     }
     
@@ -108,14 +133,14 @@ render() {
 }
 
 int
-vgatui_start(const int *lboard, int lsize) {
+vgatui_start(const int *lboard, int lsize, int charset) {
     board = lboard;
     size = lsize;
 
     curx = cury = 0;
 
     vga_clear();
-    render();
+    render(charset);
 
     char c = 0;
     while (1) {
@@ -134,7 +159,7 @@ vgatui_start(const int *lboard, int lsize) {
         if (curx >= size)   curx = 0;
         if (cury >= size)   cury = 0;
 
-        render();
+        render(charset);
     }
 }
 

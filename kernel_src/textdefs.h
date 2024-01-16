@@ -30,7 +30,8 @@
     "Available frontends:\n"\
     "    [1] vgacon: VGA text mode console\n"\
     "    [2] vgatxt: VGA text mode\n"\
-    "    [3] vgagra: VGA graphics mode\n"\
+    "    [3] vgatgr: VGA text mode with graphic characters\n"\
+    "    [4] vgagra: VGA graphics mode\n"\
     "\n"\
     "    [h] Halt CPU\n"\
     "    [s] Set board size\n"\
@@ -49,6 +50,7 @@
     "    AL=17h 80x43, 640x320, 8x8,  \n"\
     "    AL=58h 80x43, 640x348, 8x8,  \n"\
     "    AL=66h 80x50, 640x400, 8x8,  \n"\
+    "Note: Character set is CP437\n"\
     "AL> "
 
 #define TXT_FONT \

@@ -46,7 +46,7 @@ reverse(char *str, int length) {
 /* ======== Parsing functions ======== */
 char *
 itoa(int num, int base) {
-    static char buff[30];
+    static char buff[128];
     int i = 0;
     int neg = 0;
 
@@ -80,7 +80,7 @@ itoa(int num, int base) {
 
 char *
 utoa(unsigned int num, int base) {
-    static char buff[30];
+    static char buff[128];
 
     int i = 0;
     if (num == 0) {
@@ -309,31 +309,55 @@ memset(void *s, char c, size_t n) {
     return s;
 }
 
-char
-toupper(char c) {
-    return c - 32;
+void *
+memmove(void *s, void *d, int n) {
+    if (s > d)
+        for (int i = 0; i < n; i++)
+            ((char*)d)[i] = ((char*)s)[i];
+    else
+        for (int i = n - 1; i >= 0; i--)
+            ((char*)d)[i] = ((char*)s)[i];
+    return d;
 }
 
-char
-tolower(char c) {
-    return c + 32;
+unsigned char
+toupper(unsigned char c) {
+    return c - ('a' - 'A');
+}
+
+unsigned char
+tolower(unsigned char c) {
+    return c + ('a' - 'A');
 }
 
 char *
 atoupper(char *str) {
-    while (*str) {
-        *str = toupper(*str);
-        str++;
+    char *ptr = str;
+    while (*ptr) {
+        if(*ptr >= 'a' && *ptr <= 'z')
+            *ptr = toupper(*ptr);
+        ptr++;
     }
     return str;
 }
 
 char *
 atolower(char *str) {
-    while (*str) {
-        *str = tolower(*str);
-        str++;
+    char *ptr = str;
+    while (*ptr) {
+        if(*ptr >= 'A' && *ptr <= 'Z')
+            *ptr = tolower(*ptr);
+        ptr++;
     }
+    return str;
+}
+
+char *
+leftpad(char *str, int n, char c) {
+    int len = strlen(str);
+    int pad = n - len;
+    memmove(str, str + pad, len);
+    memset(str, c, pad);
     return str;
 }
 
@@ -359,7 +383,8 @@ puts(const char *s) {
     return i;
 }
 
-/* Simple minimal printf implementation */
+/* Simple minimal printf implementation
+   Partial C99 */
 int
 kprintf(char *format, ...) {
     char *p;
@@ -370,11 +395,30 @@ kprintf(char *format, ...) {
 
     int n = 0;
 
+    char flag = 0;
+    int width = 0;
+
     for (p = format; *p != '\0'; p++) {
+        /* Begins specifier */
         if(*p != '%') {
             putchar(*p); continue;
         }
         p++;
+
+        /* Flags */
+        if (*p == '-' || *p == '+' || *p == ' ' || *p == '0' || *p == '#') {
+            flag = *p;
+            p++;
+        }
+        else flag = 0;
+
+        /* Width */
+        if (*p >= '0' && *p <= '9') {
+            width = *p - '0';
+            p++;
+        }
+        else width = 0;
+
         switch(*p) {
             case 'c': putchar(va_arg(arg, int)); n++; break;
             case 'd': /* fall down */
@@ -394,7 +438,7 @@ kprintf(char *format, ...) {
                 break;
             case 'x': n += puts(utoa(va_arg(arg, unsigned int), 16));
                 break;
-            case 'X': n += puts(atoupper(utoa(va_arg(arg, unsigned int), 16)));
+            case 'X': n += puts(leftpad(atoupper(utoa(va_arg(arg, unsigned int), 16)), width, '0'));
                 break;
 
             /*case 'f':

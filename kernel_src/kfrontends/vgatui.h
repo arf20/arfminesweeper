@@ -21,7 +21,7 @@
 #ifndef _VGATUI_H
 #define _VGATUI_H
 
-int vgatui_start(const int *lboard, int lsize);
+int vgatui_start(const int *lboard, int lsize, int charset);
 void vgatui_destroy();
 
 #endif /* _VGATUI_H */
