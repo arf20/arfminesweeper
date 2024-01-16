@@ -100,6 +100,8 @@ gameInit(int lsize, int lmines) {
         n++;
     }
 
+    gameSetState(STATE_GOING);
+
     return 0;
 }
 

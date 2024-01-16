@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    vgaterm.c: VGA terminal driver
+    vgacon.c: VGA console driver
 
 */
 
@@ -213,10 +213,4 @@ vga_init(unsigned char mode, unsigned char font) {
     
     vga_enable_blink();
     vga_clear();
-}
-
-/* graphics init */
-void
-vgag_init(unsigned char mode) {
-    vga_set_mode(mode);
 }

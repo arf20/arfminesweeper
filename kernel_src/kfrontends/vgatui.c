@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    vgacon.c: VGA 80x25 (3) text mode TUI ish frontend
+    vgatui.c: VGA text modes TUI-ish frontend
 
 */
 
@@ -139,7 +139,6 @@ vgatui_start(const int *lboard, int lsize, int charset) {
 
     curx = cury = 0;
 
-    vga_clear();
     render(charset);
 
     char c = 0;

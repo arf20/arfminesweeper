@@ -71,7 +71,7 @@ LINUX MODULE TARGET
 BIOS KERNEL TARGET               
     VGA text mode console   DONE                     X    X
     VGA text mode           DONE                     X    X
-    VGA graphic mode                                 X    X
+    VGA graphic mode        WIP                      X    X
     VESA graphic mode                                     X
 UEFI APPLICATION TARGET
     UEFI console                                          X

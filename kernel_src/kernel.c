@@ -31,6 +31,7 @@
 #include "../common/game.h"
 #include "kfrontends/vgacli.h"
 #include "kfrontends/vgatui.h"
+#include "kfrontends/vgagra.h"
 
 void
 kmain() {
@@ -95,7 +96,6 @@ warm_start:
                 kprintf("Starting game with vgacon frontend, %dx%d in size with %d mines\n",
                     size, size, mines);
                 gameInit(size, mines);
-                gameSetState(STATE_GOING);
                 vgacli_start(gameGetBoard(), size);
                 goto warm_start;
             } break;
@@ -103,7 +103,6 @@ warm_start:
                 kprintf("Starting game with vgatxt frontend, %dx%d in size with %d mines\n",
                     size, size, mines);
                 gameInit(size, mines);
-                gameSetState(STATE_GOING);
                 vgatui_start(gameGetBoard(), size, 0);
                 goto warm_start;
             } break;
@@ -111,7 +110,6 @@ warm_start:
                 kprintf("Starting game with vgatgr frontend, %dx%d in size with %d mines\n",
                     size, size, mines);
                 gameInit(size, mines);
-                gameSetState(STATE_GOING);
                 vgatui_start(gameGetBoard(), size, 1);
                 goto warm_start;
             } break;
@@ -119,9 +117,7 @@ warm_start:
                 kprintf("Starting game with vgagra frontend, %dx%d in size with %d mines\n",
                     size, size, mines);
                 gameInit(size, mines);
-                gameSetState(STATE_GOING);
-                vgag_init(vgagmode);
-                /*vgagra_start(gameGetBoard(), size);*/
+                vgagra_start(gameGetBoard(), size, vgagmode);
                 goto cold_start;
             } break;
             default: kprintf("Wrong key "); break;

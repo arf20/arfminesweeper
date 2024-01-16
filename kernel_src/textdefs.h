@@ -71,6 +71,8 @@
     "   AL=10h 640x350, 16  colors [EGA]\n"\
     "   AL=11h 640x480, monochrome [VGA]\n"\
     "   AL=12h 640x480, 16  colors [VGA]\n"\
-    "   AL=13h 320x200, 256 colors [VGA]\n"
+    "   AL=13h 320x200, 256 colors [VGA]\n"\
+    "Note: CGA is supported by EGA and VGA, and EGA by VGA\n"\
+    "AL> "
 
 #endif /* _TEXTDEFS_H */

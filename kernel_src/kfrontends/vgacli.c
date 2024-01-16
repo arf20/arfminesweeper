@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    vgacon.c: default kernel console frontend
+    vgacli.c: VGA text modes terminal frontend
 
 */
 

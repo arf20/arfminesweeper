@@ -22,18 +22,18 @@
 #define _VGACON_H
 
 /* text mode colors */
-#define WHITE_ON_BLACK  0x0f
+#define WHITE_ON_BLACK        0x0f
 #define WHITE_ON_BLACK_BLINK  0x8f
-#define BLACK_ON_BLACK  0x00
-#define RED_ON_BLACK    0x0c
-#define DRED_ON_BLACK   0x04
-#define GREEN_ON_BLACK  0x0a
-#define DGREEN_ON_BLACK 0x02
-#define BLUE_ON_BLACK   0x09
-#define DBLUE_ON_BLACK  0x01
-#define CYAN_ON_BLACK   0x0b
-#define DCYAN_ON_BLACK  0x03
-#define DGREY_ON_BLACK  0x08
+#define BLACK_ON_BLACK        0x00
+#define RED_ON_BLACK          0x0c
+#define DRED_ON_BLACK         0x04
+#define GREEN_ON_BLACK        0x0a
+#define DGREEN_ON_BLACK       0x02
+#define BLUE_ON_BLACK         0x09
+#define DBLUE_ON_BLACK        0x01
+#define CYAN_ON_BLACK         0x0b
+#define DCYAN_ON_BLACK        0x03
+#define DGREY_ON_BLACK        0x08
 
 
 extern int vgatxt_rows;
@@ -54,7 +54,7 @@ void vga_print_string(const char *str, int off);
 void vga_set_char_c(char c, int off, unsigned char color);
 void vga_print_char_c(char c, int off, unsigned char color);
 void vga_print_string_c(const char *str, int off, unsigned char color);
+
 void vga_init(unsigned char mode, unsigned char font);
-void vgag_init(unsigned char mode);
 
 #endif /* _VGACON_H */
