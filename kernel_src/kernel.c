@@ -35,7 +35,7 @@
 void
 kmain() {
     /* Defaults */
-    char vgamode = 0x03; unsigned char vgafont = 0x04;
+    unsigned char vgamode = 0x03, vgagmode = 0x13, vgafont = 0x04;
     int size = 8, mines = 10;
     char ibuf[256];
     memset(ibuf, 0, 256);
@@ -50,7 +50,7 @@ cold_start:
 warm_start:
     vga_clear();
     kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
-    kprintf("\nCurrent config: %dx%d size, %d mines\n", size, size, mines);
+    kprintf("\nCurrent config: %dx%d size, %d mines, text mode %X, graphic mode %X\n", size, size, mines, vgamode, vgagmode);
 
     while (1) {
         char sel = keyb_getc();
@@ -71,7 +71,7 @@ warm_start:
             } break;
             case 'v': {
                 vga_clear();
-                kprintf(TXT_VIDEO);
+                kprintf(TXT_TEXT_MODES);
                 getsn(ibuf, 256);
                 vgamode = strtol(ibuf, NULL, 16);
                 goto cold_start;
@@ -82,6 +82,13 @@ warm_start:
                 getsn(ibuf, 256);
                 vgafont = strtol(ibuf, NULL, 16);
                 goto cold_start;
+            } break;
+            case 'g': {
+                vga_clear();
+                kprintf(TXT_GRAPHIC_MODES);
+                getsn(ibuf, 256);
+                vgagmode = strtol(ibuf, NULL, 16);
+                goto warm_start;
             } break;
 
             case '1': {
@@ -98,6 +105,15 @@ warm_start:
                 gameInit(size, mines);
                 gameSetState(STATE_GOING);
                 vgatui_start(gameGetBoard(), size);
+                goto warm_start;
+            } break;
+            case '3': {
+                kprintf("Starting game with vgagra frontend, %dx%d in size with %d mines\n",
+                    size, size, mines);
+                gameInit(size, mines);
+                gameSetState(STATE_GOING);
+                vgag_init(vgagmode);
+                /*vgagra_start(gameGetBoard(), size);*/
                 goto warm_start;
             } break;
             default: kprintf("Wrong key "); break;

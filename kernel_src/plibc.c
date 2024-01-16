@@ -85,14 +85,14 @@ utoa(unsigned int num, int base) {
     int i = 0;
     if (num == 0) {
         buff[i++] = '0';
-	buff[i] = '\0';
-	return buff;
+	    buff[i] = '\0';
+	    return buff;
     }
 
     while (num != 0) {
         unsigned int rem = num % base;
-	buff[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-	num /= base;
+	    buff[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+	    num /= base;
     }
     
     reverse(buff, i);
@@ -309,6 +309,34 @@ memset(void *s, char c, size_t n) {
     return s;
 }
 
+char
+toupper(char c) {
+    return c - 32;
+}
+
+char
+tolower(char c) {
+    return c + 32;
+}
+
+char *
+atoupper(char *str) {
+    while (*str) {
+        *str = toupper(*str);
+        str++;
+    }
+    return str;
+}
+
+char *
+atolower(char *str) {
+    while (*str) {
+        *str = tolower(*str);
+        str++;
+    }
+    return str;
+}
+
 /* ======== Standard input and output functions ======== */
 char
 putchar(char c) {
@@ -365,6 +393,8 @@ kprintf(char *format, ...) {
             case 'u': n += puts(utoa(va_arg(arg, unsigned int), 10));
                 break;
             case 'x': n += puts(utoa(va_arg(arg, unsigned int), 16));
+                break;
+            case 'X': n += puts(atoupper(utoa(va_arg(arg, unsigned int), 16)));
                 break;
 
             /*case 'f':

@@ -55,5 +55,6 @@ void vga_set_char_c(char c, int off, unsigned char color);
 void vga_print_char_c(char c, int off, unsigned char color);
 void vga_print_string_c(const char *str, int off, unsigned char color);
 void vga_init(unsigned char mode, unsigned char font);
+void vgag_init(unsigned char mode);
 
 #endif /* _VGACON_H */

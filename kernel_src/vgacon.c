@@ -214,3 +214,9 @@ vga_init(unsigned char mode, unsigned char font) {
     vga_enable_blink();
     vga_clear();
 }
+
+/* graphics init */
+void
+vgag_init(unsigned char mode) {
+    vga_set_mode(mode);
+}

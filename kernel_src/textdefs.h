@@ -30,23 +30,25 @@
     "Available frontends:\n"\
     "    [1] vgacon: VGA text mode console\n"\
     "    [2] vgatxt: VGA text mode\n"\
+    "    [3] vgagra: VGA graphics mode\n"\
     "\n"\
     "    [h] Halt CPU\n"\
     "    [s] Set board size\n"\
     "    [m] Set number of mines\n"\
-    "    [v] Set VGA video mode\n"\
-    "    [f] Set VGA video font\n"
+    "    [v] Set VGA text mode\n"\
+    "    [f] Set VGA text font\n"\
+    "    [g] Set VGA graphic mode\n"
 
-#define TXT_VIDEO \
-    "VGA modes (int 10h AH=00h):\n"\
-    "    AL=00h 40x25, 320x200, 8x8\n"\
-    "    AL=01h 40x25, 320x200, 8x8\n"\
-    "    AL=02h 80x25, 720x400, 9x16\n"\
-    "    AL=03h 80x25, 720x400, 9x16\n"\
-    "    AL=07h 80x25, 720x350, 9x14\n"\
-    "    AL=17h 80x43, 640x320, 8x8\n"\
-    "    AL=58h 80x43, 640x348, 8x8\n"\
-    "    AL=66h 80x50, 640x400, 8x8\n"\
+#define TXT_TEXT_MODES \
+    "VGA text modes (int 10h AH=00h):\n"\
+    "    AL=00h 40x25, 320x200, 8x8,  16  greys\n"\
+    "    AL=01h 40x25, 320x200, 8x8,  16  colors\n"\
+    "    AL=02h 80x25, 720x400, 9x16, 16  greys\n"\
+    "    AL=03h 80x25, 720x400, 9x16, 16  colors\n"\
+    "    AL=07h 80x25, 720x350, 9x14, monochrome [MDA]\n"\
+    "    AL=17h 80x43, 640x320, 8x8,  \n"\
+    "    AL=58h 80x43, 640x348, 8x8,  \n"\
+    "    AL=66h 80x50, 640x400, 8x8,  \n"\
     "AL> "
 
 #define TXT_FONT \
@@ -55,6 +57,18 @@
     "    AL=02h,12h LOAD ROM 8x8 DBL-DOT PATTERNS VGA\n"\
     "    AL=01h,11h MONOCHROME PATTERNS ROM VGA\n"\
     "AL> "
-    
+
+#define TXT_GRAPHIC_MODES \
+    "VGA graphics modes (int 10h, AH=00h):\n"\
+    "   AL=04h 320x200, 4   colors [CGA]\n"\
+    "   AL=05h 320x200, 4   greys  [CGA]\n"\
+    "   AL=06h 320x200, monochrome [CGA]\n"\
+    "   AL=0Dh 320x200, 16  colors [EGA]\n"\
+    "   AL=0Eh 640x200, 16  colors [EGA]\n"\
+    "   AL=0Fh 640x350, monochrome [VGA]\n"\
+    "   AL=10h 640x350, 16  colors [EGA]\n"\
+    "   AL=11h 640x480, monochrome [VGA]\n"\
+    "   AL=12h 640x480, 16  colors [VGA]\n"\
+    "   AL=13h 320x200, 256 colors [VGA]\n"
 
 #endif /* _TEXTDEFS_H */
