@@ -62,11 +62,27 @@ vgafb_vline_256(int x, int l, int iy, unsigned char c) {
         fb[(vgafb_width * y) + x] = c;
 }
 
+void
+vgafb_bios_putc(char c) {
+    regs16_t regs = { 0 };
+    regs.ah = 0x0e;
+    regs.al = c;
+    int32(0x10, &regs);
+}
 
 void
-vgag_set_mode(unsigned char al) {
+vgafb_bios_print(const char *str) {
+    while (*str) {
+        vgafb_bios_putc(*str);
+        str++;
+    }
+}
+
+
+void
+vgag_set_mode(unsigned char mode) {
     regs16_t regs = { 0 };
-    regs.al = al;
+    regs.al = mode;
     int32(0x10, &regs);
 }
 

@@ -5,22 +5,22 @@ You know the game, but in every graphical API I know as well as console
 Dependencies required: `build-essential cmake`
 Dependencies for frontends:
 ```
-Console: none
 ncurses: libncurses-dev
-fbdev: none
 Xlib: libx11-dev
 XCB: libxcb1-dev
+Wayland: libwayland-dev
 XForms: libforms-dev
 Motif: libmotif-dev
 Tcl/Tk: 
 SDL2: libsdl2-dev
 SDL1.2: libsdl1.2-dev
-OpenGL*: Included with your GPU vendor's driver or libgl-dev with llvmpipe
-ImGui: none
+OpenGL 1.2: libgl-dev libglut-dev
+OpenGL 3.3: libgl-dev libglfw3-dev
 Vulkan: libvulkan-dev
 Gtk3: libgtk-3-dev
 Qt5: qtbase5-dev qttools5-dev qttools5-dev-tools
-WinAPI:
+
+Module: headers for your kernel
 ```
 Build
 ```
@@ -41,7 +41,10 @@ MAIN TARGET
     X11 XCB                 WIP   X     X
     Wayland                 WIP   X     X
     XForms                  DONE  X     X
-    Motif                   WIP   X     X
+    Motif (Xm/Xt)           WIP   X     X
+    XView (OpenLook/Xt)           X     X
+    Athena (Xaw/Xt)               X     X
+    X Toolkit (Xt)                X     X
     Tcl/Tk                        X     X       X
     raylib                  NO    X     X   X   X  Redefines GLAD
     SDL2                    DONE  X     X   X   X
@@ -71,6 +74,7 @@ LINUX MODULE TARGET
 BIOS KERNEL TARGET               
     VGA text mode console   DONE                     X    X
     VGA text mode           DONE                     X    X
+    VGA text w/graphic char DONE                     X    X
     VGA graphic mode        WIP                      X    X
     VESA graphic mode                                     X
 UEFI APPLICATION TARGET

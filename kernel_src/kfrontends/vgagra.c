@@ -40,6 +40,7 @@ static void
 render(unsigned char mode) {
     vgafb_clear_256(VGA_256_BLACK);
     //fbDrawString(5, 15, FB_WHITE, TXT_TITLE, sizeof(TXT_TITLE));
+    vgafb_bios_print(TXT_TITLE);
 
     /* Check game state*/
     switch (gameGetState()) {
@@ -84,7 +85,7 @@ render(unsigned char mode) {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                vgafb_fill_rect_256(cX, cY, CELL_SIZE, CELL_SIZE, VGA_256_WHITE);
+                vgafb_fill_rect_256(cX, cY, CELL_SIZE, CELL_SIZE, VGA_256_RED);
                 //drawFlag(cX, cY);
             }
             /* Otherwise just a tile */
