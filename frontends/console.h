@@ -23,4 +23,4 @@
 
 int conStart(const int *lboard, int size);
 
-#endif
+#endif /* _CONSOLE_H */

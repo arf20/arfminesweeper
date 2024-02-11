@@ -24,4 +24,4 @@
 int fbdevStart(const int *lboard, int size);
 void fbdevDestroy();
 
-#endif
+#endif /* _FBDEV_H */

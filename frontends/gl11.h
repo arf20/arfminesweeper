@@ -24,4 +24,4 @@
 int GL11Start(const int *lboard, int lsize);
 void GL11Destroy();
 
-#endif
+#endif /* _GL11_H */

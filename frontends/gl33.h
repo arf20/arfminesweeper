@@ -24,4 +24,4 @@
 int GL33Start(const int *lboard, int lsize);
 void GL33Destroy();
 
-#endif
+#endif /* _GL33_H */

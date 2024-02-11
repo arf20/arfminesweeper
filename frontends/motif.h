@@ -24,4 +24,4 @@
 int motifStart(const int *lboard, int size);
 void motifDestroy();
 
-#endif
+#endif /* _MOTIF_H */

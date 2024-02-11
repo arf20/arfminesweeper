@@ -31,8 +31,7 @@ make
 
 ## TODO frontends
 ```
-MAIN TARGET
-                                  Linux BSD Mac Win  BIOS UEFI
+MAIN TARGET                       Linux BSD Mac Win
     Console (no graphics)   DONE  X     X   X   X
     ncurses                       X     X   X   
     fbdev                   WIP   X
@@ -41,16 +40,20 @@ MAIN TARGET
     X11 XCB                 WIP   X     X
     Wayland                 WIP   X     X
     XForms                  DONE  X     X
+    FLTK                          X     X   X   X
     Motif (Xm/Xt)           WIP   X     X
     XView (OpenLook/Xt)           X     X
-    Athena (Xaw/Xt)               X     X
+    Athena (Xaw/Xt)         WIP   X     X
+    Xaw3d                         X     X
     X Toolkit (Xt)                X     X
     Tcl/Tk                        X     X       X
     raylib                  NO    X     X   X   X  Redefines GLAD
     SDL2                    DONE  X     X   X   X
     SDL1.2                  WIP   X     X   X   X
+    libdrm                        X
     GLIDE (with Voodoo)           X     X       X
-    OpenGL 2.x FFP/FreeGLUT DONE  X     X   X   X
+    OpenGL GLX                    X     X
+    OpenGL 1.x FFP/FreeGLUT DONE  X     X   X   X
     OpenGL 3.3/GLFW/GLAD    WIP   X     X   X   X
     ImGui                         X     X   X   X
     Vulkan/GLFW             WIP   X     X   X   X
@@ -71,14 +74,15 @@ MAIN TARGET
     Webapp                  DONE  X     X   X   X
 LINUX MODULE TARGET
     Kernel module           DONE  X              
-BIOS KERNEL TARGET               
-    VGA text mode console   DONE                     X    X
-    VGA text mode           DONE                     X    X
-    VGA text w/graphic char DONE                     X    X
-    VGA graphic mode        WIP                      X    X
-    VESA graphic mode                                     X
+
+BIOS KERNEL TARGET                BIOS UEFI
+    VGA text mode console   DONE  X    X
+    VGA text mode           DONE  X    X
+    VGA text w/graphic char DONE  X    X
+    VGA graphic mode        WIP   X    X
+    VESA graphic mode                  X
 UEFI APPLICATION TARGET
-    UEFI console                                          X
+    UEFI console                       X
 ```
 I apologize.
 

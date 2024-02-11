@@ -24,4 +24,4 @@
 int vkStart(const int *lboard, int lsize);
 void vkDestroy();
 
-#endif
+#endif /* _VK_H */

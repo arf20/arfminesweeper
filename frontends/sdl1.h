@@ -24,4 +24,4 @@
 int SDL1Start(const int *lboard, int size);
 void SDL1Destroy();
 
-#endif
+#endif /* _SDL1_H */

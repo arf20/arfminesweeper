@@ -24,5 +24,5 @@
 int httpdStart(const int *lboard, int lsize);
 void httpdDestroy();
 
-#endif
+#endif /* _HTTPD_H */
 

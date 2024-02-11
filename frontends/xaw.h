@@ -18,10 +18,11 @@
 
 */
 
-#ifndef _XCB_H
-#define _XCB_H
+#ifndef _XAW_H
+#define _XAW_H
 
-int xcbStart(const int *lboard, int lsize);
-void xcbDestroy();
+int XawStart(const int *lboard, int lsize);
+void XawDestroy();
 
-#endif /* _XLIB_H */
+#endif /* _XAW_H */
+

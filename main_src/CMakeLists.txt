@@ -81,6 +81,15 @@ if (X11_FOUND)
         message(STATUS "Not building with motif")
     endif()
 
+    pkg_check_modules(XAW xaw7) 
+    if (XAW_FOUND)
+        file(GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/frontends/xaw.c")
+        add_compile_definitions(FRONTEND_XAW)
+        message(STATUS "Building with Athena")
+    else()
+        message(STATUS "Not building with Athena")
+    endif()
+
     if (EXISTS "/usr/include/forms.h")
         set(XFORMS_FOUND true)
         file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/frontends/xforms.c")
@@ -245,6 +254,10 @@ if (X11_FOUND)
 
     if (MOTIF_FOUND)
         target_link_libraries(arfminesweeper ${MOTIF_LIBRARIES} Xt)
+    endif()
+
+    if (XAW_FOUND)
+        target_link_libraries(arfminesweeper ${XAW_LIBRARIES})
     endif()
 
     if (XFORMS_FOUND)

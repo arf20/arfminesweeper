@@ -1,7 +1,7 @@
 /*
 
     arfminesweeper: Cross-plataform multi-frontend game
-    Copyright (C) 2023 arf20 (Ángel Ruiz Fernandez)
+    Copyright (C) 2023 arf20 (ï¿½ngel Ruiz Fernandez)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,4 +24,4 @@
 int d2dStart(const int* lboard, int lsize);
 void d2dDestroy();
 
-#endif
+#endif /* _D2D_H */

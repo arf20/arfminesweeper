@@ -24,4 +24,4 @@
 int XlibStart(const int *lboard, int lsize);
 void XlibDestroy();
 
-#endif
+#endif /* _XLIB_H */

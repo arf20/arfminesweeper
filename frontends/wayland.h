@@ -24,4 +24,4 @@
 int WaylandStart(const int *lboard, int lsize);
 void WaylandDestroy();
 
-#endif
+#endif /* _WAYLAND_H */

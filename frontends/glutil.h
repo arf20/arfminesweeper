@@ -33,4 +33,4 @@ void shader_set_uintv(GLint pid, const char *name, int size, const unsigned int 
 void shader_set_uint(GLint pid, const char *name, unsigned int v);
 
 
-#endif
+#endif /* _GLUTIL_H */

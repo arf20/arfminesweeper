@@ -24,4 +24,4 @@
 int xformsStart(const int *lboard, int size);
 void xformsDestroy();
 
-#endif
+#endif /* _XLIB_H */

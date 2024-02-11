@@ -24,4 +24,4 @@
 int Gtk3Start(const int *lboard, int size);
 void Gtk3Destroy();
 
-#endif
+#endif /* _GTK3_H */

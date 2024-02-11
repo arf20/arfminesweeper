@@ -24,4 +24,4 @@
 int Win32Start(const int *lboard, int lsize);
 void Win32Destroy();
 
-#endif
+#endif /* _WIN32_H */

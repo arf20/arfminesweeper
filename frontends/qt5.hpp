@@ -32,4 +32,4 @@ void Qt5Destroy();
 }
 #endif
 
-#endif
+#endif /* _QT5_H */
