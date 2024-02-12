@@ -52,11 +52,21 @@ if (WIN32)
 elseif (BSD)
     message(STATUS "No fbdev support in BSD")
 else()
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/frontends/fbdev.c")
+    file (GLOB SRC ${SRC}
+        "${PROJECT_SOURCE_DIR}/frontends/fbdev.c"
+        "${PROJECT_SOURCE_DIR}/frontends/common/fb.c")
     add_compile_definitions(FRONTEND_FBDEV)
     message(STATUS "Building with fbdev")
 endif()
 
+pkg_check_modules(DRM libdrm)
+if (DRM_FOUND)
+    file (GLOB SRC ${SRC}
+        "${PROJECT_SOURCE_DIR}/frontends/drmfb.c"
+        "${PROJECT_SOURCE_DIR}/frontends/common/fb.c")
+    add_compile_definitions(FRONTEND_DRMFB)
+    message(STATUS "Building with DRI DRM framebuffer")
+endif()
 
 find_package(X11)
 if (X11_FOUND)
@@ -243,6 +253,11 @@ target_link_libraries(arfminesweeper Threads::Threads m)
 
 if (WIN32)
     target_link_libraries(arfminesweeper ws2_32 msimg32 D2d1)
+endif()
+
+if (DRM_FOUND)
+    target_link_libraries(arfminesweeper ${DRM_LIBRARIES})
+    target_include_directories(arfminesweeper PUBLIC ${DRM_INCLUDE_DIRS})
 endif()
 
 if (X11_FOUND)

@@ -16,52 +16,31 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    fbdev.c: fbdev frontend
+    fb.c: draw game in raw framebuffer
 
 */
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <linux/fb.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
-#include <errno.h>
-#include <termios.h>
-
-#include <common/frontconf.h>
 #include <common/game.h>
+#include <common/frontconf.h>
 
-#include "common/fb.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-#include "fbdev.h"
+#include "fb.h"
 
 static const int *board = NULL;
 static int size = 0;
-
 static int wWidth = 0, wHeight = 0;
 
-#if 0
-static int fbfd = 0, screensize = 0;
+/* fb */
 
-typedef struct {
-    char b, g, r, a;
-} bgra_t;
-
-static int sWidth = 0, fbWidth = 0, sHeight = 0;
+static int sWidth = 0, sHeight = 0;
 static bgra_t *fbp = NULL; /* assume 32bpp */
-#define FB_XY(x, y)  fbp[((y) * fbWidth) + (x)]
+#define FB_XY(x, y)  fbp[((y) * sWidth) + (x)]
 
 /* assume 9x15 font that starts at space */
-const unsigned char *fontimg = NULL;
-int fontiw = 0, fontih = 0;
+static const unsigned char *font = NULL;
+static int fontw = 0, fonth = 0;
 #define FONT_W  9
 #define FONT_H  15
 #define FONT_FIRSTC 0x20
@@ -70,17 +49,13 @@ int fontiw = 0, fontih = 0;
 #define TXT_OFFY    4
 
 /* flag */
-const unsigned char *flag = NULL;
-int flagw = 0, flagh = 0;
-
-/* term stuff */
-struct termios raw;
-struct termios orig;
+static const unsigned char *flag = NULL;
+static int flagw = 0, flagh = 0;
 
 /* cursor */
-int curx = 0, cury = 0;
+static const int *curx = 0, *cury = 0;
 
-/* assume 32bpp */
+/* colors */
 bgra_t fbColor(char r, char g, char b, char a) {
     bgra_t c;
     c.r = r; c.g = g; c.b = b; c.a = a;
@@ -101,10 +76,7 @@ bgra_t fbColor(char r, char g, char b, char a) {
 /* fb utils */
 void
 fbClear() {
-    //for (int y = 0; y < sHeight; y++)
-    //    for (int x = 0; x < sWidth; x++)
-    //        FB_XY(x, y) = FB_BLACK;
-    memset(fbp, 0x00, sizeof(int) * sWidth * sHeight);
+    memset(fbp, 0, sizeof(int) * sWidth * sHeight);
 }
 
 void
@@ -135,7 +107,7 @@ fbRenderFont(int dx, int dy, int sx, int sy, int w, int h, bgra_t fg) {
     for (int y = 0; y < h; y++)
         for (int x = 0; x < w; x++)
             FB_XY(dx + x, dy + y)
-                = fontimg[((sy + y) * fontiw) + (sx + x)] > 0 ? fg : FB_TRANS;
+                = font[((sy + y) * fontw) + (sx + x)] > 0 ? fg : FB_TRANS;
 }
 
 void
@@ -171,8 +143,8 @@ drawFlag(int ix, int iy) {
                 = flag[(flagw * y) + x] > 0 ? FB_RED : FB_WHITE;
 }
 
-static void
-render() {
+void
+fbRender() {
     fbClear();
     fbDrawString(5, 15, FB_WHITE, TXT_TITLE, sizeof(TXT_TITLE));
 
@@ -229,7 +201,7 @@ render() {
             }
 
             /* draw cursor */
-            if (x == curx && y == cury) {
+            if (x == *curx && y == *cury) {
                 fbHLine(cX, CELL_SIZE, cY, FB_RED);
                 fbHLine(cX, CELL_SIZE, cY + CELL_SIZE - 1, FB_RED);
                 fbVLine(cX, CELL_SIZE, cY, FB_RED);
@@ -238,141 +210,25 @@ render() {
         }
     }
 }
-#endif
-
-static const unsigned char *font = NULL;
-static const unsigned char *flag = NULL;
-
-static int fbfd = 0;
-static bgra_t *fbp = NULL; /* assume 32bpp */
-static int screensize = 0;
-
-static struct termios orig;
-
-int
-fbdevStart(const int *lboard, int lsize) {
-    board = lboard;
-    size = lsize;
-
-    wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
-    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
-        ((size - 1) * CELL_MARGIN);
-
-    /* Read bitmap font */
-    const unsigned char *font = NULL;
-    int fontw = 0, fonth = 0, ch = 0;
-    font = stbi_load(FONT_BMP_PATH, &fontw, &fonth, &ch, 1);
-    if (!font) {
-        printf("Error loading bitmap font: " FONT_BMP_PATH "\n");
-        return -1;
-    }
-    printf("Bitmap font: %dx%d, %dch\n", fontw, fonth, ch);
-
-    /* Read flag bitmap */
-    int flagw = 0, flagh = 0;
-    flag = stbi_load(FLAG_PNG_PATH, &flagw, &flagh, &ch, 1);
-    if (!flag) {
-        printf("Error loading flag: " FLAG_PNG_PATH "\n");
-        return -1;
-    }
-    printf("Bitmap flag: %dx%d, %dch\n", flagw, flagh, ch);
-
-    /* Through the power of linux magic, open the framebuffer device and map it
-        to memory */
-    fbfd = open("/dev/fb0", O_RDWR);
-    if (fbfd == -1) {
-        printf("Error opening /dev/fb0: %s\n", strerror(errno));
-        return -1;
-    }
-
-    struct fb_var_screeninfo vinfo;
-    struct fb_fix_screeninfo finfo;
-
-    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        printf("Error reading fb variable information: %s\n", strerror(errno));
-        return -1;
-    }
-
-    if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
-        printf("Error reading fb variable information: %s\n", strerror(errno));
-        return -1;
-    }
-
-    static int sWidth = 0, fbWidth = 0, sHeight = 0;
-
-    sWidth = vinfo.xres; sHeight = vinfo.yres;
-    fbWidth = finfo.line_length / sizeof(int);
-    screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
-    const int PADDING = 4096;
-    int mmapsize = (screensize + PADDING - 1) & ~(PADDING-1);
-
-    fbp = (bgra_t*)mmap(0, mmapsize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
-    if (fbp == MAP_FAILED) {
-        printf("Error mapping fbdev to memory: %s\n", strerror(errno));
-        return -1;
-    }
-
-    printf("fb0: %d(%d)x%d, %dbpp\n", vinfo.xres, fbWidth, vinfo.yres,
-        vinfo.bits_per_pixel);
-
-    /* Set terminal to non-canonical non-blocking mode mode, this may fuck it up */
-    /* term stuff */
-    struct termios raw;
-    tcgetattr(STDIN_FILENO, &orig);
-    raw = orig;
-    raw.c_lflag &= ~(ECHO | ICANON);
-    tcsetattr(STDIN_FILENO, TCSANOW, &raw);
-
-    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-    flags |= O_NONBLOCK;
-    fcntl(STDIN_FILENO, F_SETFL, flags);
-
-    /* cursor */
-    int curx = 0, cury = 0;
-
-    fbRenderInit(board, size, fbp, sWidth, sHeight, font, fontw, fonth, flag, flagw, flagh, &curx, &cury);
-
-    fbRender();
-    char input[8] = { 0 };
-    int bytesread;
-    while (1) {
-        while ((bytesread = read(STDIN_FILENO, &input, 8)) > 0) {
-            for (int i = 0; i < bytesread; i++) {
-                if (input[i] == '\033') {
-                    if (strncmp(input + i, "\033[A", 3) == 0) cury--;
-                    if (strncmp(input + i, "\033[B", 3) == 0) cury++;
-                    if (strncmp(input + i, "\033[C", 3) == 0) curx++;
-                    if (strncmp(input + i, "\033[D", 3) == 0) curx--;
-                    i += 2;
-                } else if (isalpha(input[i])) {
-                    input[i] = tolower(input[i]);
-                    switch (input[i]) {
-                        case 'a': curx--; break;
-                        case 'd': curx++; break;
-                        case 'w': cury--; break;
-                        case 's': cury++; break;
-                        case 'f': gameFlagCell(curx, cury); break;
-                        case 'c': gameClearCell(curx, cury); break;
-                    }
-                }
-                if (curx < 0) curx = size - 1;
-                if (cury < 0) cury = size - 1;
-                if (curx >= size) curx = 0;
-                if (cury >= size) cury = 0;
-            }
-            fbRender();
-            memset(input, 0, 8);
-        }
-        //render();
-        //usleep(25000);
-    }
-}
 
 void
-fbdevDestroy() {
-    free((void*)font);
-    free((void*)flag);
-    munmap(fbp, screensize);
-    close(fbfd);
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig);
+fbRenderInit(const int *_board, int _size,
+    void *_fbp, int _sWidth, int _sHeight,
+    const unsigned char *_font, int _fontw, int _fonth,
+    const unsigned char *_flag, int _flagw, int _flagh,
+    const int *_curx, const int *_cury)
+{
+    board = _board;
+    size = _size;
+    fbp = _fbp;
+    sWidth = _sWidth;
+    sHeight = _sHeight;
+    font = _font;
+    fontw = _fontw;
+    fonth = _fonth;
+    flag = _flag;
+    flagw = _flagw;
+    flagh = _flagh;
+    curx = _curx;
+    cury = _cury;
 }

@@ -45,6 +45,7 @@
 #include "frontends/gdi.h"
 #include "frontends/d2d.h"
 #include "frontends/xaw.h"
+#include "frontends/drmfb.h"
 
 #include <common/frontconf.h>
 
@@ -121,6 +122,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_XAW
         printf("xaw ");
+    #endif
+    #ifdef FRONTEND_XAW
+        printf("drmfb ");
     #endif
 
     printf("\n");
@@ -310,6 +314,14 @@ main(int argc, char **argv) {
         XawDestroy();
         #else
         printf("Error: Frontend xaw not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "drmfb")) {
+        #ifdef FRONTEND_XAW
+        drmfbStart(gameGetBoard(), size);
+        drmfbDestroy();
+        #else
+        printf("Error: Frontend drmfb not built\n");
         #endif
     }
     else {

@@ -50,7 +50,7 @@ MAIN TARGET                       Linux BSD Mac Win
     raylib                  NO    X     X   X   X  Redefines GLAD
     SDL2                    DONE  X     X   X   X
     SDL1.2                  WIP   X     X   X   X
-    libdrm                        X
+    DRI DRM fb                    X
     GLIDE (with Voodoo)           X     X       X
     OpenGL GLX                    X     X
     OpenGL 1.x FFP/FreeGLUT DONE  X     X   X   X
