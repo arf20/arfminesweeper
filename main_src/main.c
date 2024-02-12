@@ -123,7 +123,7 @@ printFrontends() {
     #ifdef FRONTEND_XAW
         printf("xaw ");
     #endif
-    #ifdef FRONTEND_XAW
+    #ifdef FRONTEND_DRMFB
         printf("drmfb ");
     #endif
 
@@ -317,7 +317,7 @@ main(int argc, char **argv) {
         #endif
     }
     else if (!strcmp(frontend, "drmfb")) {
-        #ifdef FRONTEND_XAW
+        #ifdef FRONTEND_DRMFB
         drmfbStart(gameGetBoard(), size);
         drmfbDestroy();
         #else
