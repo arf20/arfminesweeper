@@ -26,7 +26,7 @@ typedef struct {
 } bgra_t;
 
 void fbRender();
-void fbRenderInit(const int *_board, int _size,
+void fbRenderInit(const int *_board, int _size, int _wWidth, int _wHeight,
     void *_fbp, int _sWidth, int _sHeight,
     const unsigned char *_font, int _fontw, int _fonth,
     const unsigned char *_flag, int _flagw, int _flagh,

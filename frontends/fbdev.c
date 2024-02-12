@@ -330,7 +330,7 @@ fbdevStart(const int *lboard, int lsize) {
     /* cursor */
     int curx = 0, cury = 0;
 
-    fbRenderInit(board, size, fbp, sWidth, sHeight, font, fontw, fonth, flag, flagw, flagh, &curx, &cury);
+    fbRenderInit(board, size, wWidth, wHeight, fbp, sWidth, sHeight, font, fontw, fonth, flag, flagw, flagh, &curx, &cury);
 
     fbRender();
     char input[8] = { 0 };
@@ -363,8 +363,6 @@ fbdevStart(const int *lboard, int lsize) {
             fbRender();
             memset(input, 0, 8);
         }
-        //render();
-        //usleep(25000);
     }
 }
 

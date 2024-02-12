@@ -212,7 +212,7 @@ fbRender() {
 }
 
 void
-fbRenderInit(const int *_board, int _size,
+fbRenderInit(const int *_board, int _size, int _wWidth, int _wHeight,
     void *_fbp, int _sWidth, int _sHeight,
     const unsigned char *_font, int _fontw, int _fonth,
     const unsigned char *_flag, int _flagw, int _flagh,
@@ -220,6 +220,8 @@ fbRenderInit(const int *_board, int _size,
 {
     board = _board;
     size = _size;
+    wWidth = _wWidth;
+    wHeight = _wHeight;
     fbp = _fbp;
     sWidth = _sWidth;
     sHeight = _sHeight;
