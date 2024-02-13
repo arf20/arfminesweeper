@@ -35,9 +35,14 @@ add_custom_command(
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/frontends/console.c")
+file (GLOB SRC ${SRC}
+    "${PROJECT_SOURCE_DIR}/frontends/console.c"
+    "${PROJECT_SOURCE_DIR}/frontends/vt100.c"
+)
 add_compile_definitions(FRONTEND_CONSOLE)
 message(STATUS "Building with console")
+add_compile_definitions(FRONTEND_VT100)
+message(STATUS "Building with vt100")
 
 if (UNIX)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/frontends/httpd.c")

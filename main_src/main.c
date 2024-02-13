@@ -46,6 +46,7 @@
 #include "frontends/d2d.h"
 #include "frontends/xaw.h"
 #include "frontends/drmfb.h"
+#include "frontends/vt100.h"
 
 #include <common/frontconf.h>
 
@@ -125,6 +126,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_DRMFB
         printf("drmfb ");
+    #endif
+    #ifdef FRONTEND_VT100
+        printf("vt100 ");
     #endif
 
     printf("\n");
@@ -322,6 +326,13 @@ main(int argc, char **argv) {
         drmfbDestroy();
         #else
         printf("Error: Frontend drmfb not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "vt100")) {
+        #ifdef FRONTEND_VT100
+        vt100Start(gameGetBoard(), size);
+        #else
+        printf("Error: Frontend vt100 not built\n");
         #endif
     }
     else {

@@ -32,7 +32,8 @@ make
 ## TODO frontends
 ```
 MAIN TARGET                       Linux BSD Mac Win
-    Console (no graphics)   DONE  X     X   X   X
+    console                 DONE  X     X   X   X
+    vt100 escapes                 X     X   X   X
     ncurses                       X     X   X   
     fbdev                   WIP   X
     SVGA buffer                   
@@ -50,7 +51,7 @@ MAIN TARGET                       Linux BSD Mac Win
     raylib                  NO    X     X   X   X  Redefines GLAD
     SDL2                    DONE  X     X   X   X
     SDL1.2                  WIP   X     X   X   X
-    DRI DRM fb                    X
+    DRI DRM fb              WIP   X
     GLIDE (with Voodoo)           X     X       X
     OpenGL GLX                    X     X
     OpenGL 1.x FFP/FreeGLUT DONE  X     X   X   X
