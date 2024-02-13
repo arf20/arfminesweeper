@@ -21,7 +21,7 @@
 #ifndef _SDL1_H
 #define _SDL1_H
 
-int SDL1Start(const int *lboard, int size);
+int SDL1Start(const int *lboard, int lsize);
 void SDL1Destroy();
 
 #endif /* _SDL1_H */

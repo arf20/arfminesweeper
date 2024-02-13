@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-int Qt5Start(const int *lboard, int size);
+int Qt5Start(const int *lboard, int lsize);
 void Qt5Destroy();
 
 #ifdef __cplusplus

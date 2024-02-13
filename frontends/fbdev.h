@@ -21,7 +21,7 @@
 #ifndef _FBDEV_H
 #define _FBDEV_H
 
-int fbdevStart(const int *lboard, int size);
+int fbdevStart(const int *lboard, int lsize);
 void fbdevDestroy();
 
 #endif /* _FBDEV_H */

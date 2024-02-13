@@ -38,11 +38,14 @@ add_custom_command(
 file (GLOB SRC ${SRC}
     "${PROJECT_SOURCE_DIR}/frontends/console.c"
     "${PROJECT_SOURCE_DIR}/frontends/vt100.c"
+    "${PROJECT_SOURCE_DIR}/frontends/ansi.c"
 )
 add_compile_definitions(FRONTEND_CONSOLE)
 message(STATUS "Building with console")
 add_compile_definitions(FRONTEND_VT100)
 message(STATUS "Building with vt100")
+add_compile_definitions(FRONTEND_ANSI)
+message(STATUS "Building with ansi")
 
 if (UNIX)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/frontends/httpd.c")

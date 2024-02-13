@@ -33,7 +33,8 @@ make
 ```
 MAIN TARGET                       Linux BSD Mac Win
     console                 DONE  X     X   X   X
-    vt100 escapes                 X     X   X   X
+    vt100 escapes           DONE  X     X   X   X
+    ANSI color escapes            X     X   X   X
     ncurses                       X     X   X   
     fbdev                   WIP   X
     SVGA buffer                   

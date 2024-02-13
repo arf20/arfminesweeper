@@ -47,6 +47,7 @@
 #include "frontends/xaw.h"
 #include "frontends/drmfb.h"
 #include "frontends/vt100.h"
+#include "frontends/ansi.h"
 
 #include <common/frontconf.h>
 
@@ -129,6 +130,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_VT100
         printf("vt100 ");
+    #endif
+    #ifdef FRONTEND_ANSI
+        printf("ansi ");
     #endif
 
     printf("\n");
@@ -333,6 +337,13 @@ main(int argc, char **argv) {
         vt100Start(gameGetBoard(), size);
         #else
         printf("Error: Frontend vt100 not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "ansi")) {
+        #ifdef FRONTEND_ANSI
+        ansiStart(gameGetBoard(), size);
+        #else
+        printf("Error: Frontend ansi not built\n");
         #endif
     }
     else {

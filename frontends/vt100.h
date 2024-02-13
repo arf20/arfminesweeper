@@ -21,6 +21,6 @@
 #ifndef _VT100_H
 #define _VT100_H
 
-int vt100Start(const int *lboard, int size);
+int vt100Start(const int *lboard, int lsize);
 
 #endif /* _VT100_H */

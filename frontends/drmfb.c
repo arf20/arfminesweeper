@@ -43,7 +43,7 @@
 
 #include "drmfb.h"
 
-#define DRM_DEV "/dev/dri/card0"    /* FIXME: use first DRI device */
+#define DRM_DEV "/dev/dri/card1"    /* FIXME: use first DRI device */
 
 typedef struct drm_dev_s {
     uint32_t *buf;
@@ -219,7 +219,7 @@ drmfbStart(const int *lboard, int lsize) {
     uint64_t has_dumb = 0;
     if (drmGetCap(drmfd, DRM_CAP_DUMB_BUFFER, &has_dumb) < 0 || has_dumb == 0) {
         printf("Error drmGetCap DRM_CAP_DUMB_BUFFER failed or card does not "
-        "have dumb buffer: %s\n", strerror(errno));
+        "have dumb buffer: %s\nIs this a modeset device?\n", strerror(errno));
         return -1;
     }
 
@@ -232,7 +232,8 @@ drmfbStart(const int *lboard, int lsize) {
     printf("Available connector(s):\n");
     for (drm_dev_t *dev = dev_head; dev != NULL; dev = dev->next) {
         printf("\tconn_id: %d\n", dev->conn_id);
-        printf("\t\tenc_id: %d crtc_id: %d fb_id: %d\n", dev->enc_id, dev->crtc_id, dev->fb_id);
+        printf("\t\tenc_id: %d crtc_id: %d fb_id: %d\n", dev->enc_id,
+            dev->crtc_id, dev->fb_id);
         printf("\t\tMode: %dx%d\n", dev->width, dev->height);
     }
 
@@ -243,8 +244,8 @@ drmfbStart(const int *lboard, int lsize) {
         return -1;
     }
 
-    /* Set terminal to non-canonical non-blocking mode mode, this may fuck it up */
-    /* term stuff */
+    /* Set terminal to non-canonical non-blocking mode mode, this may fuck it
+        up */
     struct termios raw;
     tcgetattr(STDIN_FILENO, &orig);
     raw = orig;
@@ -258,7 +259,8 @@ drmfbStart(const int *lboard, int lsize) {
     /* cursor */
     int curx = 0, cury = 0;
 
-    fbRenderInit(board, size, wWidth, wHeight, dev->buf, dev->width, dev->height, font, fontw, fonth, flag, flagw, flagh, &curx, &cury);
+    fbRenderInit(board, size, wWidth, wHeight, dev->buf, dev->width,
+        dev->height, font, fontw, fonth, flag, flagw, flagh, &curx, &cury);
     fbRender();
 
     char input[8] = { 0 };

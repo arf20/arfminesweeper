@@ -18,10 +18,9 @@
 
 */
 
-#ifndef _XFORMS_H
-#define _XFORMS_H
+#ifndef _ANSI_H
+#define _ANSI_H
 
-int xformsStart(const int *lboard, int lsize);
-void xformsDestroy();
+int ansiStart(const int *lboard, int lsize);
 
-#endif /* _XLIB_H */
+#endif /* _ANSI_H */

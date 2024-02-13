@@ -21,7 +21,7 @@
 #ifndef _GTK3_H
 #define _GTK3_H
 
-int Gtk3Start(const int *lboard, int size);
+int Gtk3Start(const int *lboard, int lsize);
 void Gtk3Destroy();
 
 #endif /* _GTK3_H */

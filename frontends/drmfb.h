@@ -21,7 +21,7 @@
 #ifndef _DRMFB_H
 #define _DRMFB_H
 
-int drmfbStart(const int *lboard, int size);
+int drmfbStart(const int *lboard, int lsize);
 void drmfbDestroy();
 
 #endif /* _DRMFB_H */

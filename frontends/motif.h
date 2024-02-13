@@ -21,7 +21,7 @@
 #ifndef _MOTIF_H
 #define _MOTIF_H
 
-int motifStart(const int *lboard, int size);
+int motifStart(const int *lboard, int lsize);
 void motifDestroy();
 
 #endif /* _MOTIF_H */
