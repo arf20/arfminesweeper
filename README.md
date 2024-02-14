@@ -12,8 +12,8 @@ Wayland: libwayland-dev
 XForms: libforms-dev
 Motif: libmotif-dev
 Tcl/Tk: 
-SDL2: libsdl2-dev
-SDL1.2: libsdl1.2-dev
+SDL2: libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
+SDL1.2: libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev
 OpenGL 1.2: libgl-dev freeglut3-dev
 OpenGL 3.3: libgl-dev libglfw3-dev
 Vulkan: libvulkan-dev

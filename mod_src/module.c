@@ -23,6 +23,7 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
+#include <linux/version.h>
 
 #include <linux/fs.h>
 #include <linux/device.h>
@@ -78,12 +79,13 @@ arfmm_release(struct inode *inodep, struct file *filep) {
 
 static ssize_t
 arfmm_read(struct file *filep, char *buf, size_t len, loff_t *off) {
+    int errc = 0;
     size_t to_read_n = min((size_t)(read_size - *off), len);
 
     if (to_read_n <= 0)
         return 0;
 
-    int errc = copy_to_user(buf, read_buff + *off, to_read_n);
+    errc = copy_to_user(buf, read_buff + *off, to_read_n);
     if (errc != 0) {
         printk(KERN_INFO "arfminesweeper: %d chars read faulted\n", errc);
         return -EFAULT;
@@ -136,21 +138,21 @@ render_rbuf(void) {
 
 static ssize_t
 arfmm_write(struct file *filep, const char *buf, size_t len, loff_t *off) {
+    char cmd_str[WBUF_SIZE] = { 0 }, c = 0;
+    int errc = 0, x = 0, y = 0;
+
     if (len > WBUF_SIZE) {
         printk(KERN_INFO "arfminesweeper: command too log\n");
         return -EFAULT;
     }
 
-    char cmd_str[WBUF_SIZE] = { 0 };
-    int errc = copy_from_user(cmd_str, buf, len);
+    errc = copy_from_user(cmd_str, buf, len);
     if (errc != 0) {
         printk(KERN_INFO "arfminesweeper: %d chars written faulted\n",   
             errc);
         return -EFAULT;
     }
 
-    char c = 0;
-    int x = 0, y = 0;
     if (sscanf(cmd_str, "%c %d %d", &c, &x, &y) != 3) {
         printk(KERN_INFO "arfminesweeper: bad command\n");
 	    return -EINVAL;
@@ -162,12 +164,12 @@ arfmm_write(struct file *filep, const char *buf, size_t len, loff_t *off) {
     }
 
     switch (c) {
-    case 'c': gameClearCell(x, y); break;
-    case 'f': gameFlagCell(x, y); break;
-    default: {
-        printk(KERN_INFO "arfminesweeper: unknown command\n");
-	    return -EINVAL;
-    } break;
+        case 'c': gameClearCell(x, y); break;
+        case 'f': gameFlagCell(x, y); break;
+        default: {
+            printk(KERN_INFO "arfminesweeper: unknown command\n");
+            return -EINVAL;
+        } break;
     }
 
     read_size = render_rbuf();
@@ -185,7 +187,11 @@ static struct file_operations fops = {
 };
 
 static char *
+#if LINUX_VERSION_CODE > KERNEL_VERSION(6,1,77) /* gotta love the kernel */
+arfmm_devnode(const struct device *dev, umode_t *mode) {
+#else
 arfmm_devnode(struct device *dev, umode_t *mode) {
+#endif
     if (!mode)
         return NULL;
     if (dev->devt == MKDEV(major_number, 0))
@@ -195,7 +201,7 @@ arfmm_devnode(struct device *dev, umode_t *mode) {
 
 static int __init
 arfmm_start(void) {
-    /* Register major number */
+    /* Register major number for character device */
     major_number = register_chrdev(0, DEVICE_NAME, &fops);
     if (major_number < 0) {
         printk(KERN_ALERT "arfminesweeper: register_chrdev failed\n");
