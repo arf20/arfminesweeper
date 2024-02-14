@@ -2,8 +2,8 @@
 Minesweeper, but in every way possible
 
 ## Build on Linux
-Dependencies required: `build-essential cmake`
-Dependencies for frontends:
+Global dependencies: `build-essential cmake`
+Dependencies for main frontends:
 ```
 ncurses: libncurses-dev
 Xlib: libx11-dev
@@ -19,9 +19,10 @@ OpenGL 3.3: libgl-dev libglfw3-dev
 Vulkan: libvulkan-dev
 Gtk3: libgtk-3-dev
 Qt5: qtbase5-dev qttools5-dev qttools5-dev-tools
-
-Module: headers for your kernel
 ```
+Dependencies for kernel module: `linux-headers-amd64`
+Dependencies for BIOS kernel: `nasm`
+
 Build
 ```
 mkdir build && cd build
