@@ -29,10 +29,10 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: arfminesweeper-linux-deb
-        path: *.deb
+        path: ./*.deb
 
     - name: Upload TGZ artifact
       uses: actions/upload-artifact@v4
       with:
         name: arfminesweeper-linux-tarball
-        path: *.tar.gz
+        path: ./*.tar.gz
