@@ -150,19 +150,17 @@ ansiStart(const int *lboard, int lsize) {
             if (cury >= size) cury = 0;
         }
 
-        if (bytesread > 0) {
-            printBoard();
-            memset(input, 0, 8);
+        printBoard();
+        memset(input, 0, 8);
 
-            if (gameGetState() == STATE_LOST) {
-                printf(TXT_LOST);
-                run = 0;
-            }
+        if (gameGetState() == STATE_LOST) {
+            printf(TXT_LOST);
+            run = 0;
+        }
 
-            if (gameGetState() == STATE_WON) {
-                printf(TXT_WON);
-                run = 0;
-            }
+        if (gameGetState() == STATE_WON) {
+            printf(TXT_WON);
+            run = 0;
         }
     }
 }

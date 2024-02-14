@@ -104,42 +104,46 @@ vt100Start(const int *lboard, int lsize) {
     char input[8] = { 0 };
     int bytesread = 0, run = 1;
     while (run) {
-        while ((bytesread = read(STDIN_FILENO, &input, 8)) > 0) {
-            for (int i = 0; i < bytesread; i++) {
-                if (input[i] == '\033') {
-                    if (strncmp(input + i, "\033[A", 3) == 0) cury--;
-                    if (strncmp(input + i, "\033[B", 3) == 0) cury++;
-                    if (strncmp(input + i, "\033[C", 3) == 0) curx++;
-                    if (strncmp(input + i, "\033[D", 3) == 0) curx--;
-                    i += 2;
-                } else if (isalpha(input[i])) {
-                    input[i] = tolower(input[i]);
-                    switch (input[i]) {
-                        case 'a': curx--; break;
-                        case 'd': curx++; break;
-                        case 'w': cury--; break;
-                        case 's': cury++; break;
-                        case 'f': gameFlagCell(curx, cury); break;
-                        case 'c': gameClearCell(curx, cury); break;
-                    }
+        do {
+            bytesread = read(STDIN_FILENO, &input, 8);
+            usleep(10000);
+        } while (bytesread <= 0);
+            
+        for (int i = 0; i < bytesread; i++) {
+            if (input[i] == '\033') {
+                if (strncmp(input + i, "\033[A", 3) == 0) cury--;
+                if (strncmp(input + i, "\033[B", 3) == 0) cury++;
+                if (strncmp(input + i, "\033[C", 3) == 0) curx++;
+                if (strncmp(input + i, "\033[D", 3) == 0) curx--;
+                i += 2;
+            } else if (isalpha(input[i])) {
+                input[i] = tolower(input[i]);
+                switch (input[i]) {
+                    case 'a': curx--; break;
+                    case 'd': curx++; break;
+                    case 'w': cury--; break;
+                    case 's': cury++; break;
+                    case 'f': gameFlagCell(curx, cury); break;
+                    case 'c': gameClearCell(curx, cury); break;
                 }
-                if (curx < 0) curx = size - 1;
-                if (cury < 0) cury = size - 1;
-                if (curx >= size) curx = 0;
-                if (cury >= size) cury = 0;
             }
-            printBoard();
-            memset(input, 0, 8);
+            if (curx < 0) curx = size - 1;
+            if (cury < 0) cury = size - 1;
+            if (curx >= size) curx = 0;
+            if (cury >= size) cury = 0;
+        }
 
-            if (gameGetState() == STATE_LOST) {
-                printf(TXT_LOST);
-                run = 0;
-            }
+        printBoard();
+        memset(input, 0, 8);
 
-            if (gameGetState() == STATE_WON) {
-                printf(TXT_WON);
-                run = 0;
-            }
+        if (gameGetState() == STATE_LOST) {
+            printf(TXT_LOST);
+            run = 0;
+        }
+
+        if (gameGetState() == STATE_WON) {
+            printf(TXT_WON);
+            run = 0;
         }
     }
 }
