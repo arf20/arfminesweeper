@@ -14,7 +14,7 @@ Motif: libmotif-dev
 Tcl/Tk: 
 SDL2: libsdl2-dev
 SDL1.2: libsdl1.2-dev
-OpenGL 1.2: libgl-dev libglut-dev
+OpenGL 1.2: libgl-dev freeglut3-dev
 OpenGL 3.3: libgl-dev libglfw3-dev
 Vulkan: libvulkan-dev
 Gtk3: libgtk-3-dev
