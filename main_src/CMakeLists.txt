@@ -251,11 +251,10 @@ else()
     message(STATUS "Not building with Win32")
 endif()
 
-# executable
+# target
 add_executable(arfminesweeper ${SRC})
 
-
-# link libraries
+# target link dependencies
 
 target_link_libraries(arfminesweeper Threads::Threads m)
 
@@ -325,8 +324,26 @@ if (WAYLAND_FOUND)
     target_link_libraries(arfminesweeper wayland-client)
 endif()
 
-# install
+
+# taget propieties
+set_property(TARGET arfminesweeper PROPERTY VERSION   ${ARFMINESWEEPER_VERSION})
+
+# target install
 install(TARGETS arfminesweeper RUNTIME DESTINATION bin)
 
 # package
+set(CPACK_PACKAGE_NAME arfminesweeper)
+set(CPACK_DEBIAN_PACKAGE_VERSION ${GITVERSIONDETECT_VERSION})
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "arf20 <arf20@arf20.com>")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+    "libdrm2, libx11-6, libforms2, libgtk-3-0, libxcb1, libxm4, libxt6, libxaw7,
+    libforms2, libgtk-3-0, libglib2.0-0, libglib2.0-0, libqt5widgets5, 
+    libqt5gui5, libqt5core5a, 
+    libsdl2-2.0-0, libsdl2-ttf-2.0-0, libsdl2-image-2.0-0, libsdl1.2debian,
+    libgl1, libglut3.12, libglfw3, libvulkan1, libwayland-client0,
+    libstdc++6, libc6, libgcc-s1")
+set(CPACK_DEBIAN_PACKAGE_NAME "arfminesweeper")
+set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+
 include(CPack)

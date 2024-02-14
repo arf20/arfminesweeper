@@ -1,5 +1,5 @@
 # minesweeper
-You know the game, but in every graphical API I know as well as console
+Minesweeper, but in every way possible
 
 ## Build on Linux
 Dependencies required: `build-essential cmake`
