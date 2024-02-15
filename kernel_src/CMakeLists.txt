@@ -15,9 +15,6 @@ add_custom_target(bootloader ALL DEPENDS ${BOOT_BIN})
 
 # kernel
 
-#set(CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS ${CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS} s S) # doesn't work
-#set(CMAKE_ASM_NASM_LINK_EXECUTABLE "ld <CMAKE_ASM_NASM_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>") # CMake bug
-#set(CMAKE_ASM_NASM_OBJECT_FORMAT elf32) # doesn't work
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> <FLAGS> -o <OBJECT> <SOURCE>") # workaround
 
 add_compile_options(
@@ -47,22 +44,12 @@ add_compile_definitions(FRONTENDS_KERNEL)
 
 add_executable(kernel ${KERN_SRC})
 
-#target_compile_options(kernel PRIVATE
-#    -Wall -Wextra -Wpedantic -Werror
-#    -m32 -ffreestanding)
-
 target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:C>:
     -Wall -Wextra -Wpedantic
     -m32 -ffreestanding -nostdlib -fno-pie>
 )
 
 set_target_properties(kernel PROPERTIES NASM_OBJ_FORMAT elf32)
-
-#set_property(TARGET kernel PROPERTY C_STANDARD 90)
-
-#target_compile_options(kernel PUBLIC $<$<COMPILE_LANGUAGE:ASM_NASM>:
-#    -felf32>
-#)
 
 target_link_options(kernel PRIVATE 
     -m32 -ffreestanding -nostdlib -fno-pie
@@ -81,17 +68,5 @@ add_custom_command(
 )
 
 add_custom_target(image ALL DEPENDS ${IMAGE_BIN})
-
-#add_executable(kernel_dbg ${KERN_SRC})
-#target_compile_options(kernel_dbg PUBLIC $<$<COMPILE_LANGUAGE:C>:
-#    -Wall -Wextra -Wpedantic -Werror
-#    -m32 -ffreestanding -nostdlib -fno-pie>
-#)
-#set_target_properties(kernel_dbg PROPERTIES NASM_OBJ_FORMAT elf32)
-#target_link_options(kernel PRIVATE 
-#    -m32 -ffreestanding -nostdlib -fno-pie
-#    -Wl,-m,elf_i386 -Wl,--oformat=elf32-i386
-#    #-m elf_i386 -Ttext 0x1000 --oformat binary
-#)
 
 message(STATUS "Building bootable image")

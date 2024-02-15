@@ -1,8 +1,9 @@
-# minesweeper
+# arfminesweeper
 Minesweeper, but in every way possible
 
 ## Build on Linux
 Global dependencies: `build-essential cmake`
+
 Dependencies for main frontends:
 ```
 ncurses: libncurses-dev
@@ -20,8 +21,12 @@ Vulkan: libvulkan-dev
 Gtk3: libgtk-3-dev
 Qt5: qtbase5-dev qttools5-dev qttools5-dev-tools
 ```
+
 Dependencies for kernel module: `linux-headers-amd64`
+
 Dependencies for BIOS kernel: `nasm`
+
+Dependencies for UEFI application: `gnu-efi binutils-mingw-w64 gcc-mingw-w64 xorriso`
 
 Build
 ```
