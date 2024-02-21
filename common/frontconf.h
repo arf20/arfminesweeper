@@ -56,7 +56,7 @@
     "There is no good ending in a war.\n" \
     "But the game is now over.\n"
 
-#define TXT_QUIT "\n\nYou tried sneaking out of the POW camp, how clever\n" \
+#define TXT_QUIT "\n\nYou tried sneaking out of the POW camp, how clever of you\n" \
     "You were caught 5km away from it, and shot in situ.\n"
 
 #endif /* _FRONTCONF_H */

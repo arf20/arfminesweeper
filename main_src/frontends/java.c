@@ -55,11 +55,22 @@ int javaStart(const int *lboard, int lsize) {
         printf("Error FindClass failed: not found\n");
         return -1;
     }
-    jmethodID mid = (*env)->GetStaticMethodID(env, class, "test", "(I)V");
-    if (mid != NULL)  {
-        printf("Error GetStaticMethodID failed\n");
+    jmethodID mid = (*env)->GetStaticMethodID(env, class, "main", "(I)V");
+    if (mid == NULL)  {
+        printf("Error GetStaticMethodID failed, wrong signature?\n");
+        return -1;
     }
-    (*env)->CallStaticVoidMethod(env, class, mid, 100);
+    
+    (*env)->CallStaticIntMethod(env, class, mid, lsize);
+
+    jthrowable flag = (*env)->ExceptionOccurred(env);
+    if (flag) {
+        printf("Unhandled Java exception from JavaVM:\n");
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+        return -1;
+    }
+
 }
 
 void javaDestroy() {
