@@ -27,6 +27,9 @@
 #define FLAG_ICO_PATH "../assets/flag.ico"
 #define FONT_TTF_PATH "../assets/FSEX300.ttf"
 #define FONT_BMP_PATH "../assets/charstrip.bmp"
+#define GL3_VS_PATH   "../assets/msboard.vs"
+#define GL3_FS_PATH   "../assets/msboard.fs"
+#define JAVA_CLASS_PATH "../assets/"
 
 #define HEADER_HEIGHT 60
 #define CELL_SIZE     20

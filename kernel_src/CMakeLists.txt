@@ -1,5 +1,8 @@
 set (NASM_PROGRAM "nasm")
 
+add_compile_definitions(ARFMINESWEEPER_VERSION="${ARFMINESWEEPER_VERSION}")
+add_compile_definitions(ARFMINESWEEPER_NUM_COMMIT="${ARFMINESWEEPER_NUM_COMMIT}")
+
 # MBR bootloader
 file (GLOB BOOT_SRC "mbr_boot.asm")
 set (BOOT_BIN "mbr_boot.bin")

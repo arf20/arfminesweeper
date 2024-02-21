@@ -150,9 +150,9 @@ GL33Start(const int *lboard, int lsize) {
 
     /* Compile shaders */
     boardShader = shader_new(
-        "../assets/msboard.vs",
+        GL3_VS_PATH,
         NULL,
-        "../assets/msboard.fs");
+        GL3_FS_PATH);
     /* Set shader uniforms */
     glUseProgram(boardShader);
     shader_set_float2(boardShader, "sSize", wWidth, wHeight);

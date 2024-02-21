@@ -25,16 +25,27 @@ file (GLOB SRC
 add_custom_command(
   OUTPUT "${PROJECT_SOURCE_DIR}/assets/msboard4vs.spv"
   COMMAND "glslc"
-  ARGS "${PROJECT_SOURCE_DIR}/assets/msboard4.vert" "-o" "${PROJECT_SOURCE_DIR}/assets/msboard4vs.spv"
-  DEPENDS "${PROJECT_SOURCE_DIR}/assets/msboard4.vert"
+  ARGS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.vert" "-o" "${PROJECT_SOURCE_DIR}/assets/msboard4vs.spv"
+  DEPENDS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.vert"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
 add_custom_command(
   OUTPUT "${PROJECT_SOURCE_DIR}/assets/msboard4fs.spv"
   COMMAND "glslc"
-  ARGS "${PROJECT_SOURCE_DIR}/assets/msboard4.frag" "-o" "${PROJECT_SOURCE_DIR}/assets/msboard4fs.spv"
-  DEPENDS "${PROJECT_SOURCE_DIR}/assets/msboard4.frag"
+  ARGS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.frag" "-o" "${PROJECT_SOURCE_DIR}/assets/msboard4fs.spv"
+  DEPENDS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.frag"
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+)
+
+configure_file("${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard.vs" "${PROJECT_SOURCE_DIR}/assets/msboard.vs" COPYONLY)
+configure_file("${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard.fs" "${PROJECT_SOURCE_DIR}/assets/msboard.fs" COPYONLY)
+
+add_custom_command(
+  OUTPUT "${PROJECT_SOURCE_DIR}/assets/awt.class"
+  COMMAND "javac"
+  ARGS "-d" "${PROJECT_SOURCE_DIR}/assets/" "${PROJECT_SOURCE_DIR}/main_src/frontends/java/awt.java"
+  DEPENDS "${PROJECT_SOURCE_DIR}/main_src/frontends/java/awt.java"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
@@ -254,6 +265,17 @@ else()
     message(STATUS "Not building with Win32")
 endif()
 
+find_package(JNI)
+if (JNI_FOUND)
+    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/java.c")
+    include_directories(${JNI_INCLUDE_DIRS})
+    add_compile_definitions(FRONTEND_JAVA)
+    add_custom_target(java_awt ALL
+        DEPENDS "${PROJECT_SOURCE_DIR}/assets/awt.class"
+    )
+    message(STATUS "Building with Java JNI")
+endif()
+
 # target
 add_executable(arfminesweeper ${SRC})
 
@@ -325,6 +347,10 @@ endif()
 
 if (WAYLAND_FOUND)
     target_link_libraries(arfminesweeper wayland-client)
+endif()
+
+if (JNI_FOUND)
+    target_link_libraries(arfminesweeper ${JNI_LIBRARIES})
 endif()
 
 

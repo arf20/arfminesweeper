@@ -20,6 +20,7 @@ OpenGL 3.3: libgl-dev libglfw3-dev
 Vulkan: libvulkan-dev
 Gtk3: libgtk-3-dev
 Qt5: qtbase5-dev qttools5-dev qttools5-dev-tools
+Java: openjdk-17-jdk-headless
 ```
 
 Dependencies for kernel module: `linux-headers-amd64`
@@ -77,8 +78,8 @@ MAIN TARGET                       Linux BSD Mac Win
     Win UWP                                     X
     WinUI 3                                     X
     .NET MAUI                                   X
-    Java AWT                      X     X   X   X
-    Java Swing                    X     X   X   X
+    Java JNI AWT                  X     X   X   X
+    Java JNI Swing                X     X   X   X
     Webapp                  DONE  X     X   X   X
 LINUX MODULE TARGET
     Kernel module           DONE  X              

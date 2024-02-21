@@ -48,6 +48,7 @@
 #include "frontends/drmfb.h"
 #include "frontends/vt100.h"
 #include "frontends/ansi.h"
+#include "frontends/java.h"
 
 #include <common/frontconf.h>
 
@@ -133,6 +134,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_ANSI
         printf("ansi ");
+    #endif
+    #ifdef FRONTEND_JAVA
+        printf("java ");
     #endif
 
     printf("\n");
@@ -345,6 +349,13 @@ main(int argc, char **argv) {
         ansiStart(gameGetBoard(), size);
         #else
         printf("Error: Frontend ansi not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "java")) {
+        #ifdef FRONTEND_JAVA
+        javaStart(gameGetBoard(), size);
+        #else
+        printf("Error: Frontend java not built\n");
         #endif
     }
     else {
