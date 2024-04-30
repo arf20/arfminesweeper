@@ -187,11 +187,7 @@ static struct file_operations fops = {
 };
 
 static char *
-#if LINUX_VERSION_CODE > KERNEL_VERSION(6,1,77) /* gotta love the kernel */
-arfmm_devnode(const struct device *dev, umode_t *mode) {
-#else
 arfmm_devnode(struct device *dev, umode_t *mode) {
-#endif
     if (!mode)
         return NULL;
     if (dev->devt == MKDEV(major_number, 0))
