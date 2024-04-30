@@ -92,6 +92,9 @@ BIOS KERNEL TARGET                BIOS UEFI
     VESA graphic mode                  X
 UEFI APPLICATION TARGET
     UEFI console                       X
+
+HARDWARE TARGET
+    SystemVerilog FPGA      
 ```
 I apologize.
 
