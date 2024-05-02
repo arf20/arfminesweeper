@@ -22,3 +22,20 @@ add_library(efiapp SHARED efi_app.c data.c)
 target_link_libraries(efiapp ${LDFLAGS})
 
 set(GNUEFILIB ${GNUEFI}/lib/data.c ${GNUEFI}/lib/str.c ${GNUEFI}/lib/print.c ${GNUEFI}/lib/misc.c ${GNUEFI}/lib/error.c ${GNUEFI}/lib/x86_64/math.c ${GNUEFI}/lib/guid.c ${GNUEFI}/lib/runtime/efirtlib.c  ${GNUEFI}/lib/console.c  ${GNUEFI}/lib/event.c  ${GNUEFI}/lib/runtime/rtdata.c ${GNUEFI}/lib/runtime/rtstr.c ${GNUEFI}/lib/runtime/efirtlib.c ${GNUEFI}/lib/dpath.c)
+
+set(IMAGE_BIN esp.img)
+
+add_custom_command(
+    OUTPUT ${IMAGE_BIN}
+    COMMAND dd if=/dev/zero of=${IMAGE_BIN} bs=1k count=1440 
+    COMMAND mformat -i ${IMAGE_BIN} -f 1440 ::
+    COMMAND mmd -i ${IMAGE_BIN} ::/EFI
+    COMMAND mmd -i ${IMAGE_BIN} ::/EFI/BOOT
+    COMMAND echo "\\EFI\\BOOT\\BOOTX64.EFI" > startup.nsh
+    COMMAND mcopy -i ${IMAGE_BIN} startup.nsh ::/
+    COMMAND mcopy -oi ${IMAGE_BIN} libefiapp.so ::/EFI/BOOT/BOOTX64.EFI
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS efiapp VERBATIM
+)
+
+add_custom_target(esp_image ALL DEPENDS ${IMAGE_BIN})
