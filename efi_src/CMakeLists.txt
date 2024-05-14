@@ -1,3 +1,6 @@
+find_program(MINGW x86_64-w64-mingw32-gcc)
+find_program(MTOOLS mcopy)
+
 set(CMAKE_C_COMPILER   x86_64-w64-mingw32-gcc)
 
 set(GNUEFI ${PROJECT_SOURCE_DIR}/efi_src/gnu_efi)
@@ -18,8 +21,13 @@ set(LDFLAGS "-nostdlib -Wl,-dll -shared -Wl,--subsystem,10 -Wl,-eefi_main -lgcc 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 ${COMMONFLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c11 ${COMMONFLAGS}")
 
-add_library(efiapp SHARED efi_app.c data.c)
-target_link_libraries(efiapp ${LDFLAGS})
+if (MINGW)
+    add_library(efiapp SHARED efi_app.c data.c)
+    target_link_libraries(efiapp ${LDFLAGS})
+    message(STATUS "Building EFI stub")
+elseif()
+    message(STATUS "Not building EFI without MINGW")
+endif()
 
 set(GNUEFILIB ${GNUEFI}/lib/data.c ${GNUEFI}/lib/str.c ${GNUEFI}/lib/print.c ${GNUEFI}/lib/misc.c ${GNUEFI}/lib/error.c ${GNUEFI}/lib/x86_64/math.c ${GNUEFI}/lib/guid.c ${GNUEFI}/lib/runtime/efirtlib.c  ${GNUEFI}/lib/console.c  ${GNUEFI}/lib/event.c  ${GNUEFI}/lib/runtime/rtdata.c ${GNUEFI}/lib/runtime/rtstr.c ${GNUEFI}/lib/runtime/efirtlib.c ${GNUEFI}/lib/dpath.c)
 
@@ -38,4 +46,9 @@ add_custom_command(
     DEPENDS efiapp VERBATIM
 )
 
-add_custom_target(esp_image ALL DEPENDS ${IMAGE_BIN})
+if (MINGW AND MTOOLS)
+    add_custom_target(esp_image ALL DEPENDS ${IMAGE_BIN})
+    message(STATUS "Building ESP")
+elseif()
+    message(STATUS "Not building ESP without mtools")
+endif()

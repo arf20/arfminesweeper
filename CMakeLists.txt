@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.19)
 # CMake modules search path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(GitVersionDetect)
+include(CheckLanguage)
 
 set(ARFMINESWEEPER_VERSION_MAJOR ${GITVERSIONDETECT_VERSION_MAJOR})
 set(ARFMINESWEEPER_VERSION_MINOR ${GITVERSIONDETECT_VERSION_MINOR})
@@ -20,17 +21,48 @@ project(
     LANGUAGES C CXX ASM ASM_NASM
 )
 
+check_language(C)
+if(CMAKE_C_COMPILER)
+    enable_language(C)
+else()
+    message(STATUS "No C support")
+endif()
+
+check_language(CXX)
+if(CMAKE_CXX_COMPILER)
+    enable_language(CXX)
+else()
+    message(STATUS "No CXX support")
+endif()
+
+check_language(ASM)
+if(CMAKE_ASM_COMPILER)
+    enable_language(ASM)
+else()
+    message(STATUS "No ASM support")
+endif()
+
+check_language(ASM_NASM)
+if(CMAKE_ASM_NASM_COMPILER)
+    enable_language(ASM_NASM)
+else()
+    message(STATUS "No ASM_NASM support")
+endif()
+
+
 add_subdirectory("main_src")
 
+
 if (LINUX)
-    add_subdirectory("mod_src")
-    add_subdirectory("kernel_src")
-    #add_subdirectory("efi_src")
-    message(STATUS "Building linux kernel module")
-    message(STATUS "Building bootable image")
-    message(STATUS "Building EFI image")
+    add_subdirectory("mod_src")    
 else()
     message(STATUS "Not building linux kernel module on non-linux")
-    message(STATUS "Not building bootable image on non-linux")
-    message(STATUS "Not building EFI image on non-linux")
 endif()
+
+if(CMAKE_ASM_NASM_COMPILER)
+    add_subdirectory("kernel_src")
+else()
+    message(STATUS "Not building kernel without NASM")
+endif()
+
+add_subdirectory("efi_src")

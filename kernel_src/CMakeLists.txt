@@ -72,4 +72,4 @@ add_custom_command(
 
 add_custom_target(image ALL DEPENDS ${IMAGE_BIN})
 
-message(STATUS "Building bootable image")
+message(STATUS "Building BIOS kernel image")
