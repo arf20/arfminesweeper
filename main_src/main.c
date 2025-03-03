@@ -49,6 +49,8 @@
 #include "frontends/vt100.h"
 #include "frontends/ansi.h"
 #include "frontends/java.h"
+#include "frontends/glx.h"
+#include "frontends/curses.h"
 
 #include <common/frontconf.h>
 
@@ -137,6 +139,12 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_JAVA
         printf("java ");
+    #endif
+    #ifdef FRONTEND_GLX
+        printf("glx ");
+    #endif
+    #ifdef FRONTEND_CURSES
+        printf("curses ");
     #endif
 
     printf("\n");
@@ -356,6 +364,20 @@ main(int argc, char **argv) {
         javaStart(gameGetBoard(), size);
         #else
         printf("Error: Frontend java not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "glx")) {
+        #ifdef FRONTEND_GLX
+        GLXStart(gameGetBoard(), size);
+        #else
+        printf("Error: Frontend glx not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "curses")) {
+        #ifdef FRONTEND_CURSES
+        cursesStart(gameGetBoard(), size);
+        #else
+        printf("Error: Frontend curses not built\n");
         #endif
     }
     else {

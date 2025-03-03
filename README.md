@@ -41,10 +41,9 @@ make
 MAIN TARGET                       Linux BSD Mac Win
     console                 DONE  X     X   X   X
     vt100 escapes           DONE  X     X   X   X
-    ANSI color escapes            X     X   X   X
-    ncurses                       X     X   X   
+    ANSI color escapes      DONE  X     X   X   X
+    curses/ncurses                X     X   X   
     fbdev                   WIP   X
-    SVGA buffer                   
     X11 Xlib                DONE  X     X
     X11 XCB                 WIP   X     X
     Wayland                 WIP   X     X
@@ -67,8 +66,10 @@ MAIN TARGET                       Linux BSD Mac Win
     ImGui                         X     X   X   X
     Vulkan/GLFW             WIP   X     X   X   X
     Metal                                       X
-    Gtk3                    DONE  X     X
+    Gtk3                    DONE  X     X   X   X
+    Gtk4                          X     X   X   X
     Qt5                     DONE  X     X   X   X
+    Qt6                           X     X   X   X
     wxWidgets                     X     X   X   X
     WinAPI                  WIP                 X
     Win32 GDI               WIP                 X
@@ -78,7 +79,7 @@ MAIN TARGET                       Linux BSD Mac Win
     Win UWP                                     X
     WinUI 3                                     X
     .NET MAUI                                   X
-    Java JNI AWT                  X     X   X   X
+    Java JNI AWT            WIP   X     X   X   X  Architectural limitation
     Java JNI Swing                X     X   X   X
     Webapp                  DONE  X     X   X   X
 LINUX MODULE TARGET

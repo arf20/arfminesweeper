@@ -41,16 +41,14 @@ add_custom_command(
 configure_file("${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard.vs" "${PROJECT_SOURCE_DIR}/assets/msboard.vs" COPYONLY)
 configure_file("${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard.fs" "${PROJECT_SOURCE_DIR}/assets/msboard.fs" COPYONLY)
 
-# compile java
 add_custom_command(
   OUTPUT "${PROJECT_SOURCE_DIR}/assets/awt.class"
   COMMAND "javac"
-  ARGS "-d" "${PROJECT_SOURCE_DIR}/assets/" "${PROJECT_SOURCE_DIR}/main_src/frontends/java/awt.java"
+  ARGS "-d" "${PROJECT_SOURCE_DIR}/assets/" "-h" "${PROJECT_SOURCE_DIR}/main_src/frontends/java/" "${PROJECT_SOURCE_DIR}/main_src/frontends/java/awt.java"
   DEPENDS "${PROJECT_SOURCE_DIR}/main_src/frontends/java/awt.java"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-# console, vt100, ansi
 file (GLOB SRC ${SRC}
     "${PROJECT_SOURCE_DIR}/main_src/frontends/console.c"
     "${PROJECT_SOURCE_DIR}/main_src/frontends/vt100.c"
@@ -63,26 +61,14 @@ message(STATUS "Building with vt100")
 add_compile_definitions(FRONTEND_ANSI)
 message(STATUS "Building with ansi")
 
-# ncurses
-find_package(Curses)
-if (CURSES_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/curses.c")
-    add_compile_definitions(FRONTEND_CURSES)
-    message(STATUS "Building with curses")
-else()
-    message(STATUS "Not building with curses")
-endif()
-
-# httpd
 if (UNIX)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/httpd.c")
     add_compile_definitions(FRONTEND_HTTPD)
     message(STATUS "Building with httpd")
 else()
-    message(STATUS "Not building with httpd")
-endif()
+    message(STATUS "Not building with console")
+endif (UNIX)
 
-# fbdev
 if (WIN32)
     message(STATUS "No fbdev support in Win32")
 elseif (BSD)
@@ -95,7 +81,6 @@ else()
     message(STATUS "Building with fbdev")
 endif()
 
-# drm
 pkg_check_modules(DRM libdrm)
 if (DRM_FOUND)
     file (GLOB SRC ${SRC}
@@ -105,14 +90,12 @@ if (DRM_FOUND)
     message(STATUS "Building with DRI DRM framebuffer")
 endif()
 
-# x11
 find_package(X11)
 if (X11_FOUND)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xlib.c")
     add_compile_definitions(FRONTEND_XLIB)
     message(STATUS "Building with X11 Xlib")
 
-    # xcb
     if (X11_xcb_FOUND)
         file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xcb.c")
         add_compile_definitions(FRONTEND_XCB)
@@ -121,7 +104,6 @@ if (X11_FOUND)
         message(STATUS "Not building with xcb")
     endif()
 
-    # motif
     find_package(Motif)
     if (MOTIF_FOUND)
         file(GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/motif.c")
@@ -131,7 +113,6 @@ if (X11_FOUND)
         message(STATUS "Not building with motif")
     endif()
 
-    # xaw/athena
     pkg_check_modules(XAW xaw7) 
     if (XAW_FOUND)
         file(GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xaw.c")
@@ -141,7 +122,6 @@ if (X11_FOUND)
         message(STATUS "Not building with Athena")
     endif()
 
-    # XForms
     if (EXISTS "/usr/include/forms.h")
         set(XFORMS_FOUND true)
         file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xforms.c")
@@ -155,7 +135,7 @@ else()
     message(STATUS "Not building with X11 Xlib")
 endif()
 
-# wayland
+#find_package(Wayland)
 pkg_check_modules(WAYLAND wayland-client) 
 if (WAYLAND_FOUND)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/wayland.c")
@@ -165,7 +145,6 @@ else()
     message(STATUS "Not building with Wayland")
 endif()
 
-# gtk3
 pkg_check_modules(GTK3 gtk+-3.0) 
 if (GTK3_FOUND)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/gtk3.c")
@@ -175,7 +154,6 @@ else()
     message(STATUS "Not building with gtk3")
 endif()
 
-# qt5
 find_package(Qt5Widgets)
 if (Qt5Widgets_FOUND)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/qt5.cpp" "${PROJECT_SOURCE_DIR}/main_src/frontends/qt5.hpp")
@@ -194,7 +172,6 @@ else()
     message(STATUS "Not building with Qt5")
 endif()
 
-# sdl2
 find_package(SDL2)
 pkg_check_modules(SDL2_ttf SDL2_ttf)
 pkg_check_modules(SDL2_image SDL2_image)
@@ -211,7 +188,6 @@ else()
     message(STATUS "Not building with SDL2")
 endif()
 
-# sdl
 find_package(SDL)
 pkg_check_modules(SDL_ttf SDL_ttf)
 pkg_check_modules(SDL_image SDL_image)
@@ -228,23 +204,22 @@ else()
     message(STATUS "Not building with SDL 1.2")
 endif()
 
-# GL
 cmake_policy(SET CMP0072 OLD)
 find_package(OpenGL)
 find_package(glfw3 3.3)
 if (OpenGL_OpenGL_FOUND)
-    # OpenGL 2.x/FreeGLUT
     find_package(GLUT)
     if (GLUT_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/gl11.c")
-        add_compile_definitions(FRONTEND_GL11)
-        message(STATUS "Building with OpenGL 2.x FFP/FreeGLUT")
+        file (GLOB SRC ${SRC}
+            "${PROJECT_SOURCE_DIR}/main_src/frontends/glut.c"
+            "${PROJECT_SOURCE_DIR}/main_src/frontends/common/gl_ffp.c")
+        add_compile_definitions(FRONTEND_GLUT)
+        message(STATUS "Building with FreeGLUT/OpenGL 1.2 FFP")
     else()
-        message(WARNING "FreeGLUT required for building OpenGL 1.1 frontend")
-        message(STATUS "Not building with OpenGL 2.x FFP/FreeGLUT")
+        message(WARNING "FreeGLUT required for building OpenGL 1.2 FFP frontend")
+        message(STATUS "Not building with OpenGL 1.2 FFP/FreeGLUT")
     endif()
 
-    # OpenGL 3.3/GLFW
     if (glfw3_FOUND)
         file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/gl33.c" "${PROJECT_SOURCE_DIR}/main_src/frontends/glad/glad.c" "${PROJECT_SOURCE_DIR}/main_src/frontends/glutil.c")
         include_directories("${PROJECT_SOURCE_DIR}/main_src/frontends/glad/include/")
@@ -254,20 +229,10 @@ if (OpenGL_OpenGL_FOUND)
         message(WARNING "GLFW required for building OpenGL 3.3 frontend")
         message(STATUS "Not building with OpenGL 3.3/GLFW/GLAD")
     endif()
-
-    # glx
-    if (OpenGL_GLX_FOUND AND X11_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/glx.c")
-        add_compile_definitions(FRONTEND_GLX)
-        message(STATUS "Building with GLX")
-    else()
-        message(STATUS "Not building with X11/GLX")
-    endif()
 else()
     message(STATUS "Not building with OpenGL")
 endif()
 
-# vulkan
 find_package(Vulkan)
 if (Vulkan_FOUND)
     if (glfw3_FOUND)
@@ -286,7 +251,6 @@ else()
     message(STATUS "Not building with Vulkan/GLFW")
 endif()
 
-# win32 comctl, gdi, direct2d
 if (WIN32)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/win32.c")
     add_compile_definitions(FRONTEND_WIN32)
@@ -303,10 +267,8 @@ else()
     message(STATUS "Not building with Win32")
 endif()
 
-# java
 find_package(JNI)
-find_program(JAVAC javac)
-if (JNI_FOUND AND JAVAC)
+if (JNI_FOUND)
     file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/java.c")
     include_directories(${JNI_INCLUDE_DIRS})
     add_compile_definitions(FRONTEND_JAVA)
@@ -316,17 +278,12 @@ if (JNI_FOUND AND JAVAC)
     message(STATUS "Building with Java JNI")
 endif()
 
-# =============================== target =======================================
+# target
 add_executable(arfminesweeper ${SRC})
-# ==============================================================================
 
 # target link dependencies
 
 target_link_libraries(arfminesweeper Threads::Threads m)
-
-if (CURSES_FOUND)
-    target_link_libraries(arfminesweeper ${CURSES_LIBRARIES})
-endif()
 
 if (WIN32)
     target_link_libraries(arfminesweeper ws2_32 msimg32 D2d1)
@@ -400,7 +357,12 @@ endif()
 
 
 # taget propieties
-set_property(TARGET arfminesweeper PROPERTY VERSION   ${ARFMINESWEEPER_VERSION})
+#set_property(TARGET arfminesweeper PROPERTY VERSION   ${ARFMINESWEEPER_VERSION})
+
+add_custom_command(TARGET arfminesweeper POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:arfminesweeper> libarfminesweeper.so
+)
+
 
 # target install
 install(TARGETS arfminesweeper RUNTIME DESTINATION bin)

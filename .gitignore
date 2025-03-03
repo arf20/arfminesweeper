@@ -1,6 +1,8 @@
 build/
 .vscode/
-/.vs
+.vs/
 CMakeSettings.json
 *.o
 *.bin
+*.ccls-cache/
+
