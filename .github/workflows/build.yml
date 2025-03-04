@@ -18,7 +18,7 @@ jobs:
         fetch-depth: 0
 
     - name: Configure CMake
-      run: cmake -B build
+      run: cmake -B build -DNO_MODULE:BOOL=TRUE
 
     - name: Build
       run: cmake --build build --verbose

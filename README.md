@@ -36,6 +36,9 @@ cmake ..
 make
 ```
 
+Use -DNO\_MODULE:BOOL=TRUE, -DNO\_KERNEL:BOOL=TRUE or -DNO\_EFIAPP:BOOL=TRUE to
+avoid building the kernel module, kernel or EFI app
+
 ## TODO frontends
 ```
 MAIN TARGET                       Linux BSD Mac Win

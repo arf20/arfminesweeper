@@ -53,16 +53,21 @@ endif()
 add_subdirectory("main_src")
 
 
-if (LINUX)
-    add_subdirectory("mod_src")    
+if (LINUX AND NOT NO_MODULE)
+	add_subdirectory("mod_src")    
 else()
-    message(STATUS "Not building linux kernel module on non-linux")
+    message(STATUS "Not building linux kernel module")
 endif()
 
-if(CMAKE_ASM_NASM_COMPILER)
+if(CMAKE_ASM_NASM_COMPILER AND NOT NO_KERNEL)
     add_subdirectory("kernel_src")
 else()
-    message(STATUS "Not building kernel without NASM")
+    message(STATUS "Not building kernel")
 endif()
 
-add_subdirectory("efi_src")
+if (NOT NO_EFIAPP)
+    add_subdirectory("efi_src")
+else()
+	message(STATUS "Not building EFI app")
+endif()
+
