@@ -42,7 +42,6 @@ static Display *d = NULL;
 static int s = 0;
 static Window w = 0;
 static GC gc;
-static Colormap cm;
 static Font f;
 
 static XColor blue, green, red, darkblue, darkred, darkcyan, /*black*/ darkgrey;
@@ -151,6 +150,10 @@ XlibStart(const int *lboard, int lsize) {
     wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
         ((size - 1) * CELL_MARGIN);
     
+
+    static Colormap cm;
+
+
     /* Xlib is pretty self explanatory */
     d = XOpenDisplay(NULL);
     if (d == NULL) {

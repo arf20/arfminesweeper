@@ -46,6 +46,29 @@
 #define TXT_OFFX 5
 #define TXT_OFFY 1
 
+static const int *board;
+static int size;
+
+static int wWidth, wHeight;
+
+
+static drawStringNptr_t drawStringNptr;
+static drawTextMultilineptr_t drawTextMultilineptr;
+
+void glRenderInit(drawStringNptr_t ldrawStringNptr,
+    drawTextMultilineptr_t ldrawTextMultilineptr,
+    const int *lboard,
+    int lsize, int lwWidth, int lwHeight)
+{
+    drawStringNptr = ldrawStringNptr;
+    drawTextMultilineptr = ldrawTextMultilineptr;
+    board = lboard;
+    size = lsize;
+    wWidth = lwWidth;
+    wHeight = lwHeight;
+}
+
+
 static void
 glTransformedVertex(int x, int y) {
     GLfloat tx = -1.0f + (2.0f * ((float)x / (float)wWidth));
@@ -57,7 +80,7 @@ static void
 drawString(int x, int y, const char *str, 
     GLfloat r, GLfloat g, GLfloat b)
 {
-    drawGLUTStringN(x, y, str, strlen(str), r, g, b);
+    drawStringNptr(x, y, str, strlen(str), r, g, b);
 }
 
 static void
@@ -86,11 +109,11 @@ glRender() {
     /* Check game state*/
     switch (gameGetState()) {
         case STATE_LOST: {
-            drawGLUTTextMultiline(5, 45, TXT_LOST);
+            drawTextMultilineptr(5, 45, TXT_LOST);
             return;
         } break;
         case STATE_WON: {
-            drawGLUTTextMultiline(5, 45, TXT_WON);
+            drawTextMultilineptr(5, 45, TXT_WON);
             return;
         } break;
     }
@@ -157,3 +180,4 @@ glRender() {
 
     glEnd();
 }
+

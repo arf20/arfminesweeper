@@ -233,6 +233,8 @@ cmake_policy(SET CMP0072 OLD)
 find_package(OpenGL)
 find_package(glfw3 3.3)
 if (OpenGL_OpenGL_FOUND)
+    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/common/gl_ffp.c")
+
     # OpenGL 2.x/FreeGLUT
     find_package(GLUT)
     if (GLUT_FOUND)

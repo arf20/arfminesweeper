@@ -44,7 +44,7 @@
     "and you have no family left to cry for you,\n" \
     "as they all died in the war.\n" \
     "Among you, there were 2600 german POWs employed by the danish\n" \
-    "to clear mines between 1945 and 1947. As much as 500 died.\n" \
+    "to clear mines between 1945 and 1947. As many as 500 died.\n" \
     "The game is now over.\n"
 
 #define TXT_WON "\nYou have finished your task.\n" \

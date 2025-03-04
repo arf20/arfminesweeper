@@ -23,16 +23,13 @@
 
 #include <GL/gl.h>
 
-extern const int *board;
-extern int size;
+typedef void (*drawStringNptr_t)(int, int, const char *, int, GLfloat, GLfloat, GLfloat);
+typedef void (*drawTextMultilineptr_t)(int, int, const char*);
 
-extern int wWidth, wHeight;
-extern int window;
-
-void drawGLUTStringN(int x, int y, const char *str, int n,
-    GLfloat r, GLfloat g, GLfloat b);
-void drawGLUTTextMultiline(int x, int y, const char *str);
-
+void glRenderInit(drawStringNptr_t drawStringNptr, 
+    drawTextMultilineptr_t drawTextMultilineptr,
+    const int *lboard,
+    int lsize, int lwWidth, int lwHeight);
 void glRender();
 
 #endif /* _GL_FFP_H */
