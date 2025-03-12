@@ -316,6 +316,18 @@ if (JNI_FOUND AND JAVAC)
         DEPENDS "${PROJECT_SOURCE_DIR}/assets/awt.class"
     )
     message(STATUS "Building with Java JNI")
+else()
+    message(STATUS "Not building with Java")
+endif()
+
+#fltk
+find_package(FLTK)
+if (FLTK_FOUND)
+    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/fltk.cpp")
+    add_compile_definitions(FRONTEND_FLTK)
+    message(STATUS "Building with FLTK")
+else()
+    message(STATUS "Not building with FLTK")
 endif()
 
 # =============================== target =======================================
@@ -400,6 +412,9 @@ if (JNI_FOUND)
     target_link_libraries(arfminesweeper ${JNI_LIBRARIES})
 endif()
 
+if (FLTK_FOUND)
+    target_link_libraries(arfminesweeper ${FLTK_LIBRARIES})
+endif()
 
 # taget propieties
 set_property(TARGET arfminesweeper PROPERTY VERSION   ${ARFMINESWEEPER_VERSION})

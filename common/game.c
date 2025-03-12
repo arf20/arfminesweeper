@@ -205,3 +205,4 @@ gameFlagCell(int x, int y) {
     CHECK_FLAG(BOARDXY(x, y)) ? flagsLeft-- : flagsLeft++;
     if (checkWin()) state = STATE_WON;
 }
+

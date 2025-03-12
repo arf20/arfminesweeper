@@ -146,6 +146,9 @@ printFrontends() {
     #ifdef FRONTEND_CURSES
         printf("curses ");
     #endif
+    #ifdef FRONTEND_FLTK
+        printf("fltk ");
+    #endif
 
     printf("\n");
 }
@@ -378,6 +381,13 @@ main(int argc, char **argv) {
         cursesStart(gameGetBoard(), size);
         #else
         printf("Error: Frontend curses not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "fltk")) {
+        #ifdef FRONTEND_FLTK
+        FLTKStart(gameGetBoard(), size);
+        #else
+        printf("Error: Frontend fltk not built\n");
         #endif
     }
     else {

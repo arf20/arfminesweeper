@@ -45,13 +45,13 @@ MAIN TARGET                       Linux BSD Mac Win
     console                 DONE  X     X   X   X
     vt100 escapes           DONE  X     X   X   X
     ANSI color escapes      DONE  X     X   X   X
-    curses/ncurses                X     X   X   
+    curses/ncurses          DONE  X     X   X   
     fbdev                   WIP   X
     X11 Xlib                DONE  X     X
     X11 XCB                 WIP   X     X
     Wayland                 WIP   X     X
     XForms                  DONE  X     X
-    FLTK                          X     X   X   X
+    FLTK                    WIP   X     X   X   X
     Motif (Xm/Xt)           WIP   X     X
     XView (OpenLook/Xt)           X     X
     Athena (Xaw/Xt)         WIP   X     X
