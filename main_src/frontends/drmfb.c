@@ -130,7 +130,7 @@ drm_setup_fb(int fd, drm_dev_t *dev) {
     memset(&creq, 0, sizeof(struct drm_mode_create_dumb));
     creq.width = dev->width;
     creq.height = dev->height;
-    creq.bpp = BPP; /* hard conding */
+    creq.bpp = BPP; /* hardcoded */
 
     if (drmIoctl(fd, DRM_IOCTL_MODE_CREATE_DUMB, &creq) < 0) {
         printf("Error drmIoctl DRM_IOCTL_MODE_CREATE_DUMB: %s\n", strerror(errno));
