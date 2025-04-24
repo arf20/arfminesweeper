@@ -46,7 +46,7 @@ MAIN TARGET                       Linux BSD Mac Win
     vt100 escapes           DONE  X     X   X   X
     ANSI color escapes      DONE  X     X   X   X
     curses/ncurses          DONE  X     X   X   
-    fbdev                   WIP   X
+    fbdev                   DONE  X
     X11 Xlib                DONE  X     X
     X11 XCB                 WIP   X     X
     Wayland                 WIP   X     X
