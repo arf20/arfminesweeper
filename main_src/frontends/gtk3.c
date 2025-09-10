@@ -28,7 +28,8 @@
 static const int *board = NULL;
 static int size = 0;
 
-static GtkWidget *window, *flaglabel = NULL, **flagimages = NULL, **buttons = NULL, **numbers = NULL;
+static GtkWidget *window, *flaglabel = NULL, **flagimages = NULL,
+    **buttons = NULL, **numbers = NULL;
 
 static void
 updateButtons() {
@@ -68,7 +69,10 @@ updateButtons() {
                         case 8: gdk_rgba_parse(&c, "darkgrey"); break;
                     }
 
-                    gtk_widget_override_color(numbers[btni], GTK_STATE_FLAG_NORMAL, &c);
+                    /* DEPRECATED because it "isn't useful in CSS-based
+                       rendering. some people don't use CSS... */
+                    gtk_widget_override_background_color(numbers[btni],
+                        GTK_STATE_FLAG_NORMAL, &c);
 
                     /* Show text */
                     gtk_widget_show(numbers[btni]);
@@ -77,7 +81,8 @@ updateButtons() {
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 //gtk_button_set_label(GTK_BUTTON(buttons[btni]), NULL);
-                gtk_button_set_image(GTK_BUTTON(buttons[btni]), flagimages[btni]);
+                gtk_button_set_image(GTK_BUTTON(buttons[btni]),
+                    flagimages[btni]);
             }
             /* Otherwise just a tile */
             else {
@@ -92,15 +97,17 @@ updateButtons() {
     GtkWidget *dialog;
     switch (gameGetState()) {
         case STATE_LOST: {
-            dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
-                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, TXT_LOST);
+            dialog = gtk_message_dialog_new(GTK_WINDOW(window),
+                GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
+                GTK_BUTTONS_CLOSE, TXT_LOST);
             gtk_dialog_run(GTK_DIALOG (dialog));
             gtk_widget_destroy(dialog);
             gtk_window_close(GTK_WINDOW(window));
         } break;
         case STATE_WON: {
-            dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
-                GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, TXT_WON);
+            dialog = gtk_message_dialog_new(GTK_WINDOW(window),
+                GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO,
+                GTK_BUTTONS_CLOSE, TXT_WON);
             gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);
             gtk_window_close(GTK_WINDOW(window));
@@ -203,7 +210,7 @@ Gtk3Start(const int *lboard, int lsize) {
     int argc = 1;
 
     app = gtk_application_new ("org.gtk." TXT_TITLE,
-        G_APPLICATION_FLAGS_NONE);
+        G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
     status = g_application_run(G_APPLICATION(app), argc, argv);
 

@@ -211,7 +211,7 @@ generateBoardResponse() {
                         color, n);
                     strlcat(tmpBuff, tmpBuff2, BUFF_SIZE);
                 }
-                strlcat(tmpBuff2, "</td>\n", BUFF_SIZE);
+                strlcat(tmpBuff2, "</td>\n", 1024);
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
