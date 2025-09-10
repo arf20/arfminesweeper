@@ -43,7 +43,7 @@
 
 #include "drmfb.h"
 
-#define DRM_DEV "/dev/dri/card1"    /* FIXME: use first DRI device */
+#define DRM_DEV "/dev/dri/card0"    /* FIXME: use first DRI device */
 
 typedef struct drm_dev_s {
     uint32_t *buf;

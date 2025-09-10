@@ -1,0 +1,1 @@
+savedcmd_/home/arf20/projects/arfminesweeper/mod_src/Module.symvers :=  scripts/mod/modpost -M -m       -o /home/arf20/projects/arfminesweeper/mod_src/Module.symvers -n -T /home/arf20/projects/arfminesweeper/mod_src/modules.order -i Module.symvers -e 

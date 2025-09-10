@@ -15,7 +15,7 @@ if (KERNELHEADERS_DIR)
             ${KERNELHEADERS_DIR}/include
             ${KERNELHEADERS_DIR}/arch/x86/include
             CACHE PATH "Kernel headers include dirs"
-            )
+    )
     set(KERNELHEADERS_FOUND 1 CACHE STRING "Set to 1 if kernel headers were found")
 else (KERNELHEADERS_DIR)
     set(KERNELHEADERS_FOUND 0 CACHE STRING "Set to 1 if kernel headers were found")

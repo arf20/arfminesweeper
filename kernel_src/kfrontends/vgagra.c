@@ -40,7 +40,7 @@ static void
 render(unsigned char mode) {
     vgafb_clear_256(VGA_256_BLACK);
     //fbDrawString(5, 15, FB_WHITE, TXT_TITLE, sizeof(TXT_TITLE));
-    vgafb_bios_print(TXT_TITLE);
+    //vgafb_bios_print(TXT_TITLE);
 
     /* Check game state*/
     switch (gameGetState()) {

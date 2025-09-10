@@ -187,7 +187,7 @@ static struct file_operations fops = {
 };
 
 static char *
-arfmm_devnode(struct device *dev, umode_t *mode) {
+arfmm_devnode(const struct device *dev, umode_t *mode) {
     if (!mode)
         return NULL;
     if (dev->devt == MKDEV(major_number, 0))
@@ -205,7 +205,7 @@ arfmm_start(void) {
     }
 
     /* Register device class */
-    arfminesweeper_class = class_create(THIS_MODULE, CLASS_NAME);
+    arfminesweeper_class = class_create(CLASS_NAME);
     if (IS_ERR(arfminesweeper_class)) {
         unregister_chrdev(major_number, DEVICE_NAME);
         printk(KERN_ALERT "arfminesweeper: class_create failed\n");

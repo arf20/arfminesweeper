@@ -137,7 +137,7 @@ gameGetSurroundingMines(int x, int y) {
     return n;
 }
 
-int
+static int
 checkWin(void) {
     for (int i = 0; i < size * size; i++)
         if ((!CHECK_CLEAR(board[i]) && !CHECK_MINE(board[i]))
