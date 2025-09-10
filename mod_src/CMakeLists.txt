@@ -28,20 +28,24 @@ include_directories(${KERNELHEADERS_INCLUDE_DIRS})
 
 # make module
 set(MODULE_FILE "arfminesweeper.ko")
-set(BUILD_CMD ${CMAKE_MAKE_PROGRAM} -C ${KERNELHEADERS_DIR} modules M=${CMAKE_CURRENT_BINARY_DIR} src=${CMAKE_CURRENT_SOURCE_DIR})
-FILE(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Kbuild "obj-m := arfminesweeper.o
+set(BUILD_CMD )
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Kbuild "obj-m := arfminesweeper.o
 arfminesweeper-y := module.o ../common/game.o
 ")
 
 add_custom_command(
     OUTPUT ${MODULE_FILE}
-    COMMAND ${BUILD_CMD}
+    COMMAND ${CMAKE_MAKE_PROGRAM} -C ${KERNELHEADERS_DIR} M=${CMAKE_CURRENT_SOURCE_DIR} modules
+    COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && cp Module.symvers modules.order arfminesweeper.ko arfminesweeper.mod arfminesweeper.mod.c arfminesweeper.mod.o arfminesweeper.o module.o ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS module.c VERBATIM
 )
 
 if (KERNELHEADERS_FOUND)
-    add_custom_target(module ALL DEPENDS ${MODULE_FILE})
+    add_custom_target(
+        module
+        ALL DEPENDS ${MODULE_FILE}
+    )
     message(STATUS "Building linux kernel module")
 else()
     message(STATUS "Kernel headers required to build module")
