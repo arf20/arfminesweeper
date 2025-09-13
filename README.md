@@ -88,6 +88,9 @@ MAIN TARGET                       Linux BSD Mac Win
 LINUX MODULE TARGET
     Kernel module           DONE  X              
 
+ANDROID TARGET
+    Android NDK
+
 BIOS KERNEL TARGET                BIOS UEFI
     VGA text mode console   DONE  X    X
     VGA text mode           DONE  X    X
@@ -98,7 +101,8 @@ UEFI APPLICATION TARGET
     UEFI console                       X
 
 HARDWARE TARGET
-    SystemVerilog FPGA      
+    SystemVerilog
+    VHDL
 ```
 I apologize.
 
