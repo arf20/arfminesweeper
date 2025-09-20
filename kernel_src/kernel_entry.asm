@@ -23,6 +23,17 @@
 
 global _start
 
+section .text
 _start:
     call kmain
     hlt         ; halt CPU on kernel exit
+
+section .multiboot
+mb2_hdr_size equ 16 ; header size hardcoded
+_mb2_hdr:
+    dd 0xE85250D6
+    dd 0
+    dd mb2_hdr_size
+    dd -(0xE85250D6 + mb2_hdr_size)
+
+

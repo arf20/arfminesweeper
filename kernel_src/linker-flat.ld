@@ -5,9 +5,10 @@ SECTIONS
    . = 1K;
    .text BLOCK(4K) : ALIGN(4K)
    {
-       CMakeFiles/kernel.dir/kernel_entry.asm.o(.text)
+       CMakeFiles/kernel-flat.dir/kernel_entry.asm.o(.text)
        *(.text)
    }
    .data : { *(.data) }
    .bss  : { *(.bss)  }
  }
+
