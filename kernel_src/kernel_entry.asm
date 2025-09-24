@@ -25,15 +25,38 @@ global _start
 
 section .text
 _start:
-    call kmain
+    call    kmain
     hlt         ; halt CPU on kernel exit
 
 section .multiboot
-mb2_hdr_size equ 16 ; header size hardcoded
+    align 8
 _mb2_hdr:
-    dd 0xE85250D6
-    dd 0
-    dd mb2_hdr_size
-    dd -(0xE85250D6 + mb2_hdr_size)
+    ; mb2 header
+    dd  0xE85250D6                   ; magic
+    dd  0                            ; arch
+    dd  _mb2_hdr_end - _mb2_hdr      ; size
+    dd  -(0xE85250D6 + (_mb2_hdr_end - _mb2_hdr)) ; checksum
 
+    align 8
+_mb2_tag_entry:
+    dw  3   ; tag type
+    dw  0   ; flags
+    dd  12  ; size
+    dd  _start
+
+    align 8
+_mb2_tag_fb:
+    dw  5       ; tag type
+    dw  0       ; flags
+    dd  20      ; size
+    dd  1024    ; width
+    dd  768     ; height
+    dd  32
+
+    align 8
+_mb2_tag_end: 
+    dw 0    ; end tag
+    dw 0
+    dd 8
+_mb2_hdr_end:
 

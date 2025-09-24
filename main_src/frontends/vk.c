@@ -75,7 +75,8 @@ static char *validationLayer = NULL;
 
 #define EXTENSIONS VK_KHR_SWAPCHAIN_EXTENSION_NAME
 static const char *requiredExtensions[] = { EXTENSIONS };
-static size_t requiredExtCount = sizeof(requiredExtensions) / sizeof(requiredExtensions[0]);
+static size_t requiredExtCount = sizeof(requiredExtensions)
+    / sizeof(requiredExtensions[0]);
 
 #define FORMAT      VK_FORMAT_B8G8R8A8_SRGB
 #define COLORSPACE  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR

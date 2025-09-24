@@ -1,3 +1,0 @@
-savedcmd_/home/arf20/projects/arfminesweeper/mod_src/arfminesweeper.o := x86_64-linux-gnu-ld -m elf_x86_64 -z noexecstack --no-warn-rwx-segments   -r -o /home/arf20/projects/arfminesweeper/mod_src/arfminesweeper.o @/home/arf20/projects/arfminesweeper/mod_src/arfminesweeper.mod  ; ./tools/objtool/objtool --hacks=jump_label --hacks=noinstr --hacks=skylake --ibt --orc --retpoline --rethunk --sls --static-call --uaccess --prefix=16  --link  --module /home/arf20/projects/arfminesweeper/mod_src/arfminesweeper.o
-
-/home/arf20/projects/arfminesweeper/mod_src/arfminesweeper.o: $(wildcard ./tools/objtool/objtool)

@@ -176,3 +176,4 @@ debugstr db 'ARFBOOT', 0x0d, 0x0a, 0
 ; padding
 times 510 - ($-$$) db 0
 dw 0xaa55 ; MBR signature
+
