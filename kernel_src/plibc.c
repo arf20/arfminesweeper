@@ -95,6 +95,8 @@ utoa(unsigned int num, int base) {
 	    num /= base;
     }
     
+    buff[i] = '\0';
+
     reverse(buff, i);
 
     return buff;
@@ -494,3 +496,4 @@ getsn(char *buff, size_t n) {
     buff[i] = '\0';
     return buff;
 }
+
