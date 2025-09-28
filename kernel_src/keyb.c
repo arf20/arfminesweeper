@@ -105,3 +105,4 @@ keyb_getc() {
 
     return keymap_en_us[scancode];
 }
+

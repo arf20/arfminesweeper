@@ -1,5 +1,5 @@
 OUTPUT_FORMAT(elf32-i386)
-ENTRY(_mb2_entry)
+ENTRY(mb2_entry)
 SECTIONS
 {
     . = 1K;

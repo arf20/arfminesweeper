@@ -23,15 +23,18 @@
 
 global _start
 
-STACK_SIZE  equ 0x4000
+STACK_SIZE:  equ 0x4000
 
 section .text
 _start:
     jmp mb2_entry
 
 mb2_entry:
+    ; first: read the entirety of
+    ; https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html
+
     ; set stack
-    mov     comm + STACK_SIZE, esp
+    mov     esp, stack + STACK_SIZE
     ; clear EFLAGS
     push    0
     popf
@@ -57,7 +60,7 @@ _mb2_tag_entry:
     dw  3   ; tag type
     dw  0   ; flags
     dd  12  ; size
-    dd  _mb2_start
+    dd  mb2_entry
 
     align 8
 _mb2_tag_fb:
@@ -76,5 +79,5 @@ _mb2_tag_end:
 _mb2_hdr_end:
 
 section .bss
-    common stack    STACK_SIZE
+    common stack    0x4000
 

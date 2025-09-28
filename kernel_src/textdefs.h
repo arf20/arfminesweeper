@@ -23,7 +23,7 @@
 
 #define TXT_HELLO \
     "arfminesweeper "ARFMINESWEEPER_VERSION "-" ARFMINESWEEPER_NUM_COMMIT" by arf20\n"\
-    "Copyright 2023 Angel Ruiz Fernandez\n"\
+    "Copyright 2023-25 Angel Ruiz Fernandez\n"\
     "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n"
 
 #define TXT_MENU \

@@ -33,13 +33,125 @@
 #include "kfrontends/vgatui.h"
 #include "kfrontends/vgagra.h"
 
+#include "multiboot2.h"
+
 void
-kmain() {
+kmain(unsigned long mbmagic, unsigned long mbiaddr) {
     /* Defaults */
     unsigned char vgamode = 0x03, vgagmode = 0x13, vgafont = 0x04;
     int size = 8, mines = 10;
     char ibuf[256];
     memset(ibuf, 0, 256);
+
+    vga_init(vgamode, vgafont);
+    vga_clear();
+
+    /* parse multiboot data */
+    if (mbmagic != MULTIBOOT2_BOOTLOADER_MAGIC) {
+        kprintf("Invalid magic number: 0x%x\n", (unsigned int)mbmagic);
+        goto cold_start;
+    }
+
+    if (mbiaddr & 7) {
+        kprintf("Unaligned mbi: 0x%x\n", mbiaddr);
+        return;
+    }
+
+    kprintf("multiboot2 tags:\n");
+
+    unsigned int mbisize = *(unsigned int*)mbiaddr;
+    struct multiboot_tag *tag = NULL;
+    for (tag = (struct multiboot_tag *)(mbiaddr + 8);
+        tag->type != MULTIBOOT_TAG_TYPE_END;
+        tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag 
+        + ((tag->size + 7) & ~7)))
+    {
+        kprintf("Tag 0x%x, Size 0x%x\n", tag->type, tag->size);
+        switch (tag->type) {
+        case MULTIBOOT_TAG_TYPE_CMDLINE:
+            kprintf("Command line = %s\n",
+                ((struct multiboot_tag_string*)tag)->string);
+        break;
+        case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
+            kprintf("Boot loader name = %s\n",
+                ((struct multiboot_tag_string*)tag)->string);
+        break;
+        case MULTIBOOT_TAG_TYPE_MODULE:
+            kprintf("Module at 0x%x-0x%x. Command line %s\n",
+                ((struct multiboot_tag_module*)tag)->mod_start,
+                ((struct multiboot_tag_module*)tag)->mod_end,
+                ((struct multiboot_tag_module*)tag)->cmdline);
+        break;
+        case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
+            kprintf("mem_lower = %uKB, mem_upper = %uKB\n",
+                ((struct multiboot_tag_basic_meminfo*)tag)->mem_lower,
+                ((struct multiboot_tag_basic_meminfo*)tag)->mem_upper);
+        break;
+        case MULTIBOOT_TAG_TYPE_BOOTDEV:
+            kprintf("Boot device 0x%x,%u,%u\n",
+                ((struct multiboot_tag_bootdev*)tag)->biosdev,
+                ((struct multiboot_tag_bootdev*)tag)->slice,
+                ((struct multiboot_tag_bootdev*)tag)->part);
+        break;
+        case MULTIBOOT_TAG_TYPE_FRAMEBUFFER: {
+            multiboot_uint32_t color;
+            unsigned i;
+            struct multiboot_tag_framebuffer *tagfb
+                = (struct multiboot_tag_framebuffer*)tag;
+            void *fb = (void *) (unsigned long) tagfb->common.framebuffer_addr;
+
+            kprintf("Frame buffer type = ");
+
+            switch (tagfb->common.framebuffer_type) {
+            case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED: {
+                kprintf("indexed, ");
+                unsigned best_distance, distance;
+                struct multiboot_color *palette;
+            
+                palette = tagfb->framebuffer_palette;
+
+                color = 0;
+                best_distance = 4*256*256;
+            
+                for (i = 0; i < tagfb->framebuffer_palette_num_colors; i++) {
+                    distance = (0xff - palette[i].blue) 
+                        * (0xff - palette[i].blue)
+                        + palette[i].red * palette[i].red
+                        + palette[i].green * palette[i].green;
+                    if (distance < best_distance) {
+                        color = i;
+                        best_distance = distance;
+                    }
+                }
+            } break;
+            case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
+                kprintf("rgb, ");
+                color = ((1 << tagfb->framebuffer_blue_mask_size) - 1) 
+                    << tagfb->framebuffer_blue_field_position;
+            break;
+            case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
+                kprintf("ega text, ");
+                color = '\\' | 0x0100;
+            break;
+            default:
+                color = 0xffffffff;
+            break;
+            }
+            
+            kprintf("bpp = %d, pitch = %d, size = %dx%d\n",
+                tagfb->common.framebuffer_bpp,
+                tagfb->common.framebuffer_pitch,
+                tagfb->common.framebuffer_width,
+                tagfb->common.framebuffer_height
+            );
+        }
+        }
+    }
+    tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag 
+        + ((tag->size + 7) & ~7));
+    kprintf("Total mbi size 0x%x\nPress any key to continue", (unsigned)tag - mbiaddr);
+
+    getchar();
 
 cold_start:
     /* clear screen, set up terminal */
@@ -54,7 +166,7 @@ warm_start:
     kprintf("\nCurrent config: %dx%d size, %d mines, text mode %2Xh, graphic mode %2Xh\n", size, size, mines, vgamode, vgagmode);
 
     while (1) {
-        char sel = keyb_getc();
+        char sel = getchar();
         
         switch (sel) {
             case 'h': return;
@@ -120,7 +232,7 @@ warm_start:
                 vgagra_start(gameGetBoard(), size, vgagmode);
                 goto cold_start;
             } break;
-            default: kprintf("Wrong key "); break;
+            default: break;
         }
     }
 }
