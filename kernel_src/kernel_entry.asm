@@ -23,10 +23,25 @@
 
 global _start
 
+STACK_SIZE  equ 0x4000
+
 section .text
 _start:
+    jmp mb2_entry
+
+mb2_entry:
+    ; set stack
+    mov     comm + STACK_SIZE, esp
+    ; clear EFLAGS
+    push    0
+    popf
+    ; push magic, multiboot info
+    push    ebx
+    push    eax
+    ; call C kernel
     call    kmain
-    hlt         ; halt CPU on kernel exit
+    ; halt
+    hlt
 
 section .multiboot
     align 8
@@ -42,7 +57,7 @@ _mb2_tag_entry:
     dw  3   ; tag type
     dw  0   ; flags
     dd  12  ; size
-    dd  _start
+    dd  _mb2_start
 
     align 8
 _mb2_tag_fb:
@@ -59,4 +74,7 @@ _mb2_tag_end:
     dw 0
     dd 8
 _mb2_hdr_end:
+
+section .bss
+    common stack    STACK_SIZE
 
