@@ -7,4 +7,5 @@ CMakeSettings.json
 *.ccls-cache/
 *.spv
 *.class
+.*
 

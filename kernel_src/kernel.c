@@ -39,6 +39,9 @@ void
 kmain(unsigned long mbmagic, unsigned long mbiaddr) {
     /* Defaults */
     unsigned char vgamode = 0x03, vgagmode = 0x13, vgafont = 0x04;
+    
+    unsigned char vga = 1;
+
     int size = 8, mines = 10;
     char ibuf[256];
     memset(ibuf, 0, 256);
@@ -57,8 +60,6 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
         return;
     }
 
-    kprintf("multiboot2 tags:\n");
-
     unsigned int mbisize = *(unsigned int*)mbiaddr;
     struct multiboot_tag *tag = NULL;
     for (tag = (struct multiboot_tag *)(mbiaddr + 8);
@@ -66,91 +67,53 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
         tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag 
         + ((tag->size + 7) & ~7)))
     {
-        kprintf("Tag 0x%x, Size 0x%x\n", tag->type, tag->size);
         switch (tag->type) {
-        case MULTIBOOT_TAG_TYPE_CMDLINE:
-            kprintf("Command line = %s\n",
-                ((struct multiboot_tag_string*)tag)->string);
-        break;
-        case MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME:
-            kprintf("Boot loader name = %s\n",
-                ((struct multiboot_tag_string*)tag)->string);
-        break;
-        case MULTIBOOT_TAG_TYPE_MODULE:
-            kprintf("Module at 0x%x-0x%x. Command line %s\n",
-                ((struct multiboot_tag_module*)tag)->mod_start,
-                ((struct multiboot_tag_module*)tag)->mod_end,
-                ((struct multiboot_tag_module*)tag)->cmdline);
-        break;
-        case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
-            kprintf("mem_lower = %uKB, mem_upper = %uKB\n",
-                ((struct multiboot_tag_basic_meminfo*)tag)->mem_lower,
-                ((struct multiboot_tag_basic_meminfo*)tag)->mem_upper);
-        break;
-        case MULTIBOOT_TAG_TYPE_BOOTDEV:
-            kprintf("Boot device 0x%x,%u,%u\n",
-                ((struct multiboot_tag_bootdev*)tag)->biosdev,
-                ((struct multiboot_tag_bootdev*)tag)->slice,
-                ((struct multiboot_tag_bootdev*)tag)->part);
-        break;
+        /* select vga or fb UI */
+        case MULTIBOOT_TAG_TYPE_CMDLINE: {
+            const char *cmdline = ((struct multiboot_tag_string*)tag)->string;
+            if (strcmp(cmdline, "vga") == 0)
+                vga = 1;
+            else if (strcmp(cmdline, "fb") == 0)
+                vga = 0;
+            else
+                vga = 1;
+        } break;
         case MULTIBOOT_TAG_TYPE_FRAMEBUFFER: {
-            multiboot_uint32_t color;
             unsigned i;
             struct multiboot_tag_framebuffer *tagfb
                 = (struct multiboot_tag_framebuffer*)tag;
-            void *fb = (void *) (unsigned long) tagfb->common.framebuffer_addr;
-
-            kprintf("Frame buffer type = ");
+            void *fb = (void*)(unsigned long)tagfb->common.framebuffer_addr;
 
             switch (tagfb->common.framebuffer_type) {
-            case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED: {
-                kprintf("indexed, ");
-                unsigned best_distance, distance;
-                struct multiboot_color *palette;
-            
-                palette = tagfb->framebuffer_palette;
-
-                color = 0;
-                best_distance = 4*256*256;
-            
-                for (i = 0; i < tagfb->framebuffer_palette_num_colors; i++) {
-                    distance = (0xff - palette[i].blue) 
-                        * (0xff - palette[i].blue)
-                        + palette[i].red * palette[i].red
-                        + palette[i].green * palette[i].green;
-                    if (distance < best_distance) {
-                        color = i;
-                        best_distance = distance;
-                    }
-                }
-            } break;
             case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
-                kprintf("rgb, ");
-                color = ((1 << tagfb->framebuffer_blue_mask_size) - 1) 
-                    << tagfb->framebuffer_blue_field_position;
+                /* support only 8888-BGRX framebuffers */
+                if (tagfb->common.framebuffer_bpp == 32 &&
+                    tagfb->framebuffer_red_field_position == 16 &&
+                    tagfb->framebuffer_red_mask_size == 8 &&
+                    tagfb->framebuffer_green_field_position == 8 &&
+                    tagfb->framebuffer_green_mask_size == 8 &&
+                    tagfb->framebuffer_blue_field_position == 8
+                    tagfb->framebuffer_blue_mask_size == 8
+                ) {
+                    vga = vga || 0;
+                } else {
+                    vga = 1;
+                    kprintf("Unsupported framebuffer\n");
+                }
             break;
             case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
-                kprintf("ega text, ");
-                color = '\\' | 0x0100;
+                vga = 1;
             break;
             default:
-                color = 0xffffffff;
+                vga = 1;
+                kprintf("Framebuffer not supported\n");
             break;
             }
-            
-            kprintf("bpp = %d, pitch = %d, size = %dx%d\n",
-                tagfb->common.framebuffer_bpp,
-                tagfb->common.framebuffer_pitch,
-                tagfb->common.framebuffer_width,
-                tagfb->common.framebuffer_height
-            );
         }
         }
     }
-    tag = (struct multiboot_tag *) ((multiboot_uint8_t *) tag 
-        + ((tag->size + 7) & ~7));
-    kprintf("Total mbi size 0x%x\nPress any key to continue", (unsigned)tag - mbiaddr);
 
+    kprintf("Press any key to continue\n");
     getchar();
 
 cold_start:

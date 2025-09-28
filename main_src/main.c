@@ -155,9 +155,9 @@ printFrontends() {
 
 int
 main(int argc, char **argv) {
-    printf("arfminesweeper " ARFMINESWEEPER_VERSION "-" ARFMINESWEEPER_NUM_COMMIT
-        " by arf20\n"
-        "Copyright 2023 Ángel Ruiz Fernandez\n"
+    printf("arfminesweeper " ARFMINESWEEPER_VERSION "-"
+        ARFMINESWEEPER_NUM_COMMIT "\n"
+        "Copyright (C) 2023-25 Ángel Ruiz Fernandez <arf20@arf20.com>\n"
         "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n\n");
 
     printFrontends();
