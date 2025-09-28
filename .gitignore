@@ -8,4 +8,9 @@ CMakeSettings.json
 *.spv
 *.class
 .*
+mod_src/Module.symvers
+*.ko
+*.mod
+*.mod.c
+*.order
 

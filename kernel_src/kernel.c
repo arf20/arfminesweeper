@@ -92,7 +92,7 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
                     tagfb->framebuffer_red_mask_size == 8 &&
                     tagfb->framebuffer_green_field_position == 8 &&
                     tagfb->framebuffer_green_mask_size == 8 &&
-                    tagfb->framebuffer_blue_field_position == 8
+                    tagfb->framebuffer_blue_field_position == 8 &&
                     tagfb->framebuffer_blue_mask_size == 8
                 ) {
                     vga = vga || 0;
