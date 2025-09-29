@@ -23,7 +23,7 @@
 #include "keyb.h"
 
 #include "port.h"
-#include "vgacon.h"
+#include "plibc.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -80,7 +80,7 @@ keyb_poll() {
 			if (scancode > 0)
 				return scancode;
             else {
-                vga_print_string("keyb_poll: keyb error\n", -1);
+                kprintf("keyb_poll: keyb error\n");
                 return 0;
             }
 		}

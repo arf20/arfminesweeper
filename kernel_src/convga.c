@@ -16,11 +16,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    vgacon.c: VGA console driver
+    convga.c: VGA console driver
 
 */
 
-#include "vgacon.h"
+#include "convga.h"
 
 #include "port.h"
 #include "int32.h"

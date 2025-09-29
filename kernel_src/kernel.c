@@ -22,9 +22,9 @@
 
 #include "plibc.h"
 #include "keyb.h"
-#include "vgacon.h"
 #include "textdefs.h"
 #include "alloc.h"
+#include "console.h"
 
 #include <stdint.h>
 
@@ -39,15 +39,12 @@ void
 kmain(unsigned long mbmagic, unsigned long mbiaddr) {
     /* Defaults */
     unsigned char vgamode = 0x03, vgagmode = 0x13, vgafont = 0x04;
-    
+    unsigned int fbwidth = 0, fbheight = 0;
     unsigned char vga = 1;
 
     int size = 8, mines = 10;
     char ibuf[256];
     memset(ibuf, 0, 256);
-
-    vga_init(vgamode, vgafont);
-    vga_clear();
 
     /* parse multiboot data */
     if (mbmagic != MULTIBOOT2_BOOTLOADER_MAGIC) {
@@ -96,6 +93,8 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
                     tagfb->framebuffer_blue_mask_size == 8
                 ) {
                     vga = vga || 0;
+                    fbwidth = tagfb->common.framebuffer_width;
+                    fbheight = tagfb->common.framebuffer_height;
                 } else {
                     vga = 1;
                     kprintf("Unsupported framebuffer\n");
@@ -113,23 +112,28 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
         }
     }
 
-    kprintf("Press any key to continue\n");
-    getchar();
-
 cold_start:
     /* clear screen, set up terminal */
-    vga_init(vgamode, vgafont);
+    if (vga)
+        con_init_vga(vgamode, vgafont);
+    else
+        con_init_fb(fbwidth, fbheight);
 
     /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
     alloc_init((void*)0x00100000, (void*)0x001fffff);
 
 warm_start:
-    vga_clear();
+    con_clear();
     kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
-    kprintf("\nCurrent config: %dx%d size, %d mines, text mode %2Xh, graphic mode %2Xh\n", size, size, mines, vgamode, vgagmode);
+    kprintf("\nCurrent config: %dx%d size, %d mines; ", size, size, mines);
+    if (vga)
+        kprintf("vga text mode %2Xh, vga font %2Xh, vga graphic mode %2Xh\n",
+            vgamode, vgagmode);
+    else
+        kprintf("fb 8888BGRX width %d height %d\n", fbwidth, fbheight);
 
     while (1) {
-        char sel = getchar();
+        char sel = keyb_getc();
         
         switch (sel) {
             case 'h': return;
@@ -146,21 +150,21 @@ warm_start:
                 goto warm_start;
             } break;
             case 'v': {
-                vga_clear();
+                con_clear();
                 kprintf(TXT_TEXT_MODES);
                 getsn(ibuf, 256);
                 vgamode = strtol(ibuf, NULL, 16);
                 goto cold_start;
             } break;
             case 'f': {
-                vga_clear();
+                con_clear();
                 kprintf(TXT_FONT);
                 getsn(ibuf, 256);
                 vgafont = strtol(ibuf, NULL, 16);
                 goto cold_start;
             } break;
             case 'g': {
-                vga_clear();
+                con_clear();
                 kprintf(TXT_GRAPHIC_MODES);
                 getsn(ibuf, 256);
                 vgagmode = strtol(ibuf, NULL, 16);

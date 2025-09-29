@@ -103,3 +103,4 @@ vgag_init(unsigned char mode) {
         case 0x13: vgafb_width = 320; vgafb_height = 200; vgafb_colors = 256; fb = (unsigned char*)0xa0000; break;
     }
 }
+

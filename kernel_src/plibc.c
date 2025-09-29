@@ -26,7 +26,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#include "vgacon.h"
+#include "console.h"
 #include "keyb.h"
 
 /* ======== Internal utils ======== */
@@ -366,14 +366,14 @@ leftpad(char *str, int n, char c) {
 /* ======== Standard input and output functions ======== */
 char
 putchar(char c) {
-    vga_print_char(c, -1);
+    con_print_char(c, -1);
     return c;
 }
 
 int
 puts(const char *s) {
     if (!s) {
-        puts("puts: imagine this is a segfault\n");
+        puts("puts: imagine this is a segfault\n"); /* YIKES */
         return 0;
     }
 
