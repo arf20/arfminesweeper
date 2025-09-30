@@ -22,7 +22,7 @@
 #define _CONSOLE_H
 
 void con_init_vga(unsigned char mode, unsigned char font);
-void con_init_fb(int width, int height);
+void con_init_fb(void *fbaddr, int width, int height);
 
 void con_clear();
 void con_print_char(char c, int off);

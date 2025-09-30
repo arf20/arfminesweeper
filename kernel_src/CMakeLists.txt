@@ -1,4 +1,5 @@
 set (NASM_PROGRAM "nasm")
+set (C_STANDARD 99)
 
 add_compile_definitions(ARFMINESWEEPER_VERSION="${ARFMINESWEEPER_VERSION}")
 add_compile_definitions(ARFMINESWEEPER_NUM_COMMIT="${ARFMINESWEEPER_NUM_COMMIT}")
@@ -32,6 +33,7 @@ file (GLOB KERN_SRC
     "port.c"
     "console.c"
     "convga.c"
+    "conrgbfb.c"
     "vgafb.c"
     "keyb.c"
     "alloc.c"

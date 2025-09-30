@@ -363,6 +363,28 @@ leftpad(char *str, int n, char c) {
     return str;
 }
 
+
+
+char *
+strcpy(char *dst, const char *src) {
+    char *dstcur = dst;
+    while (*src)
+        *dstcur++ = *src++;
+    *dstcur = '\0';
+    return dst;
+}
+
+char *
+strcat(char *dst, const char *src) {
+    char *dstcur = dst;
+    while (*dstcur)
+        dstcur++;
+    while (*src)
+        *dstcur++ = *src++;
+    *dstcur = '\0';
+    return dst;
+}
+
 /* ======== Standard input and output functions ======== */
 char
 putchar(char c) {

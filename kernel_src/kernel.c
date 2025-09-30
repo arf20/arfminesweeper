@@ -40,11 +40,14 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
     /* Defaults */
     unsigned char vgamode = 0x03, vgagmode = 0x13, vgafont = 0x04;
     unsigned int fbwidth = 0, fbheight = 0;
+    void *fbaddr = 0;
     unsigned char vga = 1;
 
     int size = 8, mines = 10;
     char ibuf[256];
     memset(ibuf, 0, 256);
+
+    char error[256] = { 0 };
 
     /* parse multiboot data */
     if (mbmagic != MULTIBOOT2_BOOTLOADER_MAGIC) {
@@ -54,7 +57,7 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
 
     if (mbiaddr & 7) {
         kprintf("Unaligned mbi: 0x%x\n", mbiaddr);
-        return;
+        goto cold_start;
     }
 
     unsigned int mbisize = *(unsigned int*)mbiaddr;
@@ -79,7 +82,7 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
             unsigned i;
             struct multiboot_tag_framebuffer *tagfb
                 = (struct multiboot_tag_framebuffer*)tag;
-            void *fb = (void*)(unsigned long)tagfb->common.framebuffer_addr;
+            fbaddr = (void*)(unsigned long)tagfb->common.framebuffer_addr;
 
             switch (tagfb->common.framebuffer_type) {
             case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
@@ -89,7 +92,7 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
                     tagfb->framebuffer_red_mask_size == 8 &&
                     tagfb->framebuffer_green_field_position == 8 &&
                     tagfb->framebuffer_green_mask_size == 8 &&
-                    tagfb->framebuffer_blue_field_position == 8 &&
+                    tagfb->framebuffer_blue_field_position == 0 &&
                     tagfb->framebuffer_blue_mask_size == 8
                 ) {
                     vga = vga || 0;
@@ -97,7 +100,23 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
                     fbheight = tagfb->common.framebuffer_height;
                 } else {
                     vga = 1;
-                    kprintf("Unsupported framebuffer\n");
+                    /* we have to sprintf */
+                    strcpy(error, "Unsupported framebuffer properties\n"
+                        "bpp,rf,rs,gf,gs,bf,bs: ");
+                    strcat(error, utoa(tagfb->common.framebuffer_bpp, 10));
+                    strcat(error, ", ");
+                    strcat(error, utoa(tagfb->framebuffer_red_field_position, 10));
+                    strcat(error, ", ");
+                    strcat(error, utoa(tagfb->framebuffer_red_mask_size, 10));
+                    strcat(error, ", ");
+                    strcat(error, utoa(tagfb->framebuffer_green_field_position, 10));
+                    strcat(error, ", ");
+                    strcat(error, utoa(tagfb->framebuffer_green_mask_size, 10));
+                    strcat(error, ", ");
+                    strcat(error, utoa(tagfb->framebuffer_blue_field_position, 10));
+                    strcat(error, ", ");
+                    strcat(error, utoa(tagfb->framebuffer_blue_mask_size, 10));
+                    strcat(error, "\n");
                 }
             break;
             case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
@@ -105,7 +124,7 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
             break;
             default:
                 vga = 1;
-                kprintf("Framebuffer not supported\n");
+                strcpy(error, "Unsupported framebuffer type\n");
             break;
             }
         }
@@ -117,14 +136,14 @@ cold_start:
     if (vga)
         con_init_vga(vgamode, vgafont);
     else
-        con_init_fb(fbwidth, fbheight);
+        con_init_fb(fbaddr, fbwidth, fbheight);
 
     /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
     alloc_init((void*)0x00100000, (void*)0x001fffff);
 
 warm_start:
     con_clear();
-    kprintf("%s\n%s", TXT_HELLO, TXT_MENU);
+    kprintf("%s%s\n%s", error, TXT_HELLO, TXT_MENU); 
     kprintf("\nCurrent config: %dx%d size, %d mines; ", size, size, mines);
     if (vga)
         kprintf("vga text mode %2Xh, vga font %2Xh, vga graphic mode %2Xh\n",

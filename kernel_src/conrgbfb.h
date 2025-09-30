@@ -16,46 +16,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    console.c: console abstraction
-
 */
 
-#include "console.h"
+#ifndef _CONRGBFB_H
+#define _CONRGBFB_H
 
-#include "convga.h"
-#include "conrgbfb.h"
+void fb_clear();
+void fb_print_char(char c, int off);
 
+void fb_init(void *fbaddr, unsigned int width, unsigned int height);
 
-static void(*_print_char)(char, int) = 0;
-static void(*_clear)() = 0;
-
-void
-con_init_vga(unsigned char mode, unsigned char font) {
-    _print_char = vga_print_char;
-    _clear = vga_clear;
-
-    vga_init(mode, font);
-}
-
-void
-con_init_fb(void *fbaddr, int width, int height) {
-    _print_char = fb_print_char;
-    _clear = fb_clear;
-
-    fb_init(fbaddr, width, height);
-}
-
-void
-con_clear() {
-    if (!_clear)
-        return;
-    _clear();
-}
-
-void
-con_print_char(char c, int off) {
-    if (!_print_char)
-        return;
-    _print_char(c, off);
-}
+#endif /* _CONRGBFB_H */
 

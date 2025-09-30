@@ -38,6 +38,8 @@ char *strchr(const char *str, char c);
 char *strstr(const char *haystack, const char *needle);
 char *strtok(char *str, const char *delim);
 void *memset(void *s, char c, size_t n);
+char *strcpy(char *dst, const char *src);
+char *strcat(char *dst, const char *src);
 
 char putchar(char c);
 int puts(const char *s);

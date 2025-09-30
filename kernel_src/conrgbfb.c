@@ -16,46 +16,36 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    console.c: console abstraction
+    conrgbfb.c: 8888RGBX graphic framebuffer console
 
 */
 
-#include "console.h"
-
-#include "convga.h"
 #include "conrgbfb.h"
 
-
-static void(*_print_char)(char, int) = 0;
-static void(*_clear)() = 0;
+static unsigned int width = 0, height = 0;
+unsigned int *fb = 0;
 
 void
-con_init_vga(unsigned char mode, unsigned char font) {
-    _print_char = vga_print_char;
-    _clear = vga_clear;
-
-    vga_init(mode, font);
+fb_clear() {
+    while (1) {
+    for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++)
+            fb[(width * y) + x] = 0xffffffff;
+    for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++)
+            fb[(width * y) + x] = 0x000000ff;
+    }
 }
 
 void
-con_init_fb(void *fbaddr, int width, int height) {
-    _print_char = fb_print_char;
-    _clear = fb_clear;
+fb_print_char(char c, int off) {
 
-    fb_init(fbaddr, width, height);
 }
 
 void
-con_clear() {
-    if (!_clear)
-        return;
-    _clear();
-}
-
-void
-con_print_char(char c, int off) {
-    if (!_print_char)
-        return;
-    _print_char(c, off);
+fb_init(void *fbaddr, unsigned int _width, unsigned int _height) {
+    fb = (unsigned int*)fbaddr;
+    width = _width;
+    height = _height;
 }
 
