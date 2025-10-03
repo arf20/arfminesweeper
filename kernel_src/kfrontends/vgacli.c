@@ -148,3 +148,4 @@ vgacli_start(const int *lboard, int lsize) {
 void vgacli_destroy() {
 
 }
+

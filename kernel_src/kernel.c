@@ -44,7 +44,7 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
     unsigned char vga = 1;
 
     int size = 8, mines = 10;
-    char ibuf[256];
+    char ibuf[2048];
     memset(ibuf, 0, 256);
 
     char error[256] = { 0 };
@@ -134,9 +134,9 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
 cold_start:
     /* clear screen, set up terminal */
     if (vga)
-        con_init_vga(vgamode, vgafont);
+        con_init_convga(vgamode, vgafont);
     else
-        con_init_fb(fbaddr, fbwidth, fbheight);
+        con_init_fbrgb(fbaddr, fbwidth, fbheight);
 
     /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
     alloc_init((void*)0x00100000, (void*)0x001fffff);
@@ -158,34 +158,34 @@ warm_start:
             case 'h': return;
             case 's': {
                 kprintf("size> ");
-                getsn(ibuf, 256);
+                getsn(ibuf, 2048);
                 size = atoi(ibuf);
                 goto warm_start;
             } break;
             case 'm': {
                 kprintf("mines> ");
-                getsn(ibuf, 256);
+                getsn(ibuf, 2048);
                 mines = atoi(ibuf);
                 goto warm_start;
             } break;
             case 'v': {
                 con_clear();
                 kprintf(TXT_TEXT_MODES);
-                getsn(ibuf, 256);
+                getsn(ibuf, 2048);
                 vgamode = strtol(ibuf, NULL, 16);
                 goto cold_start;
             } break;
             case 'f': {
                 con_clear();
                 kprintf(TXT_FONT);
-                getsn(ibuf, 256);
+                getsn(ibuf, 2048);
                 vgafont = strtol(ibuf, NULL, 16);
                 goto cold_start;
             } break;
             case 'g': {
                 con_clear();
                 kprintf(TXT_GRAPHIC_MODES);
-                getsn(ibuf, 256);
+                getsn(ibuf, 2048);
                 vgagmode = strtol(ibuf, NULL, 16);
                 goto warm_start;
             } break;
@@ -222,3 +222,4 @@ warm_start:
         }
     }
 }
+    

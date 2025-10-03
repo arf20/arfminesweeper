@@ -20,7 +20,7 @@
 
 */
 
-#include "vgafb.h"
+#include "fbvga.h"
 
 #include "int32.h"
 

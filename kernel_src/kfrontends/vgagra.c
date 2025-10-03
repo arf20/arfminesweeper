@@ -28,7 +28,7 @@
 #include "../../common/game.h"
 #include "../../common/frontconf.h"
 
-#include "../vgafb.h"
+#include "../fbvga.h"
 #include "../plibc.h"
 
 static int size = 0;

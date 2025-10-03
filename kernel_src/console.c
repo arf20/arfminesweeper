@@ -23,39 +23,79 @@
 #include "console.h"
 
 #include "convga.h"
-#include "conrgbfb.h"
+#include "fbrgb.h"
 
 
-static void(*_print_char)(char, int) = 0;
-static void(*_clear)() = 0;
+static const console_interface_t *con = 0;
+
+static int x = 0, y = 0, c = 0;
 
 void
-con_init_vga(unsigned char mode, unsigned char font) {
-    _print_char = vga_print_char;
-    _clear = vga_clear;
-
-    vga_init(mode, font);
+con_init_convga(unsigned char mode, unsigned char font) {
+    con = convga_init(mode, font);
+    con->set_cursor(x, y);
 }
 
 void
-con_init_fb(void *fbaddr, int width, int height) {
-    _print_char = fb_print_char;
-    _clear = fb_clear;
-
-    fb_init(fbaddr, width, height);
+con_init_fbrgb(void *fbaddr, int width, int height) {
+    con = fbrgb_init(fbaddr, width, height);
+    con->set_cursor(x, y);
 }
 
 void
 con_clear() {
-    if (!_clear)
-        return;
-    _clear();
+    con->clear();
+    x = 0;
+    y = 0;
+    con->set_cursor(x, y);
 }
 
 void
-con_print_char(char c, int off) {
-    if (!_print_char)
-        return;
-    _print_char(c, off);
+con_print_char(char c) {
+    /* handle control characters */
+    if (c == '\n') {
+        con->set_char(' ', x, y);
+        y++;
+        x = 0;
+    } else if (c == '\b') {
+        x--;
+        if (x<0) {
+            y--;
+            x = con->width - 1;
+        }
+    } else {
+        con->set_char(c, x, y);
+        x++;
+        if (x >= con->width) {
+            y++;
+            x = 0;
+        }
+    }
+
+    /* if after printing, cursor is ouside the screen, do scroll */
+    if (y >= con->height) {
+        con->scroll_line();
+        y--;
+    }
+
+    con->set_cursor(x, y);
+}
+
+void
+con_print_string(const char *s) {
+    while (*s)
+        con_print_char(*s++);
+}
+
+void
+con_move_cursor(int _x, int _y) {
+    x = _x;
+    y = _y;
+    con->set_cursor(x, y);
+}
+
+void
+con_set_device_color(int c) {
+    con->set_color(c);
 }
 

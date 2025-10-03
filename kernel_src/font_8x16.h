@@ -16,36 +16,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    conrgbfb.c: 8888RGBX graphic framebuffer console
-
 */
 
-#include "conrgbfb.h"
+#ifndef _FONT_8X16_H
+#define _FONT_8X16_H
 
-static unsigned int width = 0, height = 0;
-unsigned int *fb = 0;
+#define FWIDTH  8
+#define FHEIGHT 16
 
-void
-fb_clear() {
-    while (1) {
-    for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++)
-            fb[(width * y) + x] = 0xffffffff;
-    for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++)
-            fb[(width * y) + x] = 0x000000ff;
-    }
-}
+extern const unsigned char fontdata_8x16[256*FWIDTH*FHEIGHT];
 
-void
-fb_print_char(char c, int off) {
-
-}
-
-void
-fb_init(void *fbaddr, unsigned int _width, unsigned int _height) {
-    fb = (unsigned int*)fbaddr;
-    width = _width;
-    height = _height;
-}
+#endif /* _FONT_8X16_H */
 

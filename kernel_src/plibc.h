@@ -40,6 +40,7 @@ char *strtok(char *str, const char *delim);
 void *memset(void *s, char c, size_t n);
 char *strcpy(char *dst, const char *src);
 char *strcat(char *dst, const char *src);
+void memcpy(const char *src, char *dst, int n);
 
 char putchar(char c);
 int puts(const char *s);

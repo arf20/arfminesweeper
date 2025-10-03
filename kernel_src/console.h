@@ -21,11 +21,30 @@
 #ifndef _CONSOLE_H
 #define _CONSOLE_H
 
-void con_init_vga(unsigned char mode, unsigned char font);
-void con_init_fb(void *fbaddr, int width, int height);
+/*
+ * Console abstraction interface
+ * _clear()
+ * _set_char(char c, int x, int y)  // in text coordinates
+ * _scroll_line()
+ */
+typedef struct {
+    void(*clear)();
+    void(*set_color)(int);
+    void(*set_char)(char, int, int);
+    void(*scroll_line)();
+    void(*set_cursor)(int, int);
+    int width, height;
+} console_interface_t;
+
+
+void con_init_convga(unsigned char mode, unsigned char font);
+void con_init_fbrgb(void *fbaddr, int width, int height);
 
 void con_clear();
-void con_print_char(char c, int off);
+void con_print_char(char c);
+void con_print_string(const char *s);
+void con_move_cursor(int x, int y);
+void con_set_device_color(int c);
 
 #endif /* _CONSOLE_H */
 

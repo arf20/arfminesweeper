@@ -385,10 +385,18 @@ strcat(char *dst, const char *src) {
     return dst;
 }
 
+/* ======= Memory functions ======= */
+
+void
+memcpy(const char *src, char *dst, int n) {
+    for (int i = 0; i < n; i++)
+        *(dst + i) = *(src + i);
+}
+
 /* ======== Standard input and output functions ======== */
 char
 putchar(char c) {
-    con_print_char(c, -1);
+    con_print_char(c);
     return c;
 }
 
@@ -516,6 +524,7 @@ getsn(char *buff, size_t n) {
         i++;
     }
     buff[i] = '\0';
+    putchar('\n');
     return buff;
 }
 

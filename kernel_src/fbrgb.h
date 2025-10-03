@@ -18,13 +18,16 @@
 
 */
 
-#ifndef _CONRGBFB_H
-#define _CONRGBFB_H
+#ifndef _FBRGB_H
+#define _FBRGB_H
 
-void fb_clear();
-void fb_print_char(char c, int off);
+#include "console.h"
 
-void fb_init(void *fbaddr, unsigned int width, unsigned int height);
+void fbrgb_clear();
+void fbrgb_print_char(char c, int off);
 
-#endif /* _CONRGBFB_H */
+const console_interface_t *
+    fbrgb_init(void *fbaddr, unsigned int width, unsigned int height);
+
+#endif /* _FBRGB_H */
 

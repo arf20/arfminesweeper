@@ -30,6 +30,7 @@
 
 #include "../convga.h"
 #include "../plibc.h"
+#include "../console.h"
 
 static int size = 0;
 static const int *board = NULL;
@@ -67,69 +68,91 @@ const unsigned char charsets[2][9] = {
 
 static void
 render(int charset) {
-    vga_clear();
+    con_clear();
 
     /* Draw title */
-    vga_print_string(TXT_TITLE, 0);
+    con_move_cursor(0, 0);
+    con_set_device_color(VGA_WHITE_ON_BLACK);
+    con_print_string(TXT_TITLE);
 
     /* Check game state*/
+    con_move_cursor(0, 2);
     switch (gameGetState()) {
         case STATE_LOST: {
-            vga_print_string(TXT_LOST, VGATXTXY(0, 2));
+            con_print_string(TXT_LOST);
             return;
         } break;
         case STATE_WON: {
-            vga_print_string(TXT_WON, VGATXTXY(0, 2));
+            con_print_string(TXT_WON);
             return;
         } break;
     }
 
     /* Print flags left */
-    vga_print_string_c(itoa(gameGetFlagsLeft(), 10), VGATXTXY(14, 2), WHITE_ON_BLACK_BLINK);
+    con_move_cursor(14, 2);
+    con_set_device_color(VGA_WHITE_ON_BLACK_BLINK);
+    con_print_string(itoa(gameGetFlagsLeft(), 10));
+    con_set_device_color(VGA_WHITE_ON_BLACK);
 
     /* Print board */
-    vga_set_char(charsets[charset][0], VGATXTXY(BXOFF, BYOFF));
-    vga_set_char(charsets[charset][1], VGATXTXY(BXOFF + size + 1, BYOFF));
-    vga_set_char(charsets[charset][2], VGATXTXY(BXOFF, BYOFF + size + 1));
-    vga_set_char(charsets[charset][3], VGATXTXY(BXOFF + size + 1, BYOFF + size + 1));
+    con_move_cursor(BXOFF, BYOFF);
+    con_print_char(charsets[charset][0]);
+    con_move_cursor(BXOFF + size + 1, BYOFF);
+    con_print_char(charsets[charset][1]);
+    con_move_cursor(BXOFF, BYOFF + size + 1);
+    con_print_char(charsets[charset][2]);
+    con_move_cursor(BXOFF + size + 1, BYOFF + size + 1);
+    con_print_char(charsets[charset][3]);
 
-    for (int x = 0; x < size + 2; x += size + 1)
-        for (int y = 1; y < size + 1; y++)
-            vga_set_char(charsets[charset][4], VGATXTXY(BXOFF + x, BYOFF + y));
+    for (int x = 0; x < size + 2; x += size + 1) {
+        for (int y = 1; y < size + 1; y++) {
+            con_move_cursor(BXOFF + x, BYOFF + y);
+            con_print_char(charsets[charset][4]);
+        }
+    }
 
-    for (int y = 0; y < size + 2; y += size + 1)
-        for (int x = 1; x < size + 1; x++)
-            vga_set_char(charsets[charset][5], VGATXTXY(BXOFF + x, BYOFF + y));
+    for (int y = 0; y < size + 2; y += size + 1) {
+        for (int x = 1; x < size + 1; x++) {
+            con_move_cursor(BXOFF + x, BYOFF + y);
+            con_print_char(charsets[charset][5]);
+        }
+    }
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
+            con_move_cursor(BXOFF + x + 1,  BYOFF + y + 1);
             if (CHECK_CLEAR(BOARDXY(x, y))) {
                 /* If clear, count surrounding cells and print n of mines */
                 int n = gameGetSurroundingMines(x, y);
-                unsigned char color = 0;
                 switch (n) {
-                    case 1: color = BLUE_ON_BLACK; break;
-                    case 2: color = GREEN_ON_BLACK; break;
-                    case 3: color = RED_ON_BLACK; break;
-                    case 4: color = DBLUE_ON_BLACK; break;
-                    case 5: color = DRED_ON_BLACK; break;
-                    case 6: color = DCYAN_ON_BLACK; break;
-                    case 7: color = BLACK_ON_BLACK; break;
-                    case 8: color = DGREY_ON_BLACK; break;
+                    case 1: con_set_device_color(VGA_BLUE_ON_BLACK); break;
+                    case 2: con_set_device_color(VGA_GREEN_ON_BLACK); break;
+                    case 3: con_set_device_color(VGA_RED_ON_BLACK); break;
+                    case 4: con_set_device_color(VGA_DBLUE_ON_BLACK); break;
+                    case 5: con_set_device_color(VGA_DRED_ON_BLACK); break;
+                    case 6: con_set_device_color(VGA_DCYAN_ON_BLACK); break;
+                    case 7: con_set_device_color(VGA_BLACK_ON_BLACK); break;
+                    case 8: con_set_device_color(VGA_DGREY_ON_BLACK); break;
                 }
-                n ? vga_set_char_c(itoa(n, 10)[0],
-                    VGATXTXY(BXOFF + x + 1,  BYOFF + y + 1), color)
-                    : vga_set_char(charsets[charset][6], VGATXTXY(BXOFF + x + 1, BYOFF + y + 1));
+                if (n)
+                    con_print_char(itoa(n, 10)[0]);
+                else {
+                    con_set_device_color(VGA_WHITE_ON_BLACK);
+                    con_print_char(charsets[charset][6]);
+                }
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                vga_set_char_c(charsets[charset][7], VGATXTXY(BXOFF + x + 1, BYOFF + y + 1),
-                    DRED_ON_BLACK);
+                con_set_device_color(VGA_DRED_ON_BLACK);
+                con_print_char(charsets[charset][7]);
             }
-            else vga_set_char(charsets[charset][8], VGATXTXY(BXOFF + x + 1, BYOFF + y + 1));
+            else {
+                con_set_device_color(VGA_WHITE_ON_BLACK);
+                con_print_char(charsets[charset][8]);
+            }
         }
     }
     
-    vga_set_cursor_off(VGATXTXY(BXOFF + curx + 1, BYOFF + cury + 1));
+    con_move_cursor(BXOFF + curx + 1, BYOFF + cury + 1);
 }
 
 int
@@ -164,5 +187,6 @@ vgatui_start(const int *lboard, int lsize, int charset) {
 
 void
 vgatui_destroy() {
-
+    con_set_device_color(VGA_WHITE_ON_BLACK);
 }
+
