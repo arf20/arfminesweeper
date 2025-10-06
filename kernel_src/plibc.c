@@ -406,13 +406,10 @@ puts(const char *s) {
         puts("puts: imagine this is a segfault\n"); /* YIKES */
         return 0;
     }
-
-    int i = 0;
-    while (s[i]) {
-        putchar(s[i]);
-        i++;
-    }
-    return i;
+    
+    con_print_string(s);
+    
+    return strlen(s);
 }
 
 /* Simple minimal printf implementation

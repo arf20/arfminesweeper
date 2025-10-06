@@ -50,11 +50,11 @@ con_clear() {
     con->set_cursor(x, y);
 }
 
-void
-con_print_char(char c) {
+static void
+print_char_nocur(char c) {
     /* handle control characters */
     if (c == '\n') {
-        con->set_char(' ', x, y);
+        //con->set_char(' ', x, y);
         y++;
         x = 0;
     } else if (c == '\b') {
@@ -77,14 +77,19 @@ con_print_char(char c) {
         con->scroll_line();
         y--;
     }
+}
 
+void
+con_print_char(char c) {
+    print_char_nocur(c);
     con->set_cursor(x, y);
 }
 
 void
 con_print_string(const char *s) {
     while (*s)
-        con_print_char(*s++);
+        print_char_nocur(*s++);
+    con->set_cursor(x, y);
 }
 
 void

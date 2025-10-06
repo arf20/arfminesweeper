@@ -36,6 +36,20 @@ typedef struct {
     int width, height;
 } console_interface_t;
 
+enum {
+    CON_WHITE,
+    CON_WHITE_BLINK, /* VGA text mode only */
+    CON_BLACK,
+    CON_RED,
+    CON_DRED,
+    CON_GREEN,
+    CON_DGREEN,
+    CON_BLUE,
+    CON_DBLUE,
+    CON_CYAN,
+    CON_DCYAN,
+    CON_DGREY
+};
 
 void con_init_convga(unsigned char mode, unsigned char font);
 void con_init_fbrgb(void *fbaddr, int width, int height);

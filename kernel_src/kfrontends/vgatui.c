@@ -72,7 +72,7 @@ render(int charset) {
 
     /* Draw title */
     con_move_cursor(0, 0);
-    con_set_device_color(VGA_WHITE_ON_BLACK);
+    con_set_device_color(CON_WHITE);
     con_print_string(TXT_TITLE);
 
     /* Check game state*/
@@ -90,9 +90,9 @@ render(int charset) {
 
     /* Print flags left */
     con_move_cursor(14, 2);
-    con_set_device_color(VGA_WHITE_ON_BLACK_BLINK);
+    con_set_device_color(CON_WHITE_BLINK);
     con_print_string(itoa(gameGetFlagsLeft(), 10));
-    con_set_device_color(VGA_WHITE_ON_BLACK);
+    con_set_device_color(CON_WHITE);
 
     /* Print board */
     con_move_cursor(BXOFF, BYOFF);
@@ -125,28 +125,28 @@ render(int charset) {
                 /* If clear, count surrounding cells and print n of mines */
                 int n = gameGetSurroundingMines(x, y);
                 switch (n) {
-                    case 1: con_set_device_color(VGA_BLUE_ON_BLACK); break;
-                    case 2: con_set_device_color(VGA_GREEN_ON_BLACK); break;
-                    case 3: con_set_device_color(VGA_RED_ON_BLACK); break;
-                    case 4: con_set_device_color(VGA_DBLUE_ON_BLACK); break;
-                    case 5: con_set_device_color(VGA_DRED_ON_BLACK); break;
-                    case 6: con_set_device_color(VGA_DCYAN_ON_BLACK); break;
-                    case 7: con_set_device_color(VGA_BLACK_ON_BLACK); break;
-                    case 8: con_set_device_color(VGA_DGREY_ON_BLACK); break;
+                    case 1: con_set_device_color(CON_BLUE); break;
+                    case 2: con_set_device_color(CON_GREEN); break;
+                    case 3: con_set_device_color(CON_RED); break;
+                    case 4: con_set_device_color(CON_DBLUE); break;
+                    case 5: con_set_device_color(CON_DRED); break;
+                    case 6: con_set_device_color(CON_DCYAN); break;
+                    case 7: con_set_device_color(CON_BLACK); break;
+                    case 8: con_set_device_color(CON_DGREY); break;
                 }
                 if (n)
                     con_print_char(itoa(n, 10)[0]);
                 else {
-                    con_set_device_color(VGA_WHITE_ON_BLACK);
+                    con_set_device_color(CON_WHITE);
                     con_print_char(charsets[charset][6]);
                 }
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                con_set_device_color(VGA_DRED_ON_BLACK);
+                con_set_device_color(CON_DRED);
                 con_print_char(charsets[charset][7]);
             }
             else {
-                con_set_device_color(VGA_WHITE_ON_BLACK);
+                con_set_device_color(CON_WHITE);
                 con_print_char(charsets[charset][8]);
             }
         }
@@ -187,6 +187,6 @@ vgatui_start(const int *lboard, int lsize, int charset) {
 
 void
 vgatui_destroy() {
-    con_set_device_color(VGA_WHITE_ON_BLACK);
+    con_set_device_color(CON_WHITE);
 }
 

@@ -33,18 +33,36 @@ static unsigned int conwidth = 0, conheight = 0;
 static unsigned int color = 0x00ffffff;
 unsigned int *fb = 0;
 
+/* rgb colors */
+static const unsigned int color_map[] = {
+    /* WHITE       */ 0x00ffffff,
+    /* WHITE_BLINK */ 0x00ffffff,
+    /* BLACK       */ 0x00000000,
+    /* RED         */ 0x00ff0000,
+    /* DRED        */ 0x008b0000,
+    /* GREEN       */ 0x0000ff00,
+    /* DGREEN      */ 0x00008b00,
+    /* BLUE        */ 0x000000ff,
+    /* DBLUE       */ 0x0000008b,
+    /* CYAN        */ 0x0000ffff,
+    /* DCYAN       */ 0x00008b8b,
+    /* DGREY       */ 0x00a9a9a9
+};
 
 void
 fbrgb_clear() {
-    for (unsigned int y = 0; y < fbheight; y++)
-        for (unsigned int x = 0; x < fbwidth; x++)
+    for (int y = 0; y < fbheight; y++)
+        for (int x = 0; x < fbwidth; x++)
             FBXY(x, y) = 0x00000000;
 
+    for (int y = 0; y < FHEIGHT; y++)
+        for (int x = 0; x < FWIDTH; x++)
+            FBXY(x, y) = 0x00ffffff;
 }
 
 void
-fbrgb_set_color(int _color) {
-    color = _color;
+fbrgb_set_color(int color_index) {
+    color = color_map[color_index];
 }
 
 void
@@ -82,17 +100,21 @@ fbrgb_scroll_line() {
     );
 }
 
+static unsigned int
+invert_pixel(unsigned int p) {
+    return
+        (unsigned char)(255 - (p & 0xff)) |
+        ((unsigned int)((unsigned char)(255 - ((p >> 8) & 0xff))) << 8) |
+        ((unsigned int)((unsigned char)(255 - ((p >> 16) & 0xff))) << 16);
+}
+
 void
 fbrgb_set_cursor(int ox, int oy) {
     ox *= FWIDTH; oy *= FHEIGHT;
-    for (int y = 0; y < FHEIGHT; y++) {
-        FBXY(ox + 0, oy + y) = 0x00ffffff;
-        FBXY(ox + FWIDTH - 1, oy + y) = 0x00ffffff;
-    }
-    for (int x = 0; x < FWIDTH; x++) {
-        FBXY(ox + x, oy + 0) = 0x00ffffff;
-        FBXY(ox + x, oy + FHEIGHT - 1) = 0x00ffffff;
-    }
+
+    for (int y = 0; y < FHEIGHT; y++)
+        for (int x = 0; x < FWIDTH; x++)
+            FBXY(ox + x, oy + y) = invert_pixel(FBXY(ox + x, oy + y));
 }
 
 
@@ -113,6 +135,8 @@ fbrgb_init(void *fbaddr, unsigned int _fbwidth, unsigned int _fbheight) {
 
     conwidth = fbwidth / FWIDTH;
     conheight = fbheight / FHEIGHT;
+
+    color = 0x00ffffff;
 
     fbrgb_con.width = conwidth;
     fbrgb_con.height = conheight;

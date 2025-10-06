@@ -147,7 +147,7 @@ warm_start:
     kprintf("\nCurrent config: %dx%d size, %d mines; ", size, size, mines);
     if (vga)
         kprintf("vga text mode %2Xh, vga font %2Xh, vga graphic mode %2Xh\n",
-            vgamode, vgagmode);
+            vgamode, vgafont, vgagmode);
     else
         kprintf("fb 8888BGRX width %d height %d\n", fbwidth, fbheight);
 
@@ -195,6 +195,7 @@ warm_start:
                     size, size, mines);
                 gameInit(size, mines);
                 vgacli_start(gameGetBoard(), size);
+                vgacli_destroy();
                 goto warm_start;
             } break;
             case '2': {
@@ -202,6 +203,7 @@ warm_start:
                     size, size, mines);
                 gameInit(size, mines);
                 vgatui_start(gameGetBoard(), size, 0);
+                vgatui_destroy();
                 goto warm_start;
             } break;
             case '3': {
@@ -209,6 +211,7 @@ warm_start:
                     size, size, mines);
                 gameInit(size, mines);
                 vgatui_start(gameGetBoard(), size, 1);
+                vgatui_destroy();
                 goto warm_start;
             } break;
             case '4': {
@@ -216,6 +219,7 @@ warm_start:
                     size, size, mines);
                 gameInit(size, mines);
                 vgagra_start(gameGetBoard(), size, vgagmode);
+                vgagra_destroy();
                 goto cold_start;
             } break;
             default: break;
