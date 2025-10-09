@@ -86,17 +86,17 @@ fbrgb_set_char(char c, int ox, int oy) {
 void
 fbrgb_scroll_line() {
     /* Move buffer */
-    memcpy(
-        (char*)(&FBXY(FWIDTH*0, FHEIGHT*1)),
-        (char*)(&FBXY(FWIDTH*0, FHEIGHT*0)),
-        conwidth*fbwidth * ((conheight - 1)*fbheight)
+    memmove(
+        &FBXY(FWIDTH*0, FHEIGHT*0),
+        &FBXY(FWIDTH*0, FHEIGHT*1),
+        4 * fbwidth * ((conheight - 1) * FHEIGHT)
     );
 
     /* Clear bottom line */
     memset(
         (char*)(&FBXY(FWIDTH*0, FHEIGHT*(conheight-1))),
-        ((fbwidth*fbheight*4) - 1),
-        0x00
+        0x00,
+        fbwidth*FHEIGHT*4
     );
 }
 
@@ -111,10 +111,18 @@ invert_pixel(unsigned int p) {
 void
 fbrgb_set_cursor(int ox, int oy) {
     ox *= FWIDTH; oy *= FHEIGHT;
+    static int px = 0, py = 0;
+
+    if (FBXY(px, py) && 0xff000000)
+        for (int y = 0; y < FHEIGHT; y++)
+            for (int x = 0; x < FWIDTH; x++)
+                FBXY(px + x, py + y) = invert_pixel(FBXY(px + x, py + y));
 
     for (int y = 0; y < FHEIGHT; y++)
         for (int x = 0; x < FWIDTH; x++)
             FBXY(ox + x, oy + y) = invert_pixel(FBXY(ox + x, oy + y));
+    FBXY(ox, oy) = 0xff000000 | FBXY(ox, oy);
+    px = ox; py = oy;
 }
 
 

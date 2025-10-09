@@ -37,10 +37,11 @@ int strncmp(const char *s1, const char *s2, size_t n);
 char *strchr(const char *str, char c);
 char *strstr(const char *haystack, const char *needle);
 char *strtok(char *str, const char *delim);
-void *memset(void *s, char c, size_t n);
 char *strcpy(char *dst, const char *src);
 char *strcat(char *dst, const char *src);
-void memcpy(const char *src, char *dst, int n);
+void *memmove(void *dest, const void *src, int n);
+void *memset(void *s, char c, size_t n);
+void *memcpy(void *dest, const void*src, int n);
 
 char putchar(char c);
 int puts(const char *s);

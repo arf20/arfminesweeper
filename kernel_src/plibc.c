@@ -304,24 +304,6 @@ strtok(char *str, const char *delim) {
     }
 }
 
-void *
-memset(void *s, char c, size_t n) {
-    for (size_t i = 0; i < n; i++)
-        ((char*)s)[i] = c;
-    return s;
-}
-
-void *
-memmove(void *s, void *d, int n) {
-    if (s > d)
-        for (int i = 0; i < n; i++)
-            ((char*)d)[i] = ((char*)s)[i];
-    else
-        for (int i = n - 1; i >= 0; i--)
-            ((char*)d)[i] = ((char*)s)[i];
-    return d;
-}
-
 unsigned char
 toupper(unsigned char c) {
     return c - ('a' - 'A');
@@ -358,7 +340,7 @@ char *
 leftpad(char *str, int n, char c) {
     int len = strlen(str);
     int pad = n - len;
-    memmove(str, str + pad, len);
+    memmove(str + pad, str, len);
     memset(str, c, pad);
     return str;
 }
@@ -387,10 +369,31 @@ strcat(char *dst, const char *src) {
 
 /* ======= Memory functions ======= */
 
-void
-memcpy(const char *src, char *dst, int n) {
+void *
+memmove(void *dest, const void *src, int n) {
+    char *d = (char*)dest; const char *s = (char*)src;
+    if (s > d)
+        for (int i = 0; i < n; i++)
+            d[i] = s[i];
+    else
+        for (int i = n - 1; i >= 0; i--)
+            d[i] = s[i];
+    return dest;
+}
+
+void *
+memset(void *s, char c, size_t n) {
+    for (size_t i = 0; i < n; i++)
+        ((char*)s)[i] = c;
+    return s;
+}
+
+void *
+memcpy(void *dest, const void *src, int n) {
+    char *d = (char*)dest; const char *s = (char*)src;
     for (int i = 0; i < n; i++)
-        *(dst + i) = *(src + i);
+        *(d + i) = *(s + i);
+    return dest;
 }
 
 /* ======== Standard input and output functions ======== */

@@ -110,9 +110,9 @@ convga_set_char(char c, int x, int y) {
 void
 convga_scroll_line() {
     /* Move buffer */
-    memcpy(
-        (char *)(convga_xy_offset(0, 1) + VGA_ADDRESS),
-        (char *)(convga_xy_offset(0, 0) + VGA_ADDRESS),
+    memmove(
+        (char*)(convga_xy_offset(0, 0) + VGA_ADDRESS),
+        (char*)(convga_xy_offset(0, 1) + VGA_ADDRESS),
         con_width * (con_height - 1) * 2
     );
 
