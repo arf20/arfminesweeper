@@ -25,12 +25,15 @@
 #include "font_8x16.h"
 
 #include "plibc.h"
+#include "alloc.h"
 
 #define FBXY(x, y)  fb[(fbwidth*(y))+(x)]
 
 static unsigned int fbwidth = 0, fbheight = 0;
 static unsigned int conwidth = 0, conheight = 0;
 static unsigned int color = 0x00ffffff;
+static int px = 0, py = 0;
+unsigned int *realfb = 0;
 unsigned int *fb = 0;
 
 /* rgb colors */
@@ -48,6 +51,15 @@ static const unsigned int color_map[] = {
     /* DCYAN       */ 0x00008b8b,
     /* DGREY       */ 0x00a9a9a9
 };
+
+static unsigned int
+invert_pixel(unsigned int p) {
+    return
+        (unsigned char)(255 - (p & 0xff)) |
+        ((unsigned int)((unsigned char)(255 - ((p >> 8) & 0xff))) << 8) |
+        ((unsigned int)((unsigned char)(255 - ((p >> 16) & 0xff))) << 16);
+}
+
 
 void
 fbrgb_clear() {
@@ -85,6 +97,11 @@ fbrgb_set_char(char c, int ox, int oy) {
 
 void
 fbrgb_scroll_line() {
+    /* clear cursor */
+    if (FBXY(px, py) && 0xff000000)
+        for (int y = 0; y < FHEIGHT; y++)
+            for (int x = 0; x < FWIDTH; x++)
+                FBXY(px + x, py + y) = invert_pixel(FBXY(px + x, py + y));
     /* Move buffer */
     memmove(
         &FBXY(FWIDTH*0, FHEIGHT*0),
@@ -100,18 +117,9 @@ fbrgb_scroll_line() {
     );
 }
 
-static unsigned int
-invert_pixel(unsigned int p) {
-    return
-        (unsigned char)(255 - (p & 0xff)) |
-        ((unsigned int)((unsigned char)(255 - ((p >> 8) & 0xff))) << 8) |
-        ((unsigned int)((unsigned char)(255 - ((p >> 16) & 0xff))) << 16);
-}
-
 void
 fbrgb_set_cursor(int ox, int oy) {
     ox *= FWIDTH; oy *= FHEIGHT;
-    static int px = 0, py = 0;
 
     if (FBXY(px, py) && 0xff000000)
         for (int y = 0; y < FHEIGHT; y++)
@@ -125,6 +133,12 @@ fbrgb_set_cursor(int ox, int oy) {
     px = ox; py = oy;
 }
 
+void
+fbrgb_swap() {
+    for (int i = 0; i < fbwidth * fbheight; i++)
+        realfb[i] = fb[i];
+}
+
 
 console_interface_t fbrgb_con = {
     fbrgb_clear,
@@ -132,19 +146,24 @@ console_interface_t fbrgb_con = {
     fbrgb_set_char,
     fbrgb_scroll_line,
     fbrgb_set_cursor,
+    fbrgb_swap,
     0, 0
 };
 
 const console_interface_t *
 fbrgb_init(void *fbaddr, unsigned int _fbwidth, unsigned int _fbheight) {
-    fb = (unsigned int*)fbaddr;
+    realfb = (unsigned int*)fbaddr;
     fbwidth = _fbwidth;
     fbheight = _fbheight;
 
+    /* text rows/columns */
     conwidth = fbwidth / FWIDTH;
     conheight = fbheight / FHEIGHT;
 
     color = 0x00ffffff;
+
+    fb = kmalloc(4 * fbwidth * fbheight);
+
 
     fbrgb_con.width = conwidth;
     fbrgb_con.height = conheight;

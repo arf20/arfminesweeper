@@ -104,3 +104,9 @@ con_set_device_color(int c) {
     con->set_color(c);
 }
 
+void
+con_swap_buffers() {
+    if (con->swap)
+        con->swap();
+}
+

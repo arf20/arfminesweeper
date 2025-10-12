@@ -150,6 +150,7 @@ warm_start:
             vgamode, vgafont, vgagmode);
     else
         kprintf("fb 8888BGRX width %d height %d\n", fbwidth, fbheight);
+    con_swap_buffers();
 
     while (1) {
         char sel = keyb_getc();
@@ -158,19 +159,24 @@ warm_start:
             case 'h': return;
             case 's': {
                 kprintf("size> ");
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 size = atoi(ibuf);
                 goto warm_start;
             } break;
             case 'm': {
                 kprintf("mines> ");
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 mines = atoi(ibuf);
                 goto warm_start;
             } break;
             case 'v': {
                 con_clear();
                 kprintf(TXT_TEXT_MODES);
+                con_swap_buffers();
                 getsn(ibuf, 2048);
                 vgamode = strtol(ibuf, NULL, 16);
                 goto cold_start;
@@ -178,14 +184,18 @@ warm_start:
             case 'f': {
                 con_clear();
                 kprintf(TXT_FONT);
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 vgafont = strtol(ibuf, NULL, 16);
                 goto cold_start;
             } break;
             case 'g': {
                 con_clear();
                 kprintf(TXT_GRAPHIC_MODES);
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 vgagmode = strtol(ibuf, NULL, 16);
                 goto warm_start;
             } break;

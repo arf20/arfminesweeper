@@ -155,6 +155,7 @@ console_interface_t convga_con = {
     convga_set_char,
     convga_scroll_line,
     convga_set_cursor,
+    0, /* no swap */
     0, 0
 };
 

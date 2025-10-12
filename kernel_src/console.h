@@ -33,6 +33,7 @@ typedef struct {
     void(*set_char)(char, int, int);
     void(*scroll_line)();
     void(*set_cursor)(int, int);
+    void(*swap)();
     int width, height;
 } console_interface_t;
 
@@ -51,7 +52,9 @@ enum {
     CON_DGREY
 };
 
+/* VGA 80x25 text mode console */
 void con_init_convga(unsigned char mode, unsigned char font);
+/* GRUB inherited RGB framebuffer, requires buffer swap */
 void con_init_fbrgb(void *fbaddr, int width, int height);
 
 void con_clear();
@@ -59,6 +62,7 @@ void con_print_char(char c);
 void con_print_string(const char *s);
 void con_move_cursor(int x, int y);
 void con_set_device_color(int c);
+void con_swap_buffers();
 
 #endif /* _CONSOLE_H */
 
