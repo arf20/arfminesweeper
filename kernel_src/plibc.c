@@ -514,17 +514,21 @@ getsn(char *buff, size_t n) {
     size_t i = 0;
     while (((c = keyb_getc()) != '\n') && (i < n))  {
         if (c == '\b') {
-            if (i == 0) continue;
+            if (i == 0)
+                continue;
             i--;
             puts("\b \b");
+            con_swap_buffers();
             continue;
         }
         putchar(c);
+        con_swap_buffers();
         buff[i] = c;
         i++;
     }
     buff[i] = '\0';
     putchar('\n');
+    con_swap_buffers();
     return buff;
 }
 

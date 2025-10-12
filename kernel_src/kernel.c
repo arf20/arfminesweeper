@@ -132,14 +132,15 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
     }
 
 cold_start:
+    /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
+    alloc_init((void*)0x00100000, (void*)0x010fffff);
+
     /* clear screen, set up terminal */
     if (vga)
         con_init_convga(vgamode, vgafont);
     else
         con_init_fbrgb(fbaddr, fbwidth, fbheight);
 
-    /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
-    alloc_init((void*)0x00100000, (void*)0x001fffff);
 
 warm_start:
     con_clear();

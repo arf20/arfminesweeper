@@ -153,6 +153,8 @@ render(int charset) {
     }
     
     con_move_cursor(BXOFF + curx + 1, BYOFF + cury + 1);
+
+    con_swap_buffers();
 }
 
 int
