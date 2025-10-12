@@ -18,19 +18,16 @@
 
 */
 
-#ifndef _CONVGA_H
-#define _CONVGA_H
+#ifndef _FBRGB_H
+#define _FBRGB_H
 
-#include "console.h"
+#include "../console.h"
 
-/* Interface operations */
-void convga_clear();
-void convga_set_color(int c);
-void convga_set_char(char c, int x, int y);
-void convga_scroll_line();
-void convga_set_cursor(int x, int y);
+void fbrgb_clear();
+void fbrgb_print_char(char c, int off);
 
-const console_interface_t *convga_init(unsigned char mode, unsigned char font);
+const console_interface_t *
+    fbrgb_init(void *fbaddr, unsigned int width, unsigned int height);
 
-#endif /* _CONVGA_H */
+#endif /* _FBRGB_H */
 

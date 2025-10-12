@@ -28,7 +28,7 @@
 #include "../../common/game.h"
 #include "../../common/frontconf.h"
 
-#include "../convga.h"
+#include "../console.h"
 #include "../plibc.h"
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
@@ -104,6 +104,8 @@ vgacli_start(const int *lboard, int lsize) {
         /* Print state and prompt */
         printBoard();
         printf("> ");
+        con_swap_buffers();
+
         memset(buffin, 0, 256);
         getsn(buffin, 256); /* safe */
        

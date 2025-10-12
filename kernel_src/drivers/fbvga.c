@@ -22,7 +22,7 @@
 
 #include "fbvga.h"
 
-#include "int32.h"
+#include "../int32.h"
 
 
 int vgafb_width = 0, vgafb_height = 0, vgafb_colors = 0;

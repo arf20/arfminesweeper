@@ -22,8 +22,8 @@
 
 #include "console.h"
 
-#include "convga.h"
-#include "fbrgb.h"
+#include "drivers/convga.h"
+#include "drivers/fbrgb.h"
 
 
 static const console_interface_t *con = 0;
@@ -102,5 +102,11 @@ con_move_cursor(int _x, int _y) {
 void
 con_set_device_color(int c) {
     con->set_color(c);
+}
+
+void
+con_swap_buffers() {
+    if (con->swap)
+        con->swap();
 }
 

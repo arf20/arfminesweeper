@@ -21,7 +21,7 @@
 */
 
 #include "plibc.h"
-#include "keyb.h"
+#include "drivers/keyb.h"
 #include "textdefs.h"
 #include "alloc.h"
 #include "console.h"
@@ -132,14 +132,15 @@ kmain(unsigned long mbmagic, unsigned long mbiaddr) {
     }
 
 cold_start:
+    /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
+    alloc_init((void*)0x00100000, (void*)0x010fffff);
+
     /* clear screen, set up terminal */
     if (vga)
         con_init_convga(vgamode, vgafont);
     else
         con_init_fbrgb(fbaddr, fbwidth, fbheight);
 
-    /* set heap at the start of Extended Memory (>1MiB), 1MiB in size */
-    alloc_init((void*)0x00100000, (void*)0x001fffff);
 
 warm_start:
     con_clear();
@@ -150,6 +151,7 @@ warm_start:
             vgamode, vgafont, vgagmode);
     else
         kprintf("fb 8888BGRX width %d height %d\n", fbwidth, fbheight);
+    con_swap_buffers();
 
     while (1) {
         char sel = keyb_getc();
@@ -158,19 +160,24 @@ warm_start:
             case 'h': return;
             case 's': {
                 kprintf("size> ");
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 size = atoi(ibuf);
                 goto warm_start;
             } break;
             case 'm': {
                 kprintf("mines> ");
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 mines = atoi(ibuf);
                 goto warm_start;
             } break;
             case 'v': {
                 con_clear();
                 kprintf(TXT_TEXT_MODES);
+                con_swap_buffers();
                 getsn(ibuf, 2048);
                 vgamode = strtol(ibuf, NULL, 16);
                 goto cold_start;
@@ -178,14 +185,18 @@ warm_start:
             case 'f': {
                 con_clear();
                 kprintf(TXT_FONT);
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 vgafont = strtol(ibuf, NULL, 16);
                 goto cold_start;
             } break;
             case 'g': {
                 con_clear();
                 kprintf(TXT_GRAPHIC_MODES);
+                con_swap_buffers();
                 getsn(ibuf, 2048);
+
                 vgagmode = strtol(ibuf, NULL, 16);
                 goto warm_start;
             } break;

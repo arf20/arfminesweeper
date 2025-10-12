@@ -22,8 +22,8 @@
 
 #include "keyb.h"
 
-#include "port.h"
-#include "plibc.h"
+#include "../port.h"
+#include "../plibc.h"
 
 #define UNUSED(x) (void)(x)
 

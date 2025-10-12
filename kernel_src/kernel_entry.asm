@@ -67,8 +67,8 @@ _mb2_tag_fb:
     dw  5       ; tag type
     dw  0       ; flags
     dd  20      ; size
-    dd  1024    ; width
-    dd  768     ; height
+    dd  640     ; width
+    dd  480     ; height
     dd  32
 
     align 8

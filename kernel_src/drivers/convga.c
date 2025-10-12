@@ -22,10 +22,10 @@
 
 #include "convga.h"
 
-#include "port.h"
-#include "int32.h"
+#include "../port.h"
+#include "../int32.h"
 
-#include "plibc.h"
+#include "../plibc.h"
 
 /* VGA registers */
 #define VGA_CTRL_REGISTER   0x3d4
@@ -155,6 +155,7 @@ console_interface_t convga_con = {
     convga_set_char,
     convga_scroll_line,
     convga_set_cursor,
+    0, /* no swap */
     0, 0
 };
 

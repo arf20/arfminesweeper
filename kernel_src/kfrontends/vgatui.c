@@ -28,7 +28,7 @@
 #include "../../common/game.h"
 #include "../../common/frontconf.h"
 
-#include "../convga.h"
+#include "../drivers/convga.h"
 #include "../plibc.h"
 #include "../console.h"
 
@@ -80,10 +80,12 @@ render(int charset) {
     switch (gameGetState()) {
         case STATE_LOST: {
             con_print_string(TXT_LOST);
+            con_swap_buffers();
             return;
         } break;
         case STATE_WON: {
             con_print_string(TXT_WON);
+            con_swap_buffers();
             return;
         } break;
     }
@@ -153,6 +155,8 @@ render(int charset) {
     }
     
     con_move_cursor(BXOFF + curx + 1, BYOFF + cury + 1);
+
+    con_swap_buffers();
 }
 
 int
