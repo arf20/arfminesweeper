@@ -22,10 +22,10 @@
 
 #include "convga.h"
 
-#include "port.h"
-#include "int32.h"
+#include "../port.h"
+#include "../int32.h"
 
-#include "plibc.h"
+#include "../plibc.h"
 
 /* VGA registers */
 #define VGA_CTRL_REGISTER   0x3d4

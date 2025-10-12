@@ -21,7 +21,7 @@
 */
 
 #include "plibc.h"
-#include "keyb.h"
+#include "drivers/keyb.h"
 #include "textdefs.h"
 #include "alloc.h"
 #include "console.h"

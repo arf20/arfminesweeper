@@ -27,7 +27,7 @@
 #include <stddef.h>
 
 #include "console.h"
-#include "keyb.h"
+#include "drivers/keyb.h"
 
 /* ======== Internal utils ======== */
 void

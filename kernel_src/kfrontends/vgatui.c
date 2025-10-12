@@ -28,7 +28,7 @@
 #include "../../common/game.h"
 #include "../../common/frontconf.h"
 
-#include "../convga.h"
+#include "../drivers/convga.h"
 #include "../plibc.h"
 #include "../console.h"
 

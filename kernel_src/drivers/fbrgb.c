@@ -22,10 +22,10 @@
 
 #include "fbrgb.h"
 
-#include "font_8x16.h"
+#include "../font_8x16.h"
 
-#include "plibc.h"
-#include "alloc.h"
+#include "../plibc.h"
+#include "../alloc.h"
 
 #define FBXY(x, y)  fb[(fbwidth*(y))+(x)]
 

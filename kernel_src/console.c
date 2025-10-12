@@ -22,8 +22,8 @@
 
 #include "console.h"
 
-#include "convga.h"
-#include "fbrgb.h"
+#include "drivers/convga.h"
+#include "drivers/fbrgb.h"
 
 
 static const console_interface_t *con = 0;

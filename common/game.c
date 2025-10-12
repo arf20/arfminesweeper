@@ -33,7 +33,7 @@
     #include "../kernel_src/alloc.h"
     #include "../kernel_src/random.h"
     #include "../kernel_src/plibc.h"
-    #include "../kernel_src/rtc_time.h"
+    #include "../kernel_src/drivers/rtc_time.h"
     #define rand    prng_rand
     #define srand   prng_srand
     #define malloc  kmalloc

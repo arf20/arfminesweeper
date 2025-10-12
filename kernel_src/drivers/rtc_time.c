@@ -23,7 +23,7 @@
 
 #include "rtc_time.h"
 
-#include "port.h"
+#include "../port.h"
 
 #define RTC_BASE 0x70
 #define RTC_DATA 0x71
@@ -132,3 +132,4 @@ rtc_time() {
 
     return time;
 }
+
