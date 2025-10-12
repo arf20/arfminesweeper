@@ -80,7 +80,7 @@ fbrgb_set_color(int color_index) {
 void
 fbrgb_set_char(char c, int ox, int oy) {
     ox *= FWIDTH; oy *= FHEIGHT;
-    int coff = FWIDTH*FHEIGHT*(int)c;
+    unsigned int coff = FWIDTH*FHEIGHT*(unsigned char)c;
 
     for (int y = 0; y < FHEIGHT; y++) {
         for (int x = 0; x < FWIDTH; x++) {

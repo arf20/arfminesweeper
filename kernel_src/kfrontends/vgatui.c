@@ -80,10 +80,12 @@ render(int charset) {
     switch (gameGetState()) {
         case STATE_LOST: {
             con_print_string(TXT_LOST);
+            con_swap_buffers();
             return;
         } break;
         case STATE_WON: {
             con_print_string(TXT_WON);
+            con_swap_buffers();
             return;
         } break;
     }
