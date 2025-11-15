@@ -3,7 +3,7 @@ Minesweeper, but in every way possible
 
 ## Build on Linux
 
-[![Linux build](https://github.com/arf20/arfminesweeoer/actions/workflows/build.yml/badge.svg)](https://github.com/arf20/arfminesweeper/actions/workflows/build.yml)
+[![Build](https://github.com/arf20/arfminesweeper/actions/workflows/build.yml/badge.svg)](https://github.com/arf20/arfminesweeper/actions/workflows/build.yml)
 
 Global dependencies: `build-essential cmake`
 
