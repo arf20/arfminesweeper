@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include <termios.h>
 
-#include "stb_image.h"
+#include <common/stb_image.h>
 
 #include <common/frontconf.h>
 #include <common/game.h>
@@ -39,7 +39,7 @@
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 
-#include "common/fb.h"
+#include <common/fb.h>
 
 #include "drmfb.h"
 
