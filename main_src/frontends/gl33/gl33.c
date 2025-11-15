@@ -25,7 +25,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "glutil.h"
+#include <common/glutil.h>
 
 #include <common/frontconf.h>
 #include "gl33.h"

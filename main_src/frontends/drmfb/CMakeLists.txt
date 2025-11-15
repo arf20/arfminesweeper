@@ -1,0 +1,20 @@
+if (DRM_FOUND AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if (SHARED AND NOT NO_DRMFB)
+
+    else()
+        message(STATUS "Not building with shared drmfb")
+    endif()
+
+    if (NOT STATIC AND NOT NO_DRMFB)
+        target_sources(arfminesweeper PRIVATE "drmfb.c" "../common/fb.c")
+        target_link_libraries(arfminesweeper ${DRM_LIBRARIES} m)
+        target_include_directories(arfminesweeper PUBLIC ${DRM_INCLUDE_DIRS})
+        target_compile_definitions(arfminesweeper PUBLIC FRONTEND_DRMFB)
+        message(STATUS "Building with static drmfb")
+    else()
+        message(STATUS "Not building with static drmfb")
+    endif()
+else()
+    message(STATUS "No DRM support in non-Linux (no libdrm)")
+endif()
+

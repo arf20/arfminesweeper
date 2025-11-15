@@ -36,10 +36,11 @@
 #include <common/frontconf.h>
 #include <common/game.h>
 
-#include "common/fb.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <common/stb_image.h>
+
+#include <common/fb.h>
 
 #include "fbdev.h"
 

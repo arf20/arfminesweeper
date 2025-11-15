@@ -23,10 +23,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <unistd.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xproto.h>
 
 #include <common/frontconf.h>
 #include <common/game.h>

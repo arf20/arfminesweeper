@@ -9,432 +9,73 @@ find_package(Threads REQUIRED)
 
 find_package(PkgConfig)
 
-include_directories("${PROJECT_SOURCE_DIR}/")
-
-add_compile_definitions(ARFMINESWEEPER_VERSION="${ARFMINESWEEPER_VERSION}")
-add_compile_definitions(ARFMINESWEEPER_NUM_COMMIT="${ARFMINESWEEPER_NUM_COMMIT}")
-
-file (GLOB SRC
-    "${PROJECT_SOURCE_DIR}/main_src/main.c"
-    "${PROJECT_SOURCE_DIR}/common/game.c"
-)
-
-# frontends
-
-# compile vulkan shaders
-add_custom_command(
-  OUTPUT "${PROJECT_SOURCE_DIR}/assets/msboard4vs.spv"
-  COMMAND "glslc"
-  ARGS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.vert" "-o" "${PROJECT_SOURCE_DIR}/assets/msboard4vs.spv"
-  DEPENDS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.vert"
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
-
-add_custom_command(
-  OUTPUT "${PROJECT_SOURCE_DIR}/assets/msboard4fs.spv"
-  COMMAND "glslc"
-  ARGS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.frag" "-o" "${PROJECT_SOURCE_DIR}/assets/msboard4fs.spv"
-  DEPENDS "${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard4.frag"
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
-
-configure_file("${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard.vs" "${PROJECT_SOURCE_DIR}/assets/msboard.vs" COPYONLY)
-configure_file("${PROJECT_SOURCE_DIR}/main_src/frontends/shaders/msboard.fs" "${PROJECT_SOURCE_DIR}/assets/msboard.fs" COPYONLY)
-
-# compile java
-add_custom_command(
-  OUTPUT "${PROJECT_SOURCE_DIR}/assets/awt.class"
-  COMMAND "javac"
-  ARGS "-d" "${PROJECT_SOURCE_DIR}/assets/" "${PROJECT_SOURCE_DIR}/main_src/frontends/java/awt.java"
-  DEPENDS "${PROJECT_SOURCE_DIR}/main_src/frontends/java/awt.java"
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
-
-# console, vt100, ansi
-file (GLOB SRC ${SRC}
-    "${PROJECT_SOURCE_DIR}/main_src/frontends/console.c"
-    "${PROJECT_SOURCE_DIR}/main_src/frontends/vt100.c"
-    "${PROJECT_SOURCE_DIR}/main_src/frontends/ansi.c"
-)
-add_compile_definitions(FRONTEND_CONSOLE)
-message(STATUS "Building with console")
-add_compile_definitions(FRONTEND_VT100)
-message(STATUS "Building with vt100")
-add_compile_definitions(FRONTEND_ANSI)
-message(STATUS "Building with ansi")
-
-# ncurses
 find_package(Curses)
-if (CURSES_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/curses.c")
-    add_compile_definitions(FRONTEND_CURSES)
-    message(STATUS "Building with curses")
-else()
-    message(STATUS "Not building with curses")
-endif()
-
-# httpd
-if (UNIX)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/httpd.c")
-    add_compile_definitions(FRONTEND_HTTPD)
-    message(STATUS "Building with httpd")
-else()
-    message(STATUS "Not building with httpd")
-endif()
-
-# fbdev
-if (WIN32)
-    message(STATUS "No fbdev support in Win32")
-elseif (BSD)
-    message(STATUS "No fbdev support in BSD")
-else()
-    file (GLOB SRC ${SRC}
-        "${PROJECT_SOURCE_DIR}/main_src/frontends/fbdev.c"
-        "${PROJECT_SOURCE_DIR}/main_src/frontends/common/fb.c")
-    add_compile_definitions(FRONTEND_FBDEV)
-    message(STATUS "Building with fbdev")
-endif()
-
-# drm
 pkg_check_modules(DRM libdrm)
-if (DRM_FOUND)
-    file (GLOB SRC ${SRC}
-        "${PROJECT_SOURCE_DIR}/main_src/frontends/drmfb.c"
-        "${PROJECT_SOURCE_DIR}/main_src/frontends/common/fb.c")
-    add_compile_definitions(FRONTEND_DRMFB)
-    message(STATUS "Building with DRI DRM framebuffer")
-endif()
-
-# x11
 find_package(X11)
-if (X11_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xlib.c")
-    add_compile_definitions(FRONTEND_XLIB)
-    message(STATUS "Building with X11 Xlib")
-
-    # xcb
-    if (X11_xcb_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xcb.c")
-        add_compile_definitions(FRONTEND_XCB)
-        message(STATUS "Building with xcb")
-    else()
-        message(STATUS "Not building with xcb")
-    endif()
-
-    # motif
-    find_package(Motif)
-    if (MOTIF_FOUND)
-        file(GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/motif.c")
-        add_compile_definitions(FRONTEND_MOTIF)
-        message(STATUS "Building with motif")
-    else()
-        message(STATUS "Not building with motif")
-    endif()
-
-    # xaw/athena
-    pkg_check_modules(XAW xaw7) 
-    if (XAW_FOUND)
-        file(GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xaw.c")
-        add_compile_definitions(FRONTEND_XAW)
-        message(STATUS "Building with Athena")
-    else()
-        message(STATUS "Not building with Athena")
-    endif()
-
-    # XForms
-    if (EXISTS "/usr/include/forms.h")
-        set(XFORMS_FOUND true)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/xforms.c")
-        add_compile_definitions(FRONTEND_XFORMS)
-        message(STATUS "Building with XForms")
-    else()
-        message(STATUS "Not Building with XForms")
-    endif()
-
-else()
-    message(STATUS "Not building with X11 Xlib")
+find_package(Motif)
+pkg_check_modules(XAW xaw7)
+if (EXISTS "/usr/include/forms.h")
+    set(XFORMS_FOUND true)
 endif()
-
-# wayland
-pkg_check_modules(WAYLAND wayland-client) 
-if (WAYLAND_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/wayland.c")
-    add_compile_definitions(FRONTEND_WAYLAND)
-    message(STATUS "Building with Wayland")
-else()
-    message(STATUS "Not building with Wayland")
-endif()
-
-# gtk3
-pkg_check_modules(GTK3 gtk+-3.0) 
-if (GTK3_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/gtk3.c")
-    add_compile_definitions(FRONTEND_GTK3)
-    message(STATUS "Building with gtk3")
-else()
-    message(STATUS "Not building with gtk3")
-endif()
-
-# qt5
+pkg_check_modules(WAYLAND wayland-client)
+pkg_check_modules(GTK3 gtk+-3.0)
 find_package(Qt5Widgets)
-if (Qt5Widgets_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/qt5.cpp" "${PROJECT_SOURCE_DIR}/main_src/frontends/qt5.hpp")
-    include_directories(${Qt5Widgets_INCLUDES})
-    add_definitions(${Qt5Widgets_DEFINITIONS})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-    set(CMAKE_AUTOUIC ON)
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_AUTORCC ON)
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    add_compile_definitions(FRONTEND_QT5)
-    message(STATUS "Building with Qt5")
-else()
-    message(STATUS "Not building with Qt5")
-endif()
-
-# sdl2
+find_package(Qt5 COMPONENTS Core)
 find_package(SDL2)
 pkg_check_modules(SDL2_ttf SDL2_ttf)
 pkg_check_modules(SDL2_image SDL2_image)
-if (SDL2_FOUND)
-    if (SDL2_ttf_FOUND AND SDL2_image_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/sdl2.c")
-        add_compile_definitions(FRONTEND_SDL2)
-        message(STATUS "Building with SDL2")
-    else()
-        message(WARNING "SDL2_ttf and SDL2_image required for building SDL2 frontend")
-        message(STATUS "Not building with SDL2")
-    endif()
-else()
-    message(STATUS "Not building with SDL2")
-endif()
-
-# sdl
 find_package(SDL)
 pkg_check_modules(SDL_ttf SDL_ttf)
 pkg_check_modules(SDL_image SDL_image)
-if (SDL_FOUND)
-    if (SDL_ttf_FOUND AND SDL_image_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/sdl1.c")
-        add_compile_definitions(FRONTEND_SDL1)
-        message(STATUS "Building with SDL 1.2")
-    else()
-        message(WARNING "SDL_ttf and SDL_image required for building SDL1.2 frontend")
-        message(STATUS "Not building with SDL 1.2")
-    endif()
-else()
-    message(STATUS "Not building with SDL 1.2")
-endif()
-
-# GL
 cmake_policy(SET CMP0072 OLD)
 find_package(OpenGL)
 find_package(glfw3 3.3)
-if (OpenGL_OpenGL_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/common/gl_ffp.c")
-
-    # OpenGL 2.x/FreeGLUT
-    find_package(GLUT)
-    if (GLUT_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/gl11.c")
-        add_compile_definitions(FRONTEND_GL11)
-        message(STATUS "Building with OpenGL 2.x FFP/FreeGLUT")
-    else()
-        message(WARNING "FreeGLUT required for building OpenGL 1.1 frontend")
-        message(STATUS "Not building with OpenGL 2.x FFP/FreeGLUT")
-    endif()
-
-    # OpenGL 3.3/GLFW
-    if (glfw3_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/gl33.c" "${PROJECT_SOURCE_DIR}/main_src/frontends/glad/glad.c" "${PROJECT_SOURCE_DIR}/main_src/frontends/glutil.c")
-        include_directories("${PROJECT_SOURCE_DIR}/main_src/frontends/glad/include/")
-        add_compile_definitions(FRONTEND_GL33)
-        message(STATUS "Building with OpenGL 3.3/GLFW/GLAD")
-    else()
-        message(WARNING "GLFW required for building OpenGL 3.3 frontend")
-        message(STATUS "Not building with OpenGL 3.3/GLFW/GLAD")
-    endif()
-
-    # glx
-    if (OpenGL_GLX_FOUND AND X11_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/glx.c")
-        add_compile_definitions(FRONTEND_GLX)
-        message(STATUS "Building with GLX")
-    else()
-        message(STATUS "Not building with X11/GLX")
-    endif()
-else()
-    message(STATUS "Not building with OpenGL")
-endif()
-
-# vulkan
+find_package(GLUT)
 find_package(Vulkan)
-if (Vulkan_FOUND)
-    if (glfw3_FOUND)
-        file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/vk.c")
-        include_directories("${PROJECT_SOURCE_DIR}/main_src/frontends/glad/include/")
-        add_compile_definitions(FRONTEND_VK)
-        add_custom_target(vulkan_shaders ALL
-            DEPENDS "${PROJECT_SOURCE_DIR}/assets/msboard4vs.spv" "${PROJECT_SOURCE_DIR}/assets/msboard4fs.spv"
-        )
-        message(STATUS "Building with Vulkan/GLFW")
-    else()
-        message(WARNING "GLFW required for building Vulkan frontend")
-        message(STATUS "Not building with Vulkan/GLFW")
-    endif()
-else()
-    message(STATUS "Not building with Vulkan/GLFW")
-endif()
-
-# win32 comctl, gdi, direct2d
-if (WIN32)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/win32.c")
-    add_compile_definitions(FRONTEND_WIN32)
-    message(STATUS "Building with Win32 ComCtl")
-
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/gdi.c")
-    add_compile_definitions(FRONTEND_GDI)
-    message(STATUS "Building with Win32 GDI")
-
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/d2d.c")
-    add_compile_definitions(FRONTEND_D2D)
-    message(STATUS "Building with Win32 Direct2D")
-else()
-    message(STATUS "Not building with Win32")
-endif()
-
-# java
 find_package(JNI)
 find_program(JAVAC javac)
-if (JNI_FOUND AND JAVAC)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/java.c")
-    include_directories(${JNI_INCLUDE_DIRS})
-    add_compile_definitions(FRONTEND_JAVA)
-    add_custom_target(java_awt ALL
-        DEPENDS "${PROJECT_SOURCE_DIR}/assets/awt.class"
-    )
-    message(STATUS "Building with Java JNI")
-else()
-    message(STATUS "Not building with Java")
-endif()
-
-#fltk
 find_package(FLTK)
-if (FLTK_FOUND)
-    file (GLOB SRC ${SRC} "${PROJECT_SOURCE_DIR}/main_src/frontends/fltk.cpp")
-    add_compile_definitions(FRONTEND_FLTK)
-    message(STATUS "Building with FLTK")
-else()
-    message(STATUS "Not building with FLTK")
-endif()
 
-# =============================== target =======================================
+
+file (GLOB SRC
+    "main.c"
+    "${PROJECT_SOURCE_DIR}/common/game.c"
+)
+
 add_executable(arfminesweeper ${SRC})
-# ==============================================================================
 
-# target link dependencies
+target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_VERSION="${ARFMINESWEEPER_VERSION}")
+target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_NUM_COMMIT="${ARFMINESWEEPER_NUM_COMMIT}")
 
-target_link_libraries(arfminesweeper Threads::Threads m)
+target_include_directories(arfminesweeper PUBLIC "${PROJECT_SOURCE_DIR}/" "frontends/")
 
-if (CURSES_FOUND)
-    target_link_libraries(arfminesweeper ${CURSES_LIBRARIES})
-endif()
-
-if (WIN32)
-    target_link_libraries(arfminesweeper ws2_32 msimg32 D2d1)
-endif()
-
-if (DRM_FOUND)
-    target_link_libraries(arfminesweeper ${DRM_LIBRARIES})
-    target_include_directories(arfminesweeper PUBLIC ${DRM_INCLUDE_DIRS})
-endif()
-
-if (X11_FOUND)
-    target_link_libraries(arfminesweeper ${X11_LIBRARIES})
-
-    if (X11_xcb_FOUND)
-        target_link_libraries(arfminesweeper X11::xcb)
-    endif()
-
-    if (MOTIF_FOUND)
-        target_link_libraries(arfminesweeper ${MOTIF_LIBRARIES} Xt)
-    endif()
-
-    if (XAW_FOUND)
-        target_link_libraries(arfminesweeper ${XAW_LIBRARIES})
-    endif()
-
-    if (XFORMS_FOUND)
-        target_link_libraries(arfminesweeper forms)
-    endif()
-endif()
-
-if (GTK3_FOUND)
-    target_include_directories(arfminesweeper PUBLIC ${GTK3_INCLUDE_DIRS})
-    target_link_libraries(arfminesweeper ${GTK3_LIBRARIES})
-endif()
-
-if (Qt5Widgets_FOUND)
-    target_link_libraries(arfminesweeper Qt5::Widgets)
-endif()
-
-if (SDL2_FOUND AND SDL2_ttf_FOUND AND SDL2_image_FOUND)
-    target_link_libraries(arfminesweeper ${SDL2_LIBRARIES} ${SDL2_ttf_LIBRARIES} ${SDL2_image_LIBRARIES})
-endif()
-
-if (SDL_FOUND AND SDL_ttf_FOUND AND SDL_image_FOUND)
-    target_link_libraries(arfminesweeper ${SDL_LIBRARIES} ${SDL_ttf_LIBRARIES} ${SDL_image_LIBRARIES})
-endif()
-
-if (OpenGL_OpenGL_FOUND)
-    target_link_libraries(arfminesweeper OpenGL::GL)
-
-    if (GLUT_FOUND)
-        target_link_libraries(arfminesweeper ${GLUT_LIBRARIES})
-    endif()
-
-    if (glfw3_FOUND)
-        target_link_libraries(arfminesweeper glfw dl)
-    endif()
-endif()
-
-if (Vulkan_FOUND AND glfw3_FOUND)
-    target_link_libraries(arfminesweeper Vulkan::Vulkan)
-endif()
-
-if (WAYLAND_FOUND)
-    target_link_libraries(arfminesweeper wayland-client)
-endif()
-
-if (JNI_FOUND)
-    target_link_libraries(arfminesweeper ${JNI_LIBRARIES})
-endif()
-
-if (FLTK_FOUND)
-    target_link_libraries(arfminesweeper ${FLTK_LIBRARIES})
-endif()
+add_subdirectory("frontends/")
 
 # taget propieties
-set_property(TARGET arfminesweeper PROPERTY VERSION   ${ARFMINESWEEPER_VERSION})
+set_property(TARGET arfminesweeper PROPERTY VERSION ${ARFMINESWEEPER_VERSION})
 
 # target install
 install(TARGETS arfminesweeper RUNTIME DESTINATION bin)
 
-# package
+# base package
 set(CPACK_PACKAGE_NAME arfminesweeper)
 set(CPACK_DEBIAN_PACKAGE_VERSION ${GITVERSIONDETECT_VERSION})
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "arf20 <arf20@arf20.com>")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS
-    "libdrm2, libx11-6, libforms2, libgtk-3-0, libxcb1, libxm4, libxt6, libxaw7,
-    libforms2, libgtk-3-0, libglib2.0-0, libglib2.0-0, libqt5widgets5, 
-    libqt5gui5, libqt5core5a, 
-    libsdl2-2.0-0, libsdl2-ttf-2.0-0, libsdl2-image-2.0-0, libsdl1.2debian,
-    libgl1, libglut3.12, libglfw3, libvulkan1, libwayland-client0,
-    libstdc++6, libc6, libgcc-s1")
+if (NOT NO_STATIC)
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS
+        "libdrm2, libx11-6, libforms2, libgtk-3-0, libxcb1, libxm4, libxt6, libxaw7,
+        libforms2, libgtk-3-0, libglib2.0-0, libglib2.0-0, libqt5widgets5, 
+        libqt5gui5, libqt5core5a, 
+        libsdl2-2.0-0, libsdl2-ttf-2.0-0, libsdl2-image-2.0-0, libsdl1.2debian,
+        libgl1, libglut3.12, libglfw3, libvulkan1, libwayland-client0,
+        libstdc++6, libc6, libgcc-s1")
+else()
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS
+        "libc6")
+endif()
 set(CPACK_DEBIAN_PACKAGE_NAME "arfminesweeper")
 set(CPACK_DEBIAN_PACKAGE_SECTION "games")
 
 include(CPack)
+

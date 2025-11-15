@@ -36,7 +36,7 @@
 #include <GL/glx.h>
 #include <GL/glu.h>
 
-#include "common/gl_ffp.h"
+#include <common/gl_ffp.h>
 
 static int size = 0;
 static const int *board = NULL;

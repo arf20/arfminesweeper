@@ -29,7 +29,7 @@
 #include "gl11.h"
 #include <common/game.h>
 
-#include "common/gl_ffp.h"
+#include <common/gl_ffp.h>
 
 #define C_WHITE  1.0f, 1.0f, 1.0f
 #define C_BLACK  0.0f, 0.0f, 0.0f

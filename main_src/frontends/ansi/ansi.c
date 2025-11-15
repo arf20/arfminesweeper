@@ -31,7 +31,7 @@
 #include <common/frontconf.h>
 #include <common/game.h>
 
-#include "vt100.h"
+#include "ansi.h"
 
 static int size = 0;
 static const int *board = NULL;

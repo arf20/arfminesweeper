@@ -26,31 +26,31 @@
 
 #include <common/game.h>
 
-#include "frontends/console.h"
-#include "frontends/fbdev.h"
-#include "frontends/xlib.h"
-#include "frontends/motif.h"
-#include "frontends/xforms.h"
-#include "frontends/gtk3.h"
-#include "frontends/qt5.hpp"
-#include "frontends/sdl2.h"
-#include "frontends/sdl1.h"
-#include "frontends/gl11.h"
-#include "frontends/gl33.h"
-#include "frontends/vk.h"
-#include "frontends/win32.h"
-#include "frontends/httpd.h"
-#include "frontends/wayland.h"
-#include "frontends/xcb.h"
-#include "frontends/gdi.h"
-#include "frontends/d2d.h"
-#include "frontends/xaw.h"
-#include "frontends/drmfb.h"
-#include "frontends/vt100.h"
-#include "frontends/ansi.h"
-#include "frontends/java.h"
-#include "frontends/glx.h"
-#include "frontends/curses.h"
+#include <console/console.h>
+#include <fbdev/fbdev.h>
+#include <xlib/xlib.h>
+#include <motif/motif.h>
+#include <xforms/xforms.h>
+#include <gtk3/gtk3.h>
+#include <qt5/qt5.hpp>
+#include <sdl2/sdl2.h>
+#include <sdl1/sdl1.h>
+#include <gl11/gl11.h>
+#include <gl33/gl33.h>
+#include <vk/vk.h>
+#include <win32/win32.h>
+#include <httpd/httpd.h>
+#include <wayland/wayland.h>
+#include <xcb/xcb.h>
+#include <gdi/gdi.h>
+#include <d2d/d2d.h>
+#include <xaw/xaw.h>
+#include <drmfb/drmfb.h>
+#include <vt100/vt100.h>
+#include <ansi/ansi.h>
+#include <java/java.h>
+#include <glx/glx.h>
+#include <curses/curses.h>
 
 #include <common/frontconf.h>
 
