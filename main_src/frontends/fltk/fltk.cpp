@@ -51,15 +51,15 @@ static Fl_Box     **numbers;
 
 static Fl_PNG_Image *flagimg;
 
-Fl_Color C_WHITE    = fl_rgb_color(0xff, 0xff, 0xff);
-Fl_Color C_BLACK    = fl_rgb_color(0x00, 0x00, 0x00);
-Fl_Color C_BLUE     = fl_rgb_color(0x00, 0x00, 0xff);
-Fl_Color C_GREEN    = fl_rgb_color(0x00, 0xff, 0x00);
-Fl_Color C_RED      = fl_rgb_color(0xff, 0x00, 0x00);
-Fl_Color C_DARKBLUE = fl_rgb_color(0x00, 0x00, 0x8b);
-Fl_Color C_DARKRED  = fl_rgb_color(0x8b, 0x00, 0x00);
-Fl_Color C_DARKCYAN = fl_rgb_color(0x00, 0x8b, 0x8b);
-Fl_Color C_DARKGREY = fl_rgb_color(0xa9, 0xa9, 0xa9);
+static Fl_Color C_WHITE    = fl_rgb_color(0xff, 0xff, 0xff);
+static Fl_Color C_BLACK    = fl_rgb_color(0x00, 0x00, 0x00);
+static Fl_Color C_BLUE     = fl_rgb_color(0x00, 0x00, 0xff);
+static Fl_Color C_GREEN    = fl_rgb_color(0x00, 0xff, 0x00);
+static Fl_Color C_RED      = fl_rgb_color(0xff, 0x00, 0x00);
+static Fl_Color C_DARKBLUE = fl_rgb_color(0x00, 0x00, 0x8b);
+static Fl_Color C_DARKRED  = fl_rgb_color(0x8b, 0x00, 0x00);
+static Fl_Color C_DARKCYAN = fl_rgb_color(0x00, 0x8b, 0x8b);
+static Fl_Color C_DARKGREY = fl_rgb_color(0xa9, 0xa9, 0xa9);
 
 static void
 updateButtons() {
@@ -95,7 +95,6 @@ updateButtons() {
             window->hide();
         } break;
     }
-
 }
 
 void buttonCallback(Fl_Widget *w, void *data) {
@@ -124,13 +123,13 @@ FLTKStart(const int *lboard, int lsize) {
     
 
     window = new Fl_Window(wWidth, wHeight);
-    Fl_Box *title = new Fl_Box(60, 15, 0, 0, "arfminesweeper");
+    Fl_Box *title = new Fl_Box(60, 15, 0, 0, TXT_TITLE);
     title->box(FL_UP_BOX);
     title->labelsize(15);
 
     Fl::visual(FL_RGB);
 
-    Fl_Box *flagsLeftLabel = new Fl_Box(wWidth - 20, 15, 0, 0, "10");
+    Fl_Box *flagsLeftLabel = new Fl_Box(wWidth - 20, 35, 0, 0, "10");
     flagsLeftLabel->labelsize(15);
 
     flagimg = new Fl_PNG_Image(FLAG_PNG_PATH);
@@ -176,6 +175,7 @@ FLTKStart(const int *lboard, int lsize) {
     window->show(1, argv);
 
     Fl::run();
+    return 0;
 }
 
 void

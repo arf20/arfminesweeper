@@ -70,7 +70,7 @@ updateButtons() {
                     }
 
                     /* DEPRECATED because it "isn't useful in CSS-based
-                       rendering. some people don't use CSS... */
+                       rendering." some people don't use CSS... */
                     gtk_widget_override_background_color(numbers[btni],
                         GTK_STATE_FLAG_NORMAL, &c);
 
