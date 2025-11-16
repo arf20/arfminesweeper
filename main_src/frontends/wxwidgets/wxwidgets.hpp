@@ -18,10 +18,19 @@
 
 */
 
-#ifndef _ANSI_H
-#define _ANSI_H
+#ifndef _WXWIDGETS_H
+#define _WXWIDGETS_H
 
-int ansiStart(const int *lboard, int lsize);
-void ansiDestroy();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif /* _ANSI_H */
+int wxStart(const int *lboard, int lsize);
+void wxDestroy();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _WXWIDGETS_H */
+

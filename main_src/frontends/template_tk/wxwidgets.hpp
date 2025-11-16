@@ -18,10 +18,19 @@
 
 */
 
-#ifndef _ANSI_H
-#define _ANSI_H
+#ifndef _TEMPLATE_H
+#define _TEMPLATE_H
 
-int ansiStart(const int *lboard, int lsize);
-void ansiDestroy();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif /* _ANSI_H */
+int templateStart(const int *lboard, int lsize);
+void templateDestroy();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _TEMPLATE_H */
+

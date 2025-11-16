@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    xlib.c: X11 Xlib frontend
+    fltk.cpp: FLTK frontend
 
 */
 
@@ -43,6 +43,8 @@ static const int *board = NULL;
 static int size = 0;
 
 static int wWidth = 0, wHeight = 0;
+
+Fl_Window *window = NULL;
 
 static Fl_Button  **buttons;
 static Fl_Box     **numbers;
@@ -86,11 +88,11 @@ updateButtons() {
     switch (gameGetState()) {
         case STATE_LOST: {
             fl_message(TXT_LOST);
-            exit(0);
+            window->hide();
         } break;
         case STATE_WON: {
             fl_message(TXT_WON);
-            exit(0);
+            window->hide();
         } break;
     }
 
@@ -121,7 +123,7 @@ FLTKStart(const int *lboard, int lsize) {
         ((size - 1) * CELL_MARGIN);
     
 
-    Fl_Window *window = new Fl_Window(wWidth, wHeight);
+    window = new Fl_Window(wWidth, wHeight);
     Fl_Box *title = new Fl_Box(60, 15, 0, 0, "arfminesweeper");
     title->box(FL_UP_BOX);
     title->labelsize(15);

@@ -167,3 +167,8 @@ cursesStart(const int *lboard, int lsize) {
 
 }
 
+void
+cursesDestroy() {
+
+}
+

@@ -147,3 +147,9 @@ vt100Start(const int *lboard, int lsize) {
         }
     }
 }
+
+void
+vt100Destroy() {
+
+}
+

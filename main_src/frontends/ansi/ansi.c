@@ -164,3 +164,9 @@ ansiStart(const int *lboard, int lsize) {
         }
     }
 }
+
+void
+ansiDestroy() {
+
+}
+

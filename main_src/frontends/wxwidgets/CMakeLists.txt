@@ -1,0 +1,21 @@
+if (wxWidgets_FOUND)
+    include(UsewxWidgets)
+    if (SHARED AND NOT NO_WXWIDGETS)
+
+    else()
+        message(STATUS "Not building with shared wxwidgets")
+    endif()
+
+    if (NOT NO_STATIC AND NOT NO_WXWIDGETS)
+        target_sources(arfminesweeper PRIVATE "wxwidgets.cpp")
+        target_include_directories(arfminesweeper PUBLIC ${wxWidgets_INCLUDE_DIRS})
+        target_link_libraries(arfminesweeper wxWidgets::wxWidgets)
+        target_compile_definitions(arfminesweeper PUBLIC FRONTEND_WXWIDGETS)
+        message(STATUS "Building with static wxwidgets")
+    else()
+        message(STATUS "Not building with static wxwidgets")
+    endif()
+else()
+    message(STATUS "No WXWIDGETS found")
+endif()
+

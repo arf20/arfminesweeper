@@ -24,4 +24,5 @@ add_subdirectory("curses")
 add_subdirectory("xlib")
 add_subdirectory("httpd")
 add_subdirectory("drmfb")
+add_subdirectory("wxwidgets")
 

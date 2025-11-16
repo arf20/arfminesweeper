@@ -22,5 +22,6 @@
 #define _VT100_H
 
 int vt100Start(const int *lboard, int lsize);
+void vt100Destroy();
 
 #endif /* _VT100_H */

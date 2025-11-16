@@ -79,7 +79,7 @@ MAIN TARGET                       Linux BSD Mac Win
     Qt4                           X     X   X   X
     Qt5                     DONE  X     X   X   X
     Qt6                           X     X   X   X
-    wxWidgets                     X     X   X   X
+    wxWidgets               WIP   X     X   X   X
     WinAPI                  WIP                 X
     Win32 GDI               WIP                 X
     Direct2D                WIP                 X

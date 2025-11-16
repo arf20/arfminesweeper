@@ -52,6 +52,7 @@
 #include <glx/glx.h>
 #include <curses/curses.h>
 #include <fltk/fltk.hpp>
+#include <wxwidgets/wxwidgets.hpp>
 
 #include <common/frontconf.h>
 
@@ -149,6 +150,9 @@ printFrontends() {
     #endif
     #ifdef FRONTEND_FLTK
         printf("fltk ");
+    #endif
+    #ifdef FRONTEND_WXWIDGETS
+        printf("wxwidgets ");
     #endif
 
     printf("\n");
@@ -357,6 +361,7 @@ main(int argc, char **argv) {
     else if (!strcmp(frontend, "vt100")) {
         #ifdef FRONTEND_VT100
         vt100Start(gameGetBoard(), size);
+        vt100Destroy();
         #else
         printf("Error: Frontend vt100 not built\n");
         #endif
@@ -364,6 +369,7 @@ main(int argc, char **argv) {
     else if (!strcmp(frontend, "ansi")) {
         #ifdef FRONTEND_ANSI
         ansiStart(gameGetBoard(), size);
+        ansiDestroy();
         #else
         printf("Error: Frontend ansi not built\n");
         #endif
@@ -371,6 +377,7 @@ main(int argc, char **argv) {
     else if (!strcmp(frontend, "java")) {
         #ifdef FRONTEND_JAVA
         javaStart(gameGetBoard(), size);
+        javaDestroy();
         #else
         printf("Error: Frontend java not built\n");
         #endif
@@ -378,6 +385,7 @@ main(int argc, char **argv) {
     else if (!strcmp(frontend, "glx")) {
         #ifdef FRONTEND_GLX
         GLXStart(gameGetBoard(), size);
+        GLXDestroy();
         #else
         printf("Error: Frontend glx not built\n");
         #endif
@@ -385,6 +393,7 @@ main(int argc, char **argv) {
     else if (!strcmp(frontend, "curses")) {
         #ifdef FRONTEND_CURSES
         cursesStart(gameGetBoard(), size);
+        cursesDestroy();
         #else
         printf("Error: Frontend curses not built\n");
         #endif
@@ -392,6 +401,15 @@ main(int argc, char **argv) {
     else if (!strcmp(frontend, "fltk")) {
         #ifdef FRONTEND_FLTK
         FLTKStart(gameGetBoard(), size);
+        FLTKDestroy();
+        #else
+        printf("Error: Frontend fltk not built\n");
+        #endif
+    }
+    else if (!strcmp(frontend, "wxwidgets")) {
+        #ifdef FRONTEND_WXWIDGETS
+        wxStart(gameGetBoard(), size);
+        wxDestroy();
         #else
         printf("Error: Frontend fltk not built\n");
         #endif

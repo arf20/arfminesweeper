@@ -35,6 +35,7 @@ find_package(Vulkan)
 find_package(JNI)
 find_program(JAVAC javac)
 find_package(FLTK)
+find_package(wxWidgets COMPONENTS core base)
 
 
 file (GLOB SRC

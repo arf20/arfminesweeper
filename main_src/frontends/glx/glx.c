@@ -140,6 +140,9 @@ GLXStart(const int *lboard, int lsize) {
             } break;
         }
     }
+}
+
+void GLXDestroy() {
 
 }
 
