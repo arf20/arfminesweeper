@@ -29,6 +29,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/fl_ask.H>
+#include <FL/Fl_PNG_Image.H>
 
 #include <common/frontconf.h>
 
@@ -43,8 +44,10 @@ static int size = 0;
 
 static int wWidth = 0, wHeight = 0;
 
-Fl_Button  **buttons;
-Fl_Box     **numbers;
+static Fl_Button  **buttons;
+static Fl_Box     **numbers;
+
+static Fl_PNG_Image *flagimg;
 
 Fl_Color C_WHITE    = fl_rgb_color(0xff, 0xff, 0xff);
 Fl_Color C_BLACK    = fl_rgb_color(0x00, 0x00, 0x00);
@@ -60,9 +63,9 @@ static void
 updateButtons() {
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
-            int btni = (x * size) + y;
+            int btni = (size * y) + x;
 
-            if (!CHECK_MINE(BOARDXY(x, y))) {
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
                 buttons[btni]->hide();
                 if (gameGetSurroundingMines(x, y)) {
                     numbers[btni]->show();
@@ -70,9 +73,11 @@ updateButtons() {
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 /* show flag */
+                buttons[btni]->image(flagimg);
             }
             else {
                 /* normal */
+                buttons[btni]->image(NULL);
             }
         }
     }
@@ -96,10 +101,10 @@ void buttonCallback(Fl_Widget *w, void *data) {
 
     switch (Fl::event_button()) {
         case FL_LEFT_MOUSE: {
-            gameClearCell(btni / size, btni % size);
+            gameClearCell(btni % size, btni / size);
         } break;
         case FL_RIGHT_MOUSE: {
-            gameFlagCell(btni / size, btni % size);
+            gameFlagCell(btni % size, btni / size);
         } break;
     }
 
@@ -121,8 +126,12 @@ FLTKStart(const int *lboard, int lsize) {
     title->box(FL_UP_BOX);
     title->labelsize(15);
 
+    Fl::visual(FL_RGB);
+
     Fl_Box *flagsLeftLabel = new Fl_Box(wWidth - 20, 15, 0, 0, "10");
     flagsLeftLabel->labelsize(15);
+
+    flagimg = new Fl_PNG_Image(FLAG_PNG_PATH);
     
 
     buttons = (Fl_Button**)malloc(sizeof(Fl_Button*) * size * size);
@@ -138,8 +147,12 @@ FLTKStart(const int *lboard, int lsize) {
             int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
 
             buttons[btni] = new Fl_Button(cX, cY, CELL_SIZE, CELL_SIZE, "");
+            /* use address as data */
             buttons[btni]->callback(buttonCallback, (void*)btni);
             buttons[btni]->when(FL_WHEN_RELEASE);
+            buttons[btni]->horizontal_label_margin(0);
+            buttons[btni]->vertical_label_margin(-10);
+            buttons[btni]->label_image_spacing(0);
 
             int n = gameGetSurroundingMines(x, y);
             snprintf(buff, 256, "%d", n);
@@ -156,15 +169,7 @@ FLTKStart(const int *lboard, int lsize) {
                 case 7: numbers[btni]->labelcolor(C_BLACK); break;
                 case 8: numbers[btni]->labelcolor(C_DARKGREY); break;
             }
-
-            if (CHECK_MINE(BOARDXY(x, y)))
-                printf("M ");
-            else if (n > 0)
-                printf("%d ", n);
-            else
-                printf("  ");
         }
-        printf("\n");
     }
 
     window->end();
@@ -178,3 +183,4 @@ void
 FLTKDestroy() {
 
 }
+
