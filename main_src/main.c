@@ -51,6 +51,7 @@
 #include <java/java.h>
 #include <glx/glx.h>
 #include <curses/curses.h>
+#include <fltk/fltk.hpp>
 
 #include <common/frontconf.h>
 
@@ -194,7 +195,12 @@ main(int argc, char **argv) {
     gameInit(size, mines);
 
     if (!strcmp(frontend, "console")) {
+        #ifdef FRONTEND_CONSOLE
         conStart(gameGetBoard(), size);
+        conDestroy();
+        #else
+        printf("Error: Frontend console not built\n");
+        #endif
     }
     else if (!strcmp(frontend, "xlib")) {
         #ifdef FRONTEND_XLIB

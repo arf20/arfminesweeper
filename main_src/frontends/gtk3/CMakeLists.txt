@@ -5,7 +5,7 @@ if (GTK3_FOUND)
         message(STATUS "Not building with shared gtk3")
     endif()
 
-    if (NOT STATIC AND NOT NO_GTK3)
+    if (NOT NO_STATIC AND NOT NO_GTK3)
         target_sources(arfminesweeper PRIVATE "gtk3.c")
         target_include_directories(arfminesweeper PUBLIC ${GTK3_INCLUDE_DIRS})
         target_link_libraries(arfminesweeper ${GTK3_LIBRARIES})

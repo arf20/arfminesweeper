@@ -5,7 +5,7 @@ if (OpenGL_OpenGL_FOUND AND X11_FOUND)
         message(STATUS "Not building with shared glx")
     endif()
 
-    if (NOT STATIC AND NOT NO_GLX)
+    if (NOT NO_STATIC AND NOT NO_GLX)
         target_sources(arfminesweeper PRIVATE "glx.c" "../common/gl_ffp.c")
         target_link_libraries(arfminesweeper OpenGL::GL ${X11_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_GLX)

@@ -5,7 +5,7 @@ if (X11_FOUND AND MOTIF_FOUND)
         message(STATUS "Not building with shared motif")
     endif()
 
-    if (NOT STATIC AND NOT NO_MOTIF)
+    if (NOT NO_STATIC AND NOT NO_MOTIF)
         target_sources(arfminesweeper PRIVATE "motif.c")
         target_link_libraries(arfminesweeper ${MOTIF_LIBRARIES} Xt)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_MOTIF)

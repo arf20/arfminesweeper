@@ -5,7 +5,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         message(STATUS "Not building with shared fbdev")
     endif()
 
-    if (NOT STATIC AND NOT NO_FBDEV)
+    if (NOT NO_STATIC AND NOT NO_FBDEV)
         target_sources(arfminesweeper PRIVATE "fbdev.c" "../common/fb.c")
         target_link_libraries(arfminesweeper m)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_FBDEV)

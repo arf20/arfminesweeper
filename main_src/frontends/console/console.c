@@ -137,3 +137,9 @@ conStart(const int *lboard, int lsize) {
         }
     }
 }
+
+void
+conDestroy() {
+
+}
+

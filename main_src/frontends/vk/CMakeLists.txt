@@ -21,7 +21,7 @@ if (Vulkan_FOUND AND glfw3_FOUND)
         message(STATUS "Not building with shared vk")
     endif()
 
-    if (NOT STATIC AND NOT NO_VK)
+    if (NOT NO_STATIC AND NOT NO_VK)
         target_sources(arfminesweeper PRIVATE "vk.c")
         target_include_directories(arfminesweeper PUBLIC "../common/glad/include/")
         target_link_libraries(arfminesweeper Vulkan::Vulkan)

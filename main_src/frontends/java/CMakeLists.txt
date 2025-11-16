@@ -13,7 +13,7 @@ if (JNI_FOUND AND JAVAC)
         message(STATUS "Not building with shared java")
     endif()
 
-    if (NOT STATIC AND NOT NO_JAVA)
+    if (NOT NO_STATIC AND NOT NO_JAVA)
         target_sources(arfminesweeper PRIVATE "java.c")
         target_include_directories(arfminesweeper PUBLIC ${JNI_INCLUDE_DIRS})
         target_link_libraries(arfminesweeper ${JNI_LIBRARIES})

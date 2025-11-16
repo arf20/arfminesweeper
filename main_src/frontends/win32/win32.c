@@ -75,7 +75,7 @@ updateButtons(HWND hWnd) {
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
             /* Variables stuff */
-            int btni = (x * size) + y;
+            int btni = (y * size) + x;
 
             /* If clear, hide the button, count surrounding cells and print
                 n of mines */
@@ -120,7 +120,7 @@ WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
             int btni = -1;
             for (int i = 0; i < size * size; i++) if (labels[i] == (HWND)lParam) btni = i;
-            int n = gameGetSurroundingMines(btni / size, btni % size);
+            int n = gameGetSurroundingMines(btni % size, btni / size);
             switch (n) {
                 case 1: SetTextColor(hdcStatic, RGB(0, 0, 255)); break;
                 case 2: SetTextColor(hdcStatic, RGB(0, 255, 0)); break;
@@ -142,14 +142,14 @@ ButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_LBUTTONUP: {
             int btni = (int)GetProp(hWnd, TEXT("btni"));
-            gameClearCell(btni / size, btni % size);
+            gameClearCell(btni % size, btni / size);
             updateButtons(hWnd);
             printf("left click %d\n", btni);
             return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
         } break;
         case WM_RBUTTONUP: {
             int btni = (int)GetProp(hWnd, TEXT("btni"));
-            gameFlagCell(btni / size, btni % size);
+            gameFlagCell(btni % size, btni / size);
             updateButtons(hWnd);
             printf("right click %d\n", btni);
             return CallWindowProc((WNDPROC)OldButtonProc, hWnd, uMsg, wParam, lParam);
@@ -256,3 +256,4 @@ void
 Win32Destroy() {
     
 }
+

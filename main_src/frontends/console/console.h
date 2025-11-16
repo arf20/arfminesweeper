@@ -22,5 +22,6 @@
 #define _CONSOLE_H
 
 int conStart(const int *lboard, int lsize);
+void conDestroy();
 
 #endif /* _CONSOLE_H */

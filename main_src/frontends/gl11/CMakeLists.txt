@@ -5,7 +5,7 @@ if (OpenGL_OpenGL_FOUND AND GLUT_FOUND)
         message(STATUS "Not building with shared gl11")
     endif()
 
-    if (NOT STATIC AND NOT NO_GL11)
+    if (NOT NO_STATIC AND NOT NO_GL11)
         target_sources(arfminesweeper PRIVATE "gl11.c" "../common/gl_ffp.c")
         target_link_libraries(arfminesweeper OpenGL::GL ${GLUT_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_GL11)

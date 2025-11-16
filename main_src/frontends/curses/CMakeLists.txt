@@ -5,7 +5,7 @@ if (CURSES_FOUND)
         message(STATUS "Not building with shared console")
     endif()
 
-    if (NOT STATIC AND NOT NO_CONSOLE)
+    if (NOT NO_STATIC AND NOT NO_CONSOLE)
         target_sources(arfminesweeper PRIVATE "curses.c")
         target_link_libraries(arfminesweeper ${CURSES_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_CURSES)

@@ -50,7 +50,7 @@ updateButtons() {
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
             /* Variables stuff */
-            int btni = (x * size) + y;
+            int btni = (size * y) + x;
 
             /* If clear, hide the button, count surrounding cells and print
                 n of mines */
@@ -127,10 +127,10 @@ buttonCallback(FL_OBJECT *btn, long btni) {
 
     switch (e->xbutton.button) {
         case 1: { /* Left */
-            gameClearCell(btni / size, btni % size);
+            gameClearCell(btni % size, btni / size);
         } break;
         case 3: { /* Right */
-            gameFlagCell(btni / size, btni % size);
+            gameFlagCell(btni % size, btni / size);
         } break;
     }
 

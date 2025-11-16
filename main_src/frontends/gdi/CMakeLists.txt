@@ -5,7 +5,7 @@ if (WIN32)
         message(STATUS "Not building with shared gdi")
     endif()
 
-    if (NOT STATIC AND NOT NO_GDI)
+    if (NOT NO_STATIC AND NOT NO_GDI)
         target_sources(arfminesweeper PRIVATE "gdi.c")
         target_link_libraries(arfminesweeper msimg32)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_GDI)

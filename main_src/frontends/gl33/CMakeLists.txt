@@ -5,7 +5,7 @@ if (OpenGL_OpenGL_FOUND AND glfw3_FOUND)
         message(STATUS "Not building with shared gl33")
     endif()
 
-    if (NOT STATIC AND NOT NO_GL33)
+    if (NOT NO_STATIC AND NOT NO_GL33)
         target_sources(arfminesweeper PRIVATE "gl33.c" "../common/glutil.c"
             "../common/glad/glad.c")
         target_include_directories(arfminesweeper PUBLIC "../common/glad/include/")

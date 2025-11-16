@@ -5,7 +5,7 @@ if (Qt5Widgets_FOUND)
         message(STATUS "Not building with shared qt5")
     endif()
 
-    if (NOT STATIC AND NOT NO_QT5)
+    if (NOT NO_STATIC AND NOT NO_QT5)
         target_sources(arfminesweeper PRIVATE "qt5.cpp" "qt5.hpp")
         target_include_directories(arfminesweeper PUBLIC ${Qt5Widgets_INCLUDES})
         add_definitions(${Qt5Widgets_DEFINITIONS})

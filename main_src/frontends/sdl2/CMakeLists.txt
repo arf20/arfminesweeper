@@ -5,7 +5,7 @@ if (SDL2_FOUND AND SDL2_ttf_FOUND AND SDL2_image_FOUND)
         message(STATUS "Not building with shared sdl2")
     endif()
 
-    if (NOT STATIC AND NOT NO_SDL2)
+    if (NOT NO_STATIC AND NOT NO_SDL2)
         target_sources(arfminesweeper PRIVATE "sdl2.c")
         target_link_libraries(arfminesweeper ${SDL2_LIBRARIES} ${SDL2_ttf_LIBRARIES} ${SDL2_image_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_SDL2)
