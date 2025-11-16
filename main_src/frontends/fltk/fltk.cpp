@@ -150,9 +150,6 @@ FLTKStart(const int *lboard, int lsize) {
             /* use address as data */
             buttons[btni]->callback(buttonCallback, (void*)btni);
             buttons[btni]->when(FL_WHEN_RELEASE);
-            buttons[btni]->horizontal_label_margin(0);
-            buttons[btni]->vertical_label_margin(-10);
-            buttons[btni]->label_image_spacing(0);
 
             int n = gameGetSurroundingMines(x, y);
             snprintf(buff, 256, "%d", n);
