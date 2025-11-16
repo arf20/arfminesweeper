@@ -38,5 +38,23 @@ jobs:
         name: arfminesweeper-linux-tarball
         path: ./*.tar.gz
 
+    - name: Upload linux kernel module artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: arfminesweeper-linux-module
+        path: ./build/mod_src/arfminesweeper.ko
+
+    - name: Upload BIOS kernel image
+      uses: actions/upload-artifact@v4
+      with:
+        name: arfminesweeper-kernel-img
+        path: ./build/kernel_src/arfminesweeper.img
+
+    - name: Upload GRUB multiboot kernel ISO
+      uses: actions/upload-artifact@v4
+      with:
+        name: arfminesweeper-kernel-grub-iso
+        path: ./build/kernel_src/arfminesweeper.iso
+
     - name: Upload deb to repo
       run: RSYNC_PASSWORD=${{secrets.RSYNC_REPO_PASS}} rsync -avz ./*.deb rsync://debupload@arf20.com/debupload/pool/contrib/
