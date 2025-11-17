@@ -15,13 +15,13 @@ add_custom_command(
 )
 
 if (Vulkan_FOUND AND glfw3_FOUND)
-    if (MODULE AND NOT NO_VK)
+    if (MODULE_VK)
 
     else()
         message(STATUS "Not building with module vk")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_VK)
+    if (STATIC_VK)
         target_sources(arfminesweeper PRIVATE "vk.c")
         target_include_directories(arfminesweeper PUBLIC "../common/glad/include/")
         target_link_libraries(arfminesweeper Vulkan::Vulkan)

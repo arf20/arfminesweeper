@@ -25,8 +25,9 @@
 extern "C" {
 #endif
 
-int wxStart(const int *lboard, int lsize);
-void wxDestroy();
+int wxwidgets_start(const int *lboard, int lsize);
+void wxwidgets_destroy();
+const char *wxwidgets_name();
 
 #ifdef __cplusplus
 }

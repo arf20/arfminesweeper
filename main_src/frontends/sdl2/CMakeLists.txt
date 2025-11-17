@@ -1,11 +1,11 @@
 if (SDL2_FOUND AND SDL2_ttf_FOUND AND SDL2_image_FOUND)
-    if (MODULE AND NOT NO_SDL2)
+    if (MODULE_SDL2)
 
     else()
         message(STATUS "Not building with module sdl2")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_SDL2)
+    if (STATIC_SDL2)
         target_sources(arfminesweeper PRIVATE "sdl2.c")
         target_link_libraries(arfminesweeper ${SDL2_LIBRARIES} ${SDL2_ttf_LIBRARIES} ${SDL2_image_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_SDL2)

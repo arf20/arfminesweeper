@@ -1,11 +1,11 @@
 if (WAYLAND_FOUND)
-    if (MODULE AND NOT NO_WAYLAND)
+    if (MODULE_WAYLAND)
 
     else()
         message(STATUS "Not building with module wayland")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_WAYLAND)
+    if (STATIC_WAYLAND)
         target_sources(arfminesweeper PRIVATE "wayland.c")
         target_link_libraries(arfminesweeper wayland-client)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_WAYLAND)

@@ -21,7 +21,8 @@
 #ifndef _VT100_H
 #define _VT100_H
 
-int vt100Start(const int *lboard, int lsize);
-void vt100Destroy();
+int vt100_start(const int *lboard, int lsize);
+void vt100_destroy();
+const char *vt100_name();
 
 #endif /* _VT100_H */

@@ -21,7 +21,8 @@
 #ifndef _CURSES_H
 #define _CURSES_H
 
-int cursesStart(const int *lboard, int lsize);
-void cursesDestroy();
+int curses_start(const int *lboard, int lsize);
+void curses_destroy();
+const char *curses_name();
 
 #endif /* _CONSOLE_H */

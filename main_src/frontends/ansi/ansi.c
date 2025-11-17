@@ -93,7 +93,7 @@ printBoard() {
 }
 
 int
-ansiStart(const int *lboard, int lsize) {
+ansi_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -166,7 +166,12 @@ ansiStart(const int *lboard, int lsize) {
 }
 
 void
-ansiDestroy() {
+ansi_destroy() {
 
+}
+
+const char *
+ansi_name() {
+    return "ansi";
 }
 

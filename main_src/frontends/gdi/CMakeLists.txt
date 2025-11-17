@@ -1,11 +1,11 @@
 if (WIN32)
-    if (MODULE AND NOT NO_GDI)
+    if (MODULE_GDI)
 
     else()
         message(STATUS "Not building with module gdi")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_GDI)
+    if (STATIC_GDI)
         target_sources(arfminesweeper PRIVATE "gdi.c")
         target_link_libraries(arfminesweeper msimg32)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_GDI)

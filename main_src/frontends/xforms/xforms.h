@@ -21,7 +21,8 @@
 #ifndef _XFORMS_H
 #define _XFORMS_H
 
-int xformsStart(const int *lboard, int lsize);
-void xformsDestroy();
+int xforms_start(const int *lboard, int lsize);
+void xforms_destroy();
+const char *xforms_name();
 
 #endif /* _XLIB_H */

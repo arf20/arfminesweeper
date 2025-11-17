@@ -1,11 +1,11 @@
 if (WIN32)
-    if (MODULE AND NOT NO_D2D)
+    if (MODULE_D2D)
 
     else()
         message(STATUS "Not building with module d2d")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_D2D)
+    if (STATIC_D2D)
         target_sources(arfminesweeper PRIVATE "d2d.c")
         target_link_libraries(arfminesweeper D2d1)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_D2D)

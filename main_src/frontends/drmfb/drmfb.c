@@ -171,7 +171,7 @@ drm_setup_fb(int fd, drm_dev_t *dev) {
 }
 
 int
-drmfbStart(const int *lboard, int lsize) {
+drmfb_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -298,6 +298,12 @@ drmfbStart(const int *lboard, int lsize) {
 }
 
 void
-drmfbDestroy() {
+drmfb_destroy() {
 
 }
+
+const char *
+drmfb_name() {
+    return "drmfb";
+}
+

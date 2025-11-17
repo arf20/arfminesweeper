@@ -40,6 +40,7 @@ find_package(wxWidgets COMPONENTS core base)
 
 file (GLOB SRC
     "main.c"
+    "frontend.c"
     "${PROJECT_SOURCE_DIR}/common/game.c"
 )
 

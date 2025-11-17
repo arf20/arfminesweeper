@@ -199,7 +199,7 @@ activate(GtkApplication* app, gpointer user_data) {
 }
 
 int
-Gtk3Start(const int *lboard, int lsize) {
+gtk3_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -218,6 +218,12 @@ Gtk3Start(const int *lboard, int lsize) {
 }
 
 void
-Gtk3Destroy() {
+gtk3_destroy() {
 
 }
+
+const char *
+gtk3_name() {
+    return "gtk3";
+}
+

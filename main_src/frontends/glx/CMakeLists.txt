@@ -1,11 +1,11 @@
 if (OpenGL_OpenGL_FOUND AND X11_FOUND)
-    if (MODULE AND NOT NO_GLX)
+    if (MODULE_GLX)
 
     else()
         message(STATUS "Not building with module glx")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_GLX)
+    if (STATIC_GLX)
         target_sources(arfminesweeper PRIVATE "glx.c" "../common/gl_ffp.c")
         target_link_libraries(arfminesweeper OpenGL::GL ${X11_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_GLX)

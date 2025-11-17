@@ -1,11 +1,11 @@
 if (GTK3_FOUND)
-    if (MODULE AND NOT NO_GTK3)
+    if (MODULE_GTK3)
 
     else()
         message(STATUS "Not building with module gtk3")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_GTK3)
+    if (STATIC_GTK3)
         target_sources(arfminesweeper PRIVATE "gtk3.c")
         target_include_directories(arfminesweeper PUBLIC ${GTK3_INCLUDE_DIRS})
         target_link_libraries(arfminesweeper ${GTK3_LIBRARIES})

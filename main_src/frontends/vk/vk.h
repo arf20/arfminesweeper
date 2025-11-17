@@ -21,7 +21,8 @@
 #ifndef _VK_H
 #define _VK_H
 
-int vkStart(const int *lboard, int lsize);
-void vkDestroy();
+int vk_start(const int *lboard, int lsize);
+void vk_destroy();
+const char *vk_name();
 
 #endif /* _VK_H */

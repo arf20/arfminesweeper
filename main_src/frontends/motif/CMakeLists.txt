@@ -1,11 +1,11 @@
 if (X11_FOUND AND MOTIF_FOUND)
-    if (MODULE AND NOT NO_MOTIF)
+    if (MODULE_MOTIF)
 
     else()
         message(STATUS "Not building with module motif")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_MOTIF)
+    if (STATIC_MOTIF)
         target_sources(arfminesweeper PRIVATE "motif.c")
         target_link_libraries(arfminesweeper ${MOTIF_LIBRARIES} Xt)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_MOTIF)

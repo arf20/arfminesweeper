@@ -18,11 +18,20 @@
 
 */
 
-#ifndef _GL11_H
-#define _GL11_H
+#ifndef _TEMPLATE_H
+#define _TEMPLATE_H
 
-int gl11_start(const int *lboard, int lsize);
-void gl11_destroy();
-const char *gl11_name();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif /* _GL11_H */
+int template_start(const int *lboard, int lsize);
+void template_destroy();
+const char *template_name();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _TEMPLATE_H */
+

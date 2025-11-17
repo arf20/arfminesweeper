@@ -25,8 +25,9 @@
 extern "C" {
 #endif
 
-int FLTKStart(const int *lboard, int lsize);
-void FLTKDestroy();
+int fltk_start(const int *lboard, int lsize);
+void fltk_destroy();
+const char *fltk_name();
 
 #ifdef __cplusplus
 }

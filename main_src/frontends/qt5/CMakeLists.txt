@@ -1,11 +1,11 @@
 if (Qt5Widgets_FOUND)
-    if (MODULE AND NOT NO_QT5)
+    if (MODULE_QT5)
 
     else()
         message(STATUS "Not building with module qt5")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_QT5)
+    if (STATIC_QT5)
         target_sources(arfminesweeper PRIVATE "qt5.cpp" "qt5.hpp")
         target_include_directories(arfminesweeper PUBLIC ${Qt5Widgets_INCLUDES})
         add_definitions(${Qt5Widgets_DEFINITIONS})

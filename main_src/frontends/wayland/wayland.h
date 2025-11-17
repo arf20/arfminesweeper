@@ -21,7 +21,8 @@
 #ifndef _WAYLAND_H
 #define _WAYLAND_H
 
-int WaylandStart(const int *lboard, int lsize);
-void WaylandDestroy();
+int wayland_start(const int *lboard, int lsize);
+void wayland_destroy();
+const char *wayland_name();
 
 #endif /* _WAYLAND_H */

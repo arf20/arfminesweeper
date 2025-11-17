@@ -21,7 +21,8 @@
 #ifndef _XCB_H
 #define _XCB_H
 
-int xcbStart(const int *lboard, int lsize);
-void xcbDestroy();
+int xcb_start(const int *lboard, int lsize);
+void xcb_destroy();
+const char *xcb_name();
 
 #endif /* _XLIB_H */

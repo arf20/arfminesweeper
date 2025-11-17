@@ -18,19 +18,34 @@
 
 */
 
-#ifndef _TEMPLATE_H
-#define _TEMPLATE_H
+#ifndef _FRONTEND_H
+#define _FRONTEND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stddef.h>
 
-int templateStart(const int *lboard, int lsize);
-void templateDestroy();
+#define FRONTEND_VEC_INIT_SIZE  256
 
-#ifdef __cplusplus
-}
-#endif
+typedef enum { TYPE_STATIC, TYPE_MODULE } frontend_type_t;
 
-#endif /* _TEMPLATE_H */
+typedef int(start_func_t)(const int *, int);
+typedef void(destroy_func_t )();
+
+typedef struct {
+    frontend_type_t     type;
+    const char          *name;
+    start_func_t        *start_func;
+    destroy_func_t      *destroy_func;
+} frontend_t;
+
+
+extern frontend_t *frontends;
+extern size_t frontends_size, frontends_capacity;
+
+
+void frontend_init();
+void frontend_load_static();
+void frontend_load_modules();
+const frontend_t *frontend_find(const char *name);
+
+#endif /* _FRONTEND_H */
 

@@ -21,8 +21,9 @@
 #ifndef _XAW_H
 #define _XAW_H
 
-int XawStart(const int *lboard, int lsize);
-void XawDestroy();
+int xaw_start(const int *lboard, int lsize);
+void xaw_destroy();
+const char *xaw_name();
 
 #endif /* _XAW_H */
 

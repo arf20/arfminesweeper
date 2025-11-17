@@ -21,7 +21,8 @@
 #ifndef _XLIB_H
 #define _XLIB_H
 
-int XlibStart(const int *lboard, int lsize);
-void XlibDestroy();
+int xlib_start(const int *lboard, int lsize);
+void xlib_destroy();
+const char *xlib_name();
 
 #endif /* _XLIB_H */

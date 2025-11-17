@@ -390,7 +390,7 @@ loadFile(const char* path, char** buff, size_t* size) {
 }
 
 int
-httpdStart(const int* lboard, int lsize) {
+httpd_start(const int* lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -425,6 +425,12 @@ httpdStart(const int* lboard, int lsize) {
 }
 
 void
-httpdDestroy() {
+httpd_destroy() {
 
 }
+
+const char *
+httpd_name() {
+    return "httpd";
+}
+

@@ -1,11 +1,11 @@
 if (CURSES_FOUND)
-    if (MODULE AND NOT NO_CONSOLE)
+    if (MODULE_CURSES)
 
     else()
-        message(STATUS "Not building with module console")
+        message(STATUS "Not building with module curses")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_CONSOLE)
+    if (STATIC_CURSES)
         target_sources(arfminesweeper PRIVATE "curses.c")
         target_link_libraries(arfminesweeper ${CURSES_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_CURSES)

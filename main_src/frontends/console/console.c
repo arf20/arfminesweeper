@@ -85,7 +85,7 @@ parseXYCommand(char *buff, int *x, int *y) {
 }
 
 int
-conStart(const int *lboard, int lsize) {
+console_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -139,7 +139,12 @@ conStart(const int *lboard, int lsize) {
 }
 
 void
-conDestroy() {
+console_destroy() {
 
+}
+
+const char *
+console_name() {
+    return "console";
 }
 

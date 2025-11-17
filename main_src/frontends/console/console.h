@@ -21,7 +21,15 @@
 #ifndef _CONSOLE_H
 #define _CONSOLE_H
 
-int conStart(const int *lboard, int lsize);
-void conDestroy();
+#ifdef _MODULE_
+#define console_start   start
+#define console_destroy destroy
+#define console_name    name
+#endif
+
+int console_start(const int *lboard, int lsize);
+void console_destroy();
+
+const char *console_name();
 
 #endif /* _CONSOLE_H */

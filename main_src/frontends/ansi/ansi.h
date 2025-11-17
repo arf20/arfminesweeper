@@ -21,7 +21,8 @@
 #ifndef _ANSI_H
 #define _ANSI_H
 
-int ansiStart(const int *lboard, int lsize);
-void ansiDestroy();
+int ansi_start(const int *lboard, int lsize);
+void ansi_destroy();
+const char *ansi_name();
 
 #endif /* _ANSI_H */

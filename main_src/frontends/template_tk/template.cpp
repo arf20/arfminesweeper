@@ -66,7 +66,7 @@ updateButtons() {
 }
 
 int
-Start(const int *lboard, int lsize) {
+_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -89,7 +89,12 @@ Start(const int *lboard, int lsize) {
 }
 
 void
-Destroy() {
+_destroy() {
+
+}
+
+const char *
+_name() {
 
 }
 

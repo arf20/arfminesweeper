@@ -1,10 +1,10 @@
-if (MODULE AND NOT NO_VT100)
+if (MODULE_VT100)
 
 else()
     message(STATUS "Not building with module vt100")
 endif()
 
-if (NOT NO_STATIC AND NOT NO_VT100)
+if (STATIC_VT100)
     target_sources(arfminesweeper PRIVATE "vt100.c")
     target_compile_definitions(arfminesweeper PUBLIC FRONTEND_VT100)
     message(STATUS "Building with static vt100")

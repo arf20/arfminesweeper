@@ -46,14 +46,14 @@ static int wWidth = 0, wHeight = 0;
 static Display *d = NULL;
 static Window w;
 
-void
+static void
 drawStringN(int x, int y, const char *str, int n,
     GLfloat r, GLfloat g, GLfloat b)
 {
 
 }
 
-void
+static void
 drawTextMultiline(int x, int y, const char *str) {
 
 }
@@ -67,7 +67,7 @@ render() {
 }
 
 int
-GLXStart(const int *lboard, int lsize) {
+glx_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -142,7 +142,12 @@ GLXStart(const int *lboard, int lsize) {
     }
 }
 
-void GLXDestroy() {
+void glx_destroy() {
 
+}
+
+const char *
+glx_name() {
+    return "glx";
 }
 

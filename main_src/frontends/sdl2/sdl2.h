@@ -21,7 +21,8 @@
 #ifndef _SDL2_H
 #define _SDL2_H
 
-int SDL2Start(const int *lboard, int lsize);
-void SDL2Destroy();
+int sdl2_start(const int *lboard, int lsize);
+void sdl2_destroy();
+const char *sdl2_name();
 
 #endif /* _SDL2_H */

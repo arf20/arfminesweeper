@@ -21,7 +21,8 @@
 #ifndef _GDI_H
 #define _GDI_H
 
-int gdiStart(const int* lboard, int lsize);
-void gdiDestroy();
+int gdi_start(const int* lboard, int lsize);
+void gdi_destroy();
+const char *gdi_name();
 
 #endif /* _GDI_H */

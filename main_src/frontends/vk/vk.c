@@ -455,7 +455,7 @@ uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 /* ===================== MAIN ===================== */
 
 int
-vkStart(const int *lboard, int lsize) {
+vk_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -1057,7 +1057,7 @@ vkStart(const int *lboard, int lsize) {
 
 
 void
-vkDestroy() {
+vk_destroy() {
     vkDestroySemaphore(device, imageAvailableSemaphore, NULL);
     vkDestroySemaphore(device, renderFinishedSemaphore, NULL);
     vkDestroyFence(device, inFlightFence, NULL);
@@ -1091,5 +1091,10 @@ vkDestroy() {
     vkDestroyInstance(instance, NULL);
     glfwDestroyWindow(window);
     glfwTerminate();
+}
+
+const char *
+vk_name() {
+    return "vk";
 }
 

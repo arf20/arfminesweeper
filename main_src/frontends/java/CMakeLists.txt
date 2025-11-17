@@ -7,13 +7,13 @@ add_custom_command(
 )
 
 if (JNI_FOUND AND JAVAC)
-    if (MODULE AND NOT NO_JAVA)
+    if (MODULE_JAVA)
 
     else()
         message(STATUS "Not building with module java")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_JAVA)
+    if (STATIC_JAVA)
         target_sources(arfminesweeper PRIVATE "java.c")
         target_include_directories(arfminesweeper PUBLIC ${JNI_INCLUDE_DIRS})
         target_link_libraries(arfminesweeper ${JNI_LIBRARIES})

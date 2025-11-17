@@ -21,7 +21,8 @@
 #ifndef _JAVA_H
 #define _JAVA_H
 
-int javaStart(const int *lboard, int lsize);
-void javaDestroy();
+int java_start(const int *lboard, int lsize);
+void java_destroy();
+const char *java_name();
 
 #endif /* _JAVA_H */

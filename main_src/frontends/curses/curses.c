@@ -112,7 +112,7 @@ displayBoard() {
 }
 
 int
-cursesStart(const int *lboard, int lsize) {
+curses_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -168,7 +168,12 @@ cursesStart(const int *lboard, int lsize) {
 }
 
 void
-cursesDestroy() {
+curses_destroy() {
 
+}
+
+const char *
+curses_name() {
+    return "curses";
 }
 
