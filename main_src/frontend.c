@@ -22,8 +22,14 @@
 
 #include "frontend.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <dirent.h>
+#include <dlfcn.h>
+
+#include <common/frontconf.h>
 
 #include <console/console.h>
 #include <fbdev/fbdev.h>
@@ -52,6 +58,8 @@
 #include <curses/curses.h>
 #include <fltk/fltk.hpp>
 #include <wxwidgets/wxwidgets.hpp>
+
+typedef const char *(name_func_t)();
 
 frontend_t *frontends = NULL;
 size_t frontends_size = 0, frontends_capacity = 0;
@@ -159,7 +167,69 @@ frontend_load_static() {
 
 void
 frontend_load_modules() {
+    struct dirent *entry;
+    DIR *dir;
+    static char path[256];
 
+    dir = opendir(MODULE_SEARCH_PATH);
+    if (!dir) {
+        fprintf(stderr, "Error: opening directory %s: %s\n", MODULE_SEARCH_PATH,
+            strerror(errno));
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_name[0] == '.')
+            continue;
+
+        snprintf(path, 256, "%s/%s", MODULE_SEARCH_PATH, entry->d_name);
+        void *mod = dlopen(path, RTLD_NOW);
+        if (mod == NULL) {
+            fprintf(stderr, "Error: loading %s: %s\n", path, dlerror());
+            continue;
+        }
+        
+        name_func_t *name_func = dlsym(mod, "name");
+        if (!name_func) {
+            fprintf(stderr, "Error: retrieving symbol %s in %s: %s\n", "name",
+                path, dlerror());
+            continue;
+        }
+
+        start_func_t *start_func = dlsym(mod, "start");
+        if (!start_func) {
+            fprintf(stderr, "Error: retrieving symbol %s in %s: %s\n", "start",
+                path, dlerror());
+            continue;
+        }
+
+        destroy_func_t *destroy_func = dlsym(mod, "destroy");
+        if (!start_func) {
+            fprintf(stderr, "Error: retrieving symbol %s in %s: %s\n", "destroy",
+                path, dlerror());
+            continue;
+        }
+
+        const char *name = name_func();
+        if (!name) {
+            fprintf(stderr, "Error: unknown getting module name from %s: %s\n",
+                path);
+            continue;
+        }
+
+        frontend_t frontend = {
+            .type = TYPE_MODULE,
+            .name = name_func(),
+            .start_func = start_func,
+            .destroy_func = destroy_func
+        };
+
+        frontend_insert(&frontend);
+
+        printf("found %s\n", entry->d_name);
+    }
+
+    closedir(dir);
 }
 
 const frontend_t *

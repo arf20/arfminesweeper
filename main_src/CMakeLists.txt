@@ -46,6 +46,8 @@ file (GLOB SRC
 
 add_executable(arfminesweeper ${SRC})
 
+set_target_properties(arfminesweeper PROPERTIES ENABLE_EXPORTS TRUE)
+
 target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_VERSION="${ARFMINESWEEPER_VERSION}")
 target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_NUM_COMMIT="${ARFMINESWEEPER_NUM_COMMIT}")
 

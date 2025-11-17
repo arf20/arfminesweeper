@@ -45,14 +45,22 @@ print_usage(const char *self) {
 }
 
 void
+print_frontend(const frontend_t *frontend) {
+    printf("(%c)%s", "sm"[frontend->type], frontend->name);
+}
+
+void
 print_frontends() {
     printf("Available frontends:\n");
     if (frontends_size == 0)
         printf("\tNo frontends available.");
     else {
-        printf("\t%s", frontends[0].name);
-        for (int i = 1; i < frontends_size; i++)
-            printf(", %s", frontends[i].name);
+        printf("\t");
+        print_frontend(&frontends[0]);
+        for (int i = 1; i < frontends_size; i++) {
+            printf(", ");
+            print_frontend(&frontends[i]);
+        }
     }
     printf("\n");
 }
@@ -65,7 +73,10 @@ main(int argc, char **argv) {
         "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n\n");
 
     frontend_init();
+
     frontend_load_static();
+    frontend_load_modules();
+    
     print_frontends();
 
     const char *frontend_name = NULL;
@@ -98,7 +109,6 @@ main(int argc, char **argv) {
     const frontend_t *frontend = frontend_find(frontend_name);
     if (!frontend) {
         printf("Error: Frontend not recognised: %s\n", frontend_name);
-        print_frontends();
         exit(1);
     }
 
