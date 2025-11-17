@@ -1,8 +1,8 @@
 if (Qt5Widgets_FOUND)
-    if (SHARED AND NOT NO_QT5)
+    if (MODULE AND NOT NO_QT5)
 
     else()
-        message(STATUS "Not building with shared qt5")
+        message(STATUS "Not building with module qt5")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_QT5)

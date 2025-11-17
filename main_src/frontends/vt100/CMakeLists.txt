@@ -1,7 +1,7 @@
-if (SHARED AND NOT NO_VT100)
+if (MODULE AND NOT NO_VT100)
 
 else()
-    message(STATUS "Not building with shared vt100")
+    message(STATUS "Not building with module vt100")
 endif()
 
 if (NOT NO_STATIC AND NOT NO_VT100)

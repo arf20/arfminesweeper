@@ -1,8 +1,8 @@
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    if (SHARED AND NOT NO_FBDEV)
+    if (MODULE AND NOT NO_FBDEV)
 
     else()
-        message(STATUS "Not building with shared fbdev")
+        message(STATUS "Not building with module fbdev")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_FBDEV)

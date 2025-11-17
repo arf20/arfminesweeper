@@ -1,8 +1,8 @@
 if (GTK3_FOUND)
-    if (SHARED AND NOT NO_GTK3)
+    if (MODULE AND NOT NO_GTK3)
 
     else()
-        message(STATUS "Not building with shared gtk3")
+        message(STATUS "Not building with module gtk3")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_GTK3)

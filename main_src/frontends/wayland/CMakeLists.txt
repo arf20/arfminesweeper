@@ -1,8 +1,8 @@
 if (WAYLAND_FOUND)
-    if (SHARED AND NOT NO_WAYLAND)
+    if (MODULE AND NOT NO_WAYLAND)
 
     else()
-        message(STATUS "Not building with shared wayland")
+        message(STATUS "Not building with module wayland")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_WAYLAND)

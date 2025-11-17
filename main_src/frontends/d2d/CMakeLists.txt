@@ -1,8 +1,8 @@
 if (WIN32)
-    if (SHARED AND NOT NO_D2D)
+    if (MODULE AND NOT NO_D2D)
 
     else()
-        message(STATUS "Not building with shared d2d")
+        message(STATUS "Not building with module d2d")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_D2D)

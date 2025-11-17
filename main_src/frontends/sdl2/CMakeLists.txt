@@ -1,8 +1,8 @@
 if (SDL2_FOUND AND SDL2_ttf_FOUND AND SDL2_image_FOUND)
-    if (SHARED AND NOT NO_SDL2)
+    if (MODULE AND NOT NO_SDL2)
 
     else()
-        message(STATUS "Not building with shared sdl2")
+        message(STATUS "Not building with module sdl2")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_SDL2)

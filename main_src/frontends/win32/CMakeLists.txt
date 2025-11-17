@@ -1,8 +1,8 @@
 if (WIN32)
-    if (SHARED AND NOT NO_WIN32)
+    if (MODULE AND NOT NO_WIN32)
 
     else()
-        message(STATUS "Not building with shared win32")
+        message(STATUS "Not building with module win32")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_WIN32)

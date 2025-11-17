@@ -1,8 +1,8 @@
 if (X11_FOUND AND X11_xcb_FOUND)
-    if (SHARED AND NOT NO_XCB)
+    if (MODULE AND NOT NO_XCB)
 
     else()
-        message(STATUS "Not building with shared xcb")
+        message(STATUS "Not building with module xcb")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_XCB)

@@ -1,8 +1,8 @@
 if (X11_FOUND)
-    if (SHARED AND NOT NO_XLIB)
+    if (MODULE AND NOT NO_XLIB)
 
     else()
-        message(STATUS "Not building with shared xlib")
+        message(STATUS "Not building with module xlib")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_XLIB)

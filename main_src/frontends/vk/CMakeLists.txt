@@ -15,10 +15,10 @@ add_custom_command(
 )
 
 if (Vulkan_FOUND AND glfw3_FOUND)
-    if (SHARED AND NOT NO_VK)
+    if (MODULE AND NOT NO_VK)
 
     else()
-        message(STATUS "Not building with shared vk")
+        message(STATUS "Not building with module vk")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_VK)

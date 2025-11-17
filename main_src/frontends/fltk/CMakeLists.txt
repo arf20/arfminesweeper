@@ -1,8 +1,8 @@
 if (FLTK_FOUND)
-    if (SHARED AND NOT NO_FLTK)
+    if (MODULE AND NOT NO_FLTK)
 
     else()
-        message(STATUS "Not building with shared fltk")
+        message(STATUS "Not building with module fltk")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_FLTK)

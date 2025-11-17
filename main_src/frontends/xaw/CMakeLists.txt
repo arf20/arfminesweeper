@@ -1,8 +1,8 @@
 if (X11_FOUND AND XAW_FOUND)
-    if (SHARED AND NOT NO_XAW)
+    if (MODULE AND NOT NO_XAW)
 
     else()
-        message(STATUS "Not building with shared xaw")
+        message(STATUS "Not building with module xaw")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_XAW)

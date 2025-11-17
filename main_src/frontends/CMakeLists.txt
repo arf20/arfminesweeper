@@ -26,3 +26,8 @@ add_subdirectory("httpd")
 add_subdirectory("drmfb")
 add_subdirectory("wxwidgets")
 
+if (MODULE)
+    add_custom_target(module_mkdir ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${MODULE_DIR})
+  endif()
+

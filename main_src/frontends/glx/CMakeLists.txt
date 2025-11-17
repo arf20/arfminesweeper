@@ -1,8 +1,8 @@
 if (OpenGL_OpenGL_FOUND AND X11_FOUND)
-    if (SHARED AND NOT NO_GLX)
+    if (MODULE AND NOT NO_GLX)
 
     else()
-        message(STATUS "Not building with shared glx")
+        message(STATUS "Not building with module glx")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_GLX)

@@ -1,8 +1,8 @@
 if (OpenGL_OpenGL_FOUND AND GLUT_FOUND)
-    if (SHARED AND NOT NO_GL11)
+    if (MODULE AND NOT NO_GL11)
 
     else()
-        message(STATUS "Not building with shared gl11")
+        message(STATUS "Not building with module gl11")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_GL11)

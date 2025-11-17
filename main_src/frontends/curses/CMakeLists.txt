@@ -1,8 +1,8 @@
 if (CURSES_FOUND)
-    if (SHARED AND NOT NO_CONSOLE)
+    if (MODULE AND NOT NO_CONSOLE)
 
     else()
-        message(STATUS "Not building with shared console")
+        message(STATUS "Not building with module console")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_CONSOLE)

@@ -1,7 +1,12 @@
-if (SHARED AND NOT NO_CONSOLE)
-
+if (MODULE AND NOT NO_CONSOLE)
+    add_library(console MODULE "console.c")
+    get_target_property(outname console OUTPUT_NAME)
+    add_custom_target(symlink_console ALL
+        COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+        DEPENDS console)
+    message(STATUS "Building with module console")
 else()
-    message(STATUS "Not building with shared console")
+    message(STATUS "Not building with module console")
 endif()
 
 if (NOT NO_STATIC AND NOT NO_CONSOLE)

@@ -1,8 +1,8 @@
 if (DRM_FOUND AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    if (SHARED AND NOT NO_DRMFB)
+    if (MODULE AND NOT NO_DRMFB)
 
     else()
-        message(STATUS "Not building with shared drmfb")
+        message(STATUS "Not building with module drmfb")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_DRMFB)

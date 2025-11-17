@@ -1,8 +1,8 @@
 if (OpenGL_OpenGL_FOUND AND glfw3_FOUND)
-    if (SHARED AND NOT NO_GL33)
+    if (MODULE AND NOT NO_GL33)
 
     else()
-        message(STATUS "Not building with shared gl33")
+        message(STATUS "Not building with module gl33")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_GL33)

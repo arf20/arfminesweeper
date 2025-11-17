@@ -1,7 +1,7 @@
-if (SHARED AND NOT NO_ANSI)
+if (MODULE AND NOT NO_ANSI)
 
 else()
-    message(STATUS "Not building with shared ansi")
+    message(STATUS "Not building with module ansi")
 endif()
 
 if (NOT NO_STATIC AND NOT NO_ANSI)

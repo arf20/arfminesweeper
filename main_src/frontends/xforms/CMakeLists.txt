@@ -1,8 +1,8 @@
 if (X11_FOUND AND EXISTS "/usr/include/forms.h")
-    if (SHARED AND NOT NO_XFORMS)
+    if (MODULE AND NOT NO_XFORMS)
 
     else()
-        message(STATUS "Not building with shared xforms")
+        message(STATUS "Not building with module xforms")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_XFORMS)

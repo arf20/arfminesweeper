@@ -48,12 +48,16 @@ add_executable(arfminesweeper ${SRC})
 target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_VERSION="${ARFMINESWEEPER_VERSION}")
 target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_NUM_COMMIT="${ARFMINESWEEPER_NUM_COMMIT}")
 
-target_include_directories(arfminesweeper PUBLIC "${PROJECT_SOURCE_DIR}/" "frontends/")
+include_directories(arfminesweeper PUBLIC "${PROJECT_SOURCE_DIR}/" "frontends/")
+
+# module dir
+set(MODULE_DIR "${CMAKE_BINARY_DIR}/main_src/modules/")
 
 add_subdirectory("frontends/")
 
 # taget propieties
 set_property(TARGET arfminesweeper PROPERTY VERSION ${ARFMINESWEEPER_VERSION})
+
 
 # target install
 install(TARGETS arfminesweeper RUNTIME DESTINATION bin)

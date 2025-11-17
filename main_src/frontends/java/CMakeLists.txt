@@ -7,10 +7,10 @@ add_custom_command(
 )
 
 if (JNI_FOUND AND JAVAC)
-    if (SHARED AND NOT NO_JAVA)
+    if (MODULE AND NOT NO_JAVA)
 
     else()
-        message(STATUS "Not building with shared java")
+        message(STATUS "Not building with module java")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_JAVA)

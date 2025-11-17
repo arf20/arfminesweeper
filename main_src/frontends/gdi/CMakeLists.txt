@@ -1,8 +1,8 @@
 if (WIN32)
-    if (SHARED AND NOT NO_GDI)
+    if (MODULE AND NOT NO_GDI)
 
     else()
-        message(STATUS "Not building with shared gdi")
+        message(STATUS "Not building with module gdi")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_GDI)

@@ -1,8 +1,8 @@
 if (X11_FOUND AND MOTIF_FOUND)
-    if (SHARED AND NOT NO_MOTIF)
+    if (MODULE AND NOT NO_MOTIF)
 
     else()
-        message(STATUS "Not building with shared motif")
+        message(STATUS "Not building with module motif")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_MOTIF)

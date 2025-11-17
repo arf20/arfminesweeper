@@ -1,4 +1,4 @@
-if (SHARED AND NOT NO_HTTPD)
+if (MODULE AND NOT NO_HTTPD)
 
 else()
     message(STATUS "Not building with dynamic httpd")
