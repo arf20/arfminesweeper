@@ -21,6 +21,12 @@
 #ifndef _SDL1_H
 #define _SDL1_H
 
+#ifdef _MODULE_
+#define sdl1_start   start
+#define sdl1_destroy destroy
+#define sdl1_name    name
+#endif
+
 int sdl1_start(const int *lboard, int lsize);
 void sdl1_destroy();
 const char *sdl1_name();

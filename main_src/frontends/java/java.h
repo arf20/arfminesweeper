@@ -21,6 +21,12 @@
 #ifndef _JAVA_H
 #define _JAVA_H
 
+#ifdef _MODULE_
+#define java_start   start
+#define java_destroy destroy
+#define java_name    name
+#endif
+
 int java_start(const int *lboard, int lsize);
 void java_destroy();
 const char *java_name();

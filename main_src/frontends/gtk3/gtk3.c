@@ -25,6 +25,8 @@
 #include <common/frontconf.h>
 #include <common/game.h>
 
+#include "gtk3.h"
+
 static const int *board = NULL;
 static int size = 0;
 

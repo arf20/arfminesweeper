@@ -1,6 +1,12 @@
 if (X11_FOUND AND X11_xcb_FOUND)
     if (MODULE_XCB)
-
+        add_library(xcb MODULE "xcb.c")
+        target_compile_definitions(xcb PUBLIC _MODULE_)
+        target_link_libraries(xcb X11::xcb)
+        add_custom_target(symlink_xcb ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS xcb module_dir)
+        message(STATUS "Building with module xcb")
     else()
         message(STATUS "Not building with module xcb")
     endif()

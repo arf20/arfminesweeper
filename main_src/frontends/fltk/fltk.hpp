@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+#ifdef _MODULE_
+#define fltk_start   start
+#define fltk_destroy destroy
+#define fltk_name    name
+#endif
+
 int fltk_start(const int *lboard, int lsize);
 void fltk_destroy();
 const char *fltk_name();

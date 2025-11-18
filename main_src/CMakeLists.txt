@@ -61,6 +61,8 @@ add_subdirectory("frontends/")
 # taget propieties
 set_property(TARGET arfminesweeper PROPERTY VERSION ${ARFMINESWEEPER_VERSION})
 
+# for modules
+target_link_libraries(arfminesweeper dl)
 
 # target install
 install(TARGETS arfminesweeper RUNTIME DESTINATION bin)

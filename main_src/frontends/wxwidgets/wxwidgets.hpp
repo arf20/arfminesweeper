@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+#ifdef _MODULE_
+#define wxwidgets_start   start
+#define wxwidgets_destroy destroy
+#define wxwidgets_name    name
+#endif
+
 int wxwidgets_start(const int *lboard, int lsize);
 void wxwidgets_destroy();
 const char *wxwidgets_name();

@@ -21,6 +21,12 @@
 #ifndef _GL11_H
 #define _GL11_H
 
+#ifdef _MODULE_
+#define gl11_start   start
+#define gl11_destroy destroy
+#define gl11_name    name
+#endif
+
 int gl11_start(const int *lboard, int lsize);
 void gl11_destroy();
 const char *gl11_name();

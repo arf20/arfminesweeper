@@ -31,6 +31,7 @@
 #include <unistd.h>
 #include <termios.h>
 
+#define STB_IMAGE_IMPLEMENTATION
 #include <common/stb_image.h>
 
 #include <common/frontconf.h>

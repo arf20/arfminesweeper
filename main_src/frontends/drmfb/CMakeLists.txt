@@ -1,6 +1,13 @@
 if (DRM_FOUND AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (MODULE_DRMFB)
-
+        add_library(drmfb MODULE "drmfb.c" "../common/fb.c")
+        target_compile_definitions(drmfb PUBLIC _MODULE_)
+        target_link_libraries(drmfb ${DRM_LIBRARIES} m)
+        target_include_directories(drmfb PUBLIC ${DRM_INCLUDE_DIRS})
+        add_custom_target(symlink_drmfb ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS drmfb module_dir)
+        message(STATUS "Building with module drmfb")
     else()
         message(STATUS "Not building with module drmfb")
     endif()

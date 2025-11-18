@@ -21,6 +21,12 @@
 #ifndef _CURSES_H
 #define _CURSES_H
 
+#ifdef _MODULE_
+#define curses_start   start
+#define curses_destroy destroy
+#define curses_name    name
+#endif
+
 int curses_start(const int *lboard, int lsize);
 void curses_destroy();
 const char *curses_name();

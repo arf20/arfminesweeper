@@ -29,6 +29,8 @@
 #include <common/frontconf.h>
 #include <common/game.h>
 
+#include "xforms.h"
+
 static const int *board = NULL;
 static int size = 0;
 

@@ -1,11 +1,17 @@
 if (X11_FOUND AND EXISTS "/usr/include/forms.h")
-    if (MODULE AND NOT NO_XFORMS)
-
+    if (MODULE_XFORMS)
+        add_library(xforms MODULE "xforms.c")
+        target_compile_definitions(xforms PUBLIC _MODULE_)
+        target_link_libraries(xforms forms)
+        add_custom_target(symlink_xforms ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS xforms module_dir)
+        message(STATUS "Building with module xforms")
     else()
         message(STATUS "Not building with module xforms")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_XFORMS)
+    if (STATIC_XFORMS)
         target_sources(arfminesweeper PRIVATE "xforms.c")
         target_link_libraries(arfminesweeper forms)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_XFORMS)

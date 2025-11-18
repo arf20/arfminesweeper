@@ -21,6 +21,12 @@
 #ifndef _MOTIF_H
 #define _MOTIF_H
 
+#ifdef _MODULE_
+#define motif_start   start
+#define motif_destroy destroy
+#define motif_name    name
+#endif
+
 int motif_start(const int *lboard, int lsize);
 void motif_destroy();
 const char *motif_name();

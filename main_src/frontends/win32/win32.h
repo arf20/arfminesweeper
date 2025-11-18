@@ -21,6 +21,12 @@
 #ifndef _WIN32_H
 #define _WIN32_H
 
+#ifdef _MODULE_
+#define win32_start   start
+#define win32_destroy destroy
+#define win32_name    name
+#endif
+
 int win32_start(const int *lboard, int lsize);
 void win32_destroy();
 const char *win32_name();

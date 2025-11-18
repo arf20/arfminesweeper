@@ -1,6 +1,13 @@
 if (FLTK_FOUND)
     if (MODULE_FLTK)
-
+        add_library(fltk MODULE "fltk.cpp")
+        target_compile_definitions(fltk PUBLIC _MODULE_)
+        target_link_libraries(fltk ${FLTK_LIBRARIES})
+        target_include_directories(fltk PUBLIC "/usr/include/cairo/")
+        add_custom_target(symlink_fltk ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS fltk module_dir)
+        message(STATUS "Building with module fltk")
     else()
         message(STATUS "Not building with module fltk")
     endif()
@@ -8,6 +15,7 @@ if (FLTK_FOUND)
     if (STATIC_FLTK)
         target_sources(arfminesweeper PRIVATE "fltk.cpp")
         target_link_libraries(arfminesweeper ${FLTK_LIBRARIES})
+        target_include_directories(arfminesweeper PUBLIC "/usr/include/cairo/")
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_FLTK)
         message(STATUS "Building with static fltk")
     else()

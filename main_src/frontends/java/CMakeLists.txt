@@ -8,7 +8,14 @@ add_custom_command(
 
 if (JNI_FOUND AND JAVAC)
     if (MODULE_JAVA)
-
+        add_library(java MODULE "java.c")
+        target_compile_definitions(java PUBLIC _MODULE_)
+        target_include_directories(java PUBLIC ${JNI_INCLUDE_DIRS})
+        target_link_libraries(java ${JNI_LIBRARIES})
+        add_custom_target(symlink_java ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS java module_dir)
+        message(STATUS "Building with module java")
     else()
         message(STATUS "Not building with module java")
     endif()

@@ -21,6 +21,12 @@
 #ifndef _GLX_H
 #define _GLX_H
 
+#ifdef _MODULE_
+#define glx_start   start
+#define glx_destroy destroy
+#define glx_name    name
+#endif
+
 int glx_start(const int *lboard, int lsize);
 void glx_destroy();
 const char *glx_name();

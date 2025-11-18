@@ -1,6 +1,12 @@
 if (CURSES_FOUND)
     if (MODULE_CURSES)
-
+        add_library(curses MODULE "curses.c")
+        target_compile_definitions(curses PUBLIC _MODULE_)
+        target_link_libraries(curses ${CURSES_LIBRARIES})
+        add_custom_target(symlink_curses ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS curses module_dir)
+        message(STATUS "Building with module curses")
     else()
         message(STATUS "Not building with module curses")
     endif()

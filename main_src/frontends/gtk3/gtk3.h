@@ -21,6 +21,12 @@
 #ifndef _GTK3_H
 #define _GTK3_H
 
+#ifdef _MODULE_
+#define gtk3_start   start
+#define gtk3_destroy destroy
+#define gtk3_name    name
+#endif
+
 int gtk3_start(const int *lboard, int lsize);
 void gtk3_destroy();
 const char *gtk3_name();

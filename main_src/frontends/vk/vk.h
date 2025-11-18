@@ -21,6 +21,12 @@
 #ifndef _VK_H
 #define _VK_H
 
+#ifdef _MODULE_
+#define vk_start   start
+#define vk_destroy destroy
+#define vk_name    name
+#endif
+
 int vk_start(const int *lboard, int lsize);
 void vk_destroy();
 const char *vk_name();

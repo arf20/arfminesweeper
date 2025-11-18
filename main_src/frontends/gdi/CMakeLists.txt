@@ -1,6 +1,12 @@
 if (WIN32)
     if (MODULE_GDI)
-
+        add_library(gdi MODULE "gdi.c")
+        target_compile_definitions(gdi PUBLIC _MODULE_)
+        target_link_libraries(gdi msimg32)
+        add_custom_target(symlink_gdi ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS gdi module_dir)
+        message(STATUS "Building with module gdi")
     else()
         message(STATUS "Not building with module gdi")
     endif()

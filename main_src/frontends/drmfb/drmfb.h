@@ -21,6 +21,12 @@
 #ifndef _DRMFB_H
 #define _DRMFB_H
 
+#ifdef _MODULE_
+#define drmfb_start   start
+#define drmfb_destroy destroy
+#define drmfb_name    name
+#endif
+
 int drmfb_start(const int *lboard, int lsize);
 void drmfb_destroy();
 const char *drmfb_name();

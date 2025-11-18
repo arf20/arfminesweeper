@@ -1,11 +1,17 @@
 if (X11_FOUND)
-    if (MODULE AND NOT NO_XLIB)
-
+    if (MODULE_XLIB)
+        add_library(xlib MODULE "xlib.c")
+        target_compile_definitions(xlib PUBLIC _MODULE_)
+        target_link_libraries(xlib ${X11_LIBRARIES})
+        add_custom_target(symlink_xlib ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS xlib module_dir)
+        message(STATUS "Building with module xlib")
     else()
         message(STATUS "Not building with module xlib")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_XLIB)
+    if (STATIC_XLIB)
         target_sources(arfminesweeper PRIVATE "xlib.c")
         target_link_libraries(arfminesweeper ${X11_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_XLIB)

@@ -21,6 +21,12 @@
 #ifndef _GDI_H
 #define _GDI_H
 
+#ifdef _MODULE_
+#define gdi_start   start
+#define gdi_destroy destroy
+#define gdi_name    name
+#endif
+
 int gdi_start(const int* lboard, int lsize);
 void gdi_destroy();
 const char *gdi_name();

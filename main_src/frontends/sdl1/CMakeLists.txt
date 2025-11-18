@@ -1,6 +1,12 @@
 if (SDL_FOUND AND SDL_ttf_FOUND AND SDL_image_FOUND)
     if (MODULE_SDL1)
-
+        add_library(sdl1 MODULE "sdl1.c")
+        target_compile_definitions(sdl1 PUBLIC _MODULE_)
+        target_link_libraries(sdl1 ${SDL_LIBRARIES} ${SDL_ttf_LIBRARIES} ${SDL_image_LIBRARIES})
+        add_custom_target(symlink_sdl1 ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS sdl1 module_dir)
+        message(STATUS "Building with module sdl1")
     else()
         message(STATUS "Not building with module sdl1")
     endif()

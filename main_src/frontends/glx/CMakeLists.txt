@@ -1,6 +1,12 @@
 if (OpenGL_OpenGL_FOUND AND X11_FOUND)
     if (MODULE_GLX)
-
+        add_library(glx MODULE "glx.c" "../common/gl_ffp.c")
+        target_compile_definitions(glx PUBLIC _MODULE_)
+        target_link_libraries(glx OpenGL::GL ${X11_LIBRARIES})
+        add_custom_target(symlink_glx ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS glx module_dir)
+        message(STATUS "Building with module glx")
     else()
         message(STATUS "Not building with module glx")
     endif()

@@ -185,7 +185,7 @@ frontend_load_modules() {
         snprintf(path, 256, "%s/%s", MODULE_SEARCH_PATH, entry->d_name);
         void *mod = dlopen(path, RTLD_NOW);
         if (mod == NULL) {
-            fprintf(stderr, "Error: loading %s: %s\n", path, dlerror());
+            fprintf(stderr, "Error: loading %s\n", dlerror());
             continue;
         }
         
@@ -225,8 +225,6 @@ frontend_load_modules() {
         };
 
         frontend_insert(&frontend);
-
-        printf("found %s\n", entry->d_name);
     }
 
     closedir(dir);

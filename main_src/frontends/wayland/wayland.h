@@ -21,6 +21,12 @@
 #ifndef _WAYLAND_H
 #define _WAYLAND_H
 
+#ifdef _MODULE_
+#define wayland_start   start
+#define wayland_destroy destroy
+#define wayland_name    name
+#endif
+
 int wayland_start(const int *lboard, int lsize);
 void wayland_destroy();
 const char *wayland_name();

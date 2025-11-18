@@ -21,6 +21,12 @@
 #ifndef _XLIB_H
 #define _XLIB_H
 
+#ifdef _MODULE_
+#define xlib_start   start
+#define xlib_destroy destroy
+#define xlib_name    name
+#endif
+
 int xlib_start(const int *lboard, int lsize);
 void xlib_destroy();
 const char *xlib_name();

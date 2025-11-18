@@ -21,6 +21,12 @@
 #ifndef _XAW_H
 #define _XAW_H
 
+#ifdef _MODULE_
+#define xaw_start   start
+#define xaw_destroy destroy
+#define xaw_name    name
+#endif
+
 int xaw_start(const int *lboard, int lsize);
 void xaw_destroy();
 const char *xaw_name();

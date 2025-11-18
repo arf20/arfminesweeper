@@ -32,6 +32,8 @@
 
 #include <common/frontconf.h>
 
+#include "motif.h"
+
 static const int *board = NULL;
 static int size = 0;
 

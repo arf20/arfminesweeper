@@ -1,5 +1,11 @@
 if (MODULE_HTTPD)
-
+    add_library(httpd MODULE "httpd.c")
+    target_compile_definitions(httpd PUBLIC _MODULE_)
+    target_link_libraries(httpd Threads::Threads)
+    add_custom_target(symlink_httpd ALL
+        COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+        DEPENDS httpd module_dir)
+    message(STATUS "Building with module httpd")
 else()
     message(STATUS "Not building with dynamic httpd")
 endif()
