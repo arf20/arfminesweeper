@@ -212,7 +212,7 @@ frontend_load_modules() {
 
         const char *name = name_func();
         if (!name) {
-            fprintf(stderr, "Error: unknown getting module name from %s: %s\n",
+            fprintf(stderr, "Error: unknown getting module name from %s\n",
                 path);
             continue;
         }

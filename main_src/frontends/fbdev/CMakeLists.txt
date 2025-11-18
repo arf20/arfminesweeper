@@ -1,6 +1,6 @@
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (MODULE_FBDEV)
-        add_library(fbdev MODULE "fbdev.c" "../common/fb.c")
+        add_library(fbdev MODULE "fbdev.c" "../common/fb.c" "../common/stb_image_impl.c")
         target_compile_definitions(fbdev PUBLIC _MODULE_)
         target_link_libraries(fbdev m)
         add_custom_target(symlink_fbdev ALL
@@ -12,7 +12,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif()
 
     if (STATIC_FBDEV)
-        target_sources(arfminesweeper PRIVATE "fbdev.c" "../common/fb.c")
+        target_sources(arfminesweeper PRIVATE "fbdev.c" "../common/fb.c" "../common/stb_image_impl.c")
         target_link_libraries(arfminesweeper m)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_FBDEV)
         message(STATUS "Building with static fbdev")

@@ -31,7 +31,6 @@
 #include <unistd.h>
 #include <termios.h>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <common/stb_image.h>
 
 #include <common/frontconf.h>
@@ -44,7 +43,7 @@
 
 #include "drmfb.h"
 
-#define DRM_DEV "/dev/dri/card0"    /* FIXME: use first DRI device */
+#define DRM_DEV "/dev/dri/card0"    /* FIXME: uses first DRI device */
 
 typedef struct drm_dev_s {
     uint32_t *buf;
