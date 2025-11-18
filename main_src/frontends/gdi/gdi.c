@@ -170,7 +170,7 @@ WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 }
 
 int
-gdiStart(const int* lboard, int lsize) {
+gdi_start(const int* lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -217,6 +217,12 @@ gdiStart(const int* lboard, int lsize) {
 }
 
 void
-gdiDestroy() {
+gdi_destroy() {
 
 }
+
+const char *
+gdi_name() {
+    return "gdi";
+}
+

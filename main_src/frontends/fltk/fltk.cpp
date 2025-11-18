@@ -113,7 +113,7 @@ void buttonCallback(Fl_Widget *w, void *data) {
 }
 
 int
-FLTKStart(const int *lboard, int lsize) {
+fltk_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -179,7 +179,12 @@ FLTKStart(const int *lboard, int lsize) {
 }
 
 void
-FLTKDestroy() {
+fltk_destroy() {
 
+}
+
+const char *
+fltk_name() {
+    return "fltk";
 }
 

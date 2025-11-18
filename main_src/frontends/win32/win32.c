@@ -162,7 +162,7 @@ ButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 }
 
 int
-Win32Start(const int *lboard, int lsize) {
+win32_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -253,7 +253,12 @@ Win32Start(const int *lboard, int lsize) {
 }
 
 void
-Win32Destroy() {
+win32_destroy() {
     
+}
+
+const char *
+win32_name() {
+    return "win32";
 }
 

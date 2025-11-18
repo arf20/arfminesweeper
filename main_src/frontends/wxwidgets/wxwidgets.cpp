@@ -188,7 +188,7 @@ public:
 
 
 int
-wxStart(const int *lboard, int lsize) {
+wxwidgets_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -212,10 +212,13 @@ wxStart(const int *lboard, int lsize) {
     return 0;
 }
 
-
-
 void
-wxDestroy() {
+wxwidgets_destroy() {
 
+}
+
+const char *
+wxwidgets_name() {
+    return "wxwidgets";
 }
 

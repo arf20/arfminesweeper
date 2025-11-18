@@ -53,7 +53,7 @@ endif()
 add_subdirectory("main_src")
 
 
-if (LINUX AND NOT NO_MODULE)
+if (LINUX AND NOT NO_LINUX_MODULE)
 	add_subdirectory("mod_src")    
 else()
     message(STATUS "Not building linux kernel module")

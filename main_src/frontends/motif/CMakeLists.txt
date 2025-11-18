@@ -1,11 +1,17 @@
 if (X11_FOUND AND MOTIF_FOUND)
-    if (SHARED AND NOT NO_MOTIF)
-
+    if (MODULE_MOTIF)
+        add_library(motif MODULE "motif.c")
+        target_compile_definitions(motif PUBLIC _MODULE_)
+        target_link_libraries(motif ${MOTIF_LIBRARIES} Xt)
+        add_custom_target(symlink_motif ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS motif module_dir)
+        message(STATUS "Building with module motif")
     else()
-        message(STATUS "Not building with shared motif")
+        message(STATUS "Not building with module motif")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_MOTIF)
+    if (STATIC_MOTIF)
         target_sources(arfminesweeper PRIVATE "motif.c")
         target_link_libraries(arfminesweeper ${MOTIF_LIBRARIES} Xt)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_MOTIF)

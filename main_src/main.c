@@ -26,33 +26,7 @@
 
 #include <common/game.h>
 
-#include <console/console.h>
-#include <fbdev/fbdev.h>
-#include <xlib/xlib.h>
-#include <motif/motif.h>
-#include <xforms/xforms.h>
-#include <gtk3/gtk3.h>
-#include <qt5/qt5.hpp>
-#include <sdl2/sdl2.h>
-#include <sdl1/sdl1.h>
-#include <gl11/gl11.h>
-#include <gl33/gl33.h>
-#include <vk/vk.h>
-#include <win32/win32.h>
-#include <httpd/httpd.h>
-#include <wayland/wayland.h>
-#include <xcb/xcb.h>
-#include <gdi/gdi.h>
-#include <d2d/d2d.h>
-#include <xaw/xaw.h>
-#include <drmfb/drmfb.h>
-#include <vt100/vt100.h>
-#include <ansi/ansi.h>
-#include <java/java.h>
-#include <glx/glx.h>
-#include <curses/curses.h>
-#include <fltk/fltk.hpp>
-#include <wxwidgets/wxwidgets.hpp>
+#include "frontend.h"
 
 #include <common/frontconf.h>
 
@@ -61,7 +35,7 @@
 #endif
 
 void
-printUsage(const char *self) {
+print_usage(const char *self) {
     printf("Usage: %s [--frontend|-f API] [--size|-s size]\n"
         "\t[--mines|-m N of mines] [--help]\n\n"
         "\t--help | -h:     Get this message\n"
@@ -71,90 +45,23 @@ printUsage(const char *self) {
 }
 
 void
-printFrontends() {
-    printf("Built with the following frontends:\n");
-    #ifdef FRONTEND_CONSOLE
-        printf("\tconsole ");
-    #endif
-    #ifdef FRONTEND_FBDEV
-        printf("fbdev ");
-    #endif
-    #ifdef FRONTEND_XLIB
-        printf("xlib ");
-    #endif
-    #ifdef FRONTEND_MOTIF
-        printf("motif ");
-    #endif
-    #ifdef FRONTEND_XFORMS
-        printf("xforms ");
-    #endif
-    #ifdef FRONTEND_GTK3
-        printf("gtk3 ");
-    #endif
-    #ifdef FRONTEND_QT5
-        printf("qt5 ");
-    #endif
-    #ifdef FRONTEND_SDL2
-        printf("sdl2 ");
-    #endif
-    #ifdef FRONTEND_SDL1
-        printf("sdl12 ");
-    #endif
-    #ifdef FRONTEND_GL11
-        printf("gl11 ");
-    #endif
-    #ifdef FRONTEND_GL33
-        printf("gl33 ");
-    #endif
-    #ifdef FRONTEND_VK
-        printf("vk ");
-    #endif
-    #ifdef FRONTEND_WIN32
-        printf("win32 ");
-    #endif
-    #ifdef FRONTEND_HTTPD
-        printf("webapp ");
-    #endif
-    #ifdef FRONTEND_WAYLAND
-        printf("wayland ");
-    #endif
-    #ifdef FRONTEND_XCB
-        printf("xcb ");
-    #endif
-    #ifdef FRONTEND_GDI
-        printf("gdi ");
-    #endif
-    #ifdef FRONTEND_D2D
-        printf("d2d ");
-    #endif
-    #ifdef FRONTEND_XAW
-        printf("xaw ");
-    #endif
-    #ifdef FRONTEND_DRMFB
-        printf("drmfb ");
-    #endif
-    #ifdef FRONTEND_VT100
-        printf("vt100 ");
-    #endif
-    #ifdef FRONTEND_ANSI
-        printf("ansi ");
-    #endif
-    #ifdef FRONTEND_JAVA
-        printf("java ");
-    #endif
-    #ifdef FRONTEND_GLX
-        printf("glx ");
-    #endif
-    #ifdef FRONTEND_CURSES
-        printf("curses ");
-    #endif
-    #ifdef FRONTEND_FLTK
-        printf("fltk ");
-    #endif
-    #ifdef FRONTEND_WXWIDGETS
-        printf("wxwidgets ");
-    #endif
+print_frontend(const frontend_t *frontend) {
+    printf("(%c)%s", "sm"[frontend->type], frontend->name);
+}
 
+void
+print_frontends() {
+    printf("Available frontends:\n");
+    if (frontends_size == 0)
+        printf("\tNo frontends available.");
+    else {
+        printf("\t");
+        print_frontend(&frontends[0]);
+        for (int i = 1; i < frontends_size; i++) {
+            printf(", ");
+            print_frontend(&frontends[i]);
+        }
+    }
     printf("\n");
 }
 
@@ -165,9 +72,14 @@ main(int argc, char **argv) {
         "Copyright (C) 2023-25 Ángel Ruiz Fernandez <arf20@arf20.com>\n"
         "License GPLv3+ <http://gnu.org/licenses/gpl.html>\n\n");
 
-    printFrontends();
+    frontend_init();
 
-    const char *frontend = NULL;
+    frontend_load_static();
+    frontend_load_modules();
+    
+    print_frontends();
+
+    const char *frontend_name = NULL;
     int size = 0, mines = 0;
 
     /* Parse command-line options */
@@ -176,13 +88,13 @@ main(int argc, char **argv) {
     }
     else if (argc == 2 || argc == 4 || argc == 6) {
         /* Unpossible */
-        printUsage(argv[0]);
+        print_usage(argv[0]);
         exit(1);
     }
     else {
         for (int i = 1; i < argc; i += 2) {
             if (!strcmp(argv[i], "--frontend") || !strcmp(argv[i], "-f"))
-                frontend = argv[i + 1];
+                frontend_name = argv[i + 1];
             if (!strcmp(argv[i], "--size") || !strcmp(argv[i], "-s"))
                 size = atoi(argv[i + 1]);
             if (!strcmp(argv[i], "--mines") || !strcmp(argv[i], "-m"))
@@ -190,236 +102,25 @@ main(int argc, char **argv) {
         }
     }
 
-    if (frontend == NULL) frontend = "console";
+    if (frontend_name == NULL) frontend_name = "console";
     if (size == 0) size = 8;
     if (mines == 0) mines = 10;
 
+    const frontend_t *frontend = frontend_find(frontend_name);
+    if (!frontend) {
+        printf("Error: Frontend not recognised: %s\n", frontend_name);
+        exit(1);
+    }
+
     printf("Starting game with %s frontend, %dx%d in size with %d mines\n",
-        frontend, size, size, mines);
+        frontend->name, size, size, mines);
     gameInit(size, mines);
 
-    if (!strcmp(frontend, "console")) {
-        #ifdef FRONTEND_CONSOLE
-        conStart(gameGetBoard(), size);
-        conDestroy();
-        #else
-        printf("Error: Frontend console not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "xlib")) {
-        #ifdef FRONTEND_XLIB
-        XlibStart(gameGetBoard(), size);
-        XlibDestroy();
-        #else
-        printf("Error: Frontend xlib not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "fbdev")) {
-        #ifdef FRONTEND_FBDEV
-        fbdevStart(gameGetBoard(), size);
-        fbdevDestroy();
-        #else
-        printf("Error: Frontend fbdev not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "motif")) {
-        #ifdef FRONTEND_MOTIF
-        motifStart(gameGetBoard(), size);
-        motifDestroy();
-        #else
-        printf("Error: Frontend motif not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "xforms")) {
-        #ifdef FRONTEND_XFORMS
-        xformsStart(gameGetBoard(), size);
-        xformsDestroy();
-        #else
-        printf("Error: Frontend xforms not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "gtk3")) {
-        #ifdef FRONTEND_GTK3
-        Gtk3Start(gameGetBoard(), size);
-        Gtk3Destroy();
-        #else
-        printf("Error: Frontend gtk not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "qt5")) {
-        #ifdef FRONTEND_QT5
-        Qt5Start(gameGetBoard(), size);
-        Qt5Destroy();
-        #else
-        printf("Error: Frontend qt5 not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "sdl2")) {
-        #ifdef FRONTEND_SDL2
-        SDL2Start(gameGetBoard(), size);
-        SDL2Destroy();
-        #else
-        printf("Error: Frontend sdl2 not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "sdl1")) {
-        #ifdef FRONTEND_SDL1
-        SDL1Start(gameGetBoard(), size);
-        SDL1Destroy();
-        #else
-        printf("Error: Frontend sdl1 not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "gl11")) {
-        #ifdef FRONTEND_GL11
-        GL11Start(gameGetBoard(), size);
-        GL11Destroy();
-        #else
-        printf("Error: Frontend gl11 not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "gl33")) {
-        #ifdef FRONTEND_GL33
-        GL33Start(gameGetBoard(), size);
-        GL33Destroy();
-        #else
-        printf("Error: Frontend gl11 not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "vk")) {
-        #ifdef FRONTEND_VK
-        vkStart(gameGetBoard(), size);
-        vkDestroy();
-        #else
-        printf("Error: Frontend vk not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "win32")) {
-        #ifdef FRONTEND_WIN32
-        Win32Start(gameGetBoard(), size);
-        Win32Destroy();
-        #else
-        printf("Error: Frontend win32 not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "webapp")) {
-        #ifdef FRONTEND_HTTPD
-        httpdStart(gameGetBoard(), size);
-        httpdDestroy();
-        #else
-        printf("Error: Frontend webapp not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "wayland")) {
-        #ifdef FRONTEND_WAYLAND
-        WaylandStart(gameGetBoard(), size);
-        WaylandDestroy();
-        #else
-        printf("Error: Frontend webapp not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "xcb")) {
-        #ifdef FRONTEND_XCB
-        xcbStart(gameGetBoard(), size);
-        xcbDestroy();
-        #else
-        printf("Error: Frontend xcb not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "gdi")) {
-        #ifdef FRONTEND_GDI
-        gdiStart(gameGetBoard(), size);
-        gdiDestroy();
-        #else
-        printf("Error: Frontend gdi not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "d2d")) {
-        #ifdef FRONTEND_D2D
-        d2dStart(gameGetBoard(), size);
-        d2dDestroy();
-        #else
-        printf("Error: Frontend d2d not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "xaw")) {
-        #ifdef FRONTEND_XAW
-        XawStart(gameGetBoard(), size);
-        XawDestroy();
-        #else
-        printf("Error: Frontend xaw not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "drmfb")) {
-        #ifdef FRONTEND_DRMFB
-        drmfbStart(gameGetBoard(), size);
-        drmfbDestroy();
-        #else
-        printf("Error: Frontend drmfb not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "vt100")) {
-        #ifdef FRONTEND_VT100
-        vt100Start(gameGetBoard(), size);
-        vt100Destroy();
-        #else
-        printf("Error: Frontend vt100 not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "ansi")) {
-        #ifdef FRONTEND_ANSI
-        ansiStart(gameGetBoard(), size);
-        ansiDestroy();
-        #else
-        printf("Error: Frontend ansi not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "java")) {
-        #ifdef FRONTEND_JAVA
-        javaStart(gameGetBoard(), size);
-        javaDestroy();
-        #else
-        printf("Error: Frontend java not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "glx")) {
-        #ifdef FRONTEND_GLX
-        GLXStart(gameGetBoard(), size);
-        GLXDestroy();
-        #else
-        printf("Error: Frontend glx not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "curses")) {
-        #ifdef FRONTEND_CURSES
-        cursesStart(gameGetBoard(), size);
-        cursesDestroy();
-        #else
-        printf("Error: Frontend curses not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "fltk")) {
-        #ifdef FRONTEND_FLTK
-        FLTKStart(gameGetBoard(), size);
-        FLTKDestroy();
-        #else
-        printf("Error: Frontend fltk not built\n");
-        #endif
-    }
-    else if (!strcmp(frontend, "wxwidgets")) {
-        #ifdef FRONTEND_WXWIDGETS
-        wxStart(gameGetBoard(), size);
-        wxDestroy();
-        #else
-        printf("Error: Frontend fltk not built\n");
-        #endif
-    }
-    else {
-        printf("Error: Frontend not recognised: %s\n", frontend);
-        printFrontends();
-    }
+    frontend->start_func(gameGetBoard(), size);
+    frontend->destroy_func();
 
     gameDestroy();
 
     return 0;
 }
+

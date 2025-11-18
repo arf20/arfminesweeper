@@ -41,7 +41,7 @@ static int size = 0;
 static int wWidth = 0, wHeight = 0;
 
 int
-XawStart(const int *lboard, int lsize) {
+xaw_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -100,6 +100,12 @@ XawStart(const int *lboard, int lsize) {
 }
 
 void
-XawDestroy() {
+xaw_destroy() {
 
 }
+
+const char *
+xaw_name() {
+    return "xaw";
+}
+

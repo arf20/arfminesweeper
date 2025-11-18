@@ -1,11 +1,17 @@
 if (SDL_FOUND AND SDL_ttf_FOUND AND SDL_image_FOUND)
-    if (SHARED AND NOT NO_SDL1)
-
+    if (MODULE_SDL1)
+        add_library(sdl1 MODULE "sdl1.c")
+        target_compile_definitions(sdl1 PUBLIC _MODULE_)
+        target_link_libraries(sdl1 ${SDL_LIBRARIES} ${SDL_ttf_LIBRARIES} ${SDL_image_LIBRARIES})
+        add_custom_target(symlink_sdl1 ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS sdl1 module_dir)
+        message(STATUS "Building with module sdl1")
     else()
-        message(STATUS "Not building with shared sdl1")
+        message(STATUS "Not building with module sdl1")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_SDL1)
+    if (STATIC_SDL1)
         target_sources(arfminesweeper PRIVATE "sdl1.c")
         target_link_libraries(arfminesweeper ${SDL_LIBRARIES} ${SDL_ttf_LIBRARIES} ${SDL_image_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_SDL1)

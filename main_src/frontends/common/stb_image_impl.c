@@ -16,19 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+    stb_image_impl.c: Define stb_image once
+
 */
 
-#ifndef _XLIB_H
-#define _XLIB_H
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-#ifdef _MODULE_
-#define xlib_start   start
-#define xlib_destroy destroy
-#define xlib_name    name
-#endif
-
-int xlib_start(const int *lboard, int lsize);
-void xlib_destroy();
-const char *xlib_name();
-
-#endif /* _XLIB_H */

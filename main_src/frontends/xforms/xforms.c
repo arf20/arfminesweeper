@@ -29,6 +29,8 @@
 #include <common/frontconf.h>
 #include <common/game.h>
 
+#include "xforms.h"
+
 static const int *board = NULL;
 static int size = 0;
 
@@ -138,7 +140,7 @@ buttonCallback(FL_OBJECT *btn, long btni) {
 }
 
 int
-xformsStart(const int *lboard, int lsize) {
+xforms_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -200,7 +202,13 @@ xformsStart(const int *lboard, int lsize) {
 }
 
 void
-xformsDestroy() {
+xforms_destroy() {
     fl_hide_form(form);
     fl_finish();
 }
+
+const char *
+xforms_name() {
+    return "xforms";
+}
+

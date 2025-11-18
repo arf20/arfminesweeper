@@ -18,17 +18,20 @@
 
 */
 
-#ifndef _XLIB_H
-#define _XLIB_H
+#ifndef _TEMPLATE_H
+#define _TEMPLATE_H
 
-#ifdef _MODULE_
-#define xlib_start   start
-#define xlib_destroy destroy
-#define xlib_name    name
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-int xlib_start(const int *lboard, int lsize);
-void xlib_destroy();
-const char *xlib_name();
+int template_start(const int *lboard, int lsize);
+void template_destroy();
+const char *template_name();
 
-#endif /* _XLIB_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _TEMPLATE_H */
+

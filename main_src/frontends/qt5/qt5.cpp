@@ -204,7 +204,7 @@ Minesweeper::~Minesweeper() {
 
 
 int
-Qt5Start(const int *lboard, int size) {
+qt5_start(const int *lboard, int size) {
     const char *argv[2] = { TXT_TITLE, NULL };
     int argc = 1;
 
@@ -217,6 +217,12 @@ Qt5Start(const int *lboard, int size) {
 }
 
 void
-Qt5Destroy() {
+qt5_destroy() {
 
 }
+
+const char *
+qt5_name() {
+    return "qt5";
+}
+

@@ -107,7 +107,7 @@ mouseCallback(GLFWwindow* window, int button, int action, int mods) {
 }
 
 int
-GL33Start(const int *lboard, int lsize) {
+gl33_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -178,8 +178,13 @@ GL33Start(const int *lboard, int lsize) {
 }
 
 void
-GL33Destroy() {
+gl33_destroy() {
     glfwDestroyWindow(g_window);
     glfwTerminate();
+}
+
+const char *
+gl33_name() {
+    return "gl33";
 }
 

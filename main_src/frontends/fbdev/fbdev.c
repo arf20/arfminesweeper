@@ -36,8 +36,6 @@
 #include <common/frontconf.h>
 #include <common/game.h>
 
-
-#define STB_IMAGE_IMPLEMENTATION
 #include <common/stb_image.h>
 
 #include <common/fb.h>
@@ -59,7 +57,7 @@ static int screensize = 0;
 static struct termios orig;
 
 int
-fbdevStart(const int *lboard, int lsize) {
+fbdev_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -180,10 +178,16 @@ fbdevStart(const int *lboard, int lsize) {
 }
 
 void
-fbdevDestroy() {
+fbdev_destroy() {
     free((void*)font);
     free((void*)flag);
     munmap(fbp, screensize);
     close(fbfd);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig);
 }
+
+const char *
+fbdev_name() {
+    return "fbdev";
+}
+

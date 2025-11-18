@@ -32,6 +32,8 @@
 
 #include <common/frontconf.h>
 
+#include "motif.h"
+
 static const int *board = NULL;
 static int size = 0;
 
@@ -42,7 +44,7 @@ buttonCallback(Widget w, void *client_data, void *call_data) {
 
 
 int
-motifStart(const int *lboard, int lsize) {
+motif_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -125,7 +127,12 @@ motifStart(const int *lboard, int lsize) {
 }
 
 void
-motifDestroy() {
+motif_destroy() {
     
+}
+
+const char *
+motif_name() {
+    return "motif";
 }
 

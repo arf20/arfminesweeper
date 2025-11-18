@@ -1,8 +1,8 @@
 if (wxWidgets_FOUND)
-    if (SHARED AND NOT NO_WXWIDGETS)
+    if (MODULE AND NOT NO_WXWIDGETS)
 
     else()
-        message(STATUS "Not building with shared wxwidgets")
+        message(STATUS "Not building with module wxwidgets")
     endif()
 
     if (NOT NO_STATIC AND NOT NO_WXWIDGETS)

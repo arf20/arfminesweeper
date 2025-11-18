@@ -76,7 +76,7 @@ printBoard() {
 }
 
 int
-vt100Start(const int *lboard, int lsize) {
+vt100_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -149,7 +149,11 @@ vt100Start(const int *lboard, int lsize) {
 }
 
 void
-vt100Destroy() {
+vt100_destroy() {
 
+}
+
+const char *vt100_name() {
+    return "vt100";
 }
 

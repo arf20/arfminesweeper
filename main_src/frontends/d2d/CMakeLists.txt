@@ -1,11 +1,17 @@
 if (WIN32)
-    if (SHARED AND NOT NO_D2D)
-
+    if (MODULE_D2D)
+        add_library(d2d MODULE "d2d.c")
+        target_compile_definitions(d2d PUBLIC _MODULE_)
+        target_link_libraries(d2d D2d1)
+        add_custom_target(symlink_d2d ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS d2d module_dir)
+        message(STATUS "Building with module d2d")
     else()
-        message(STATUS "Not building with shared d2d")
+        message(STATUS "Not building with module d2d")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_D2D)
+    if (STATIC_D2D)
         target_sources(arfminesweeper PRIVATE "d2d.c")
         target_link_libraries(arfminesweeper D2d1)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_D2D)

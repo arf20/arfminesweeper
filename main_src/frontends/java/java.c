@@ -30,7 +30,7 @@
 
 JavaVM *jvm;       /* denotes a Java VM */
 
-int javaStart(const int *lboard, int lsize) {
+int java_start(const int *lboard, int lsize) {
     JNIEnv *env;       /* pointer to native method interface */
     JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
     JavaVMOption *options = malloc(sizeof(JavaVMOption) * 1);
@@ -73,6 +73,12 @@ int javaStart(const int *lboard, int lsize) {
 
 }
 
-void javaDestroy() {
+void java_destroy() {
     (*jvm)->DestroyJavaVM(jvm);
 }
+
+const char *
+java_name() {
+    return "java";
+}
+

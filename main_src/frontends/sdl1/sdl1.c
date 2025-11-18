@@ -166,7 +166,7 @@ render() {
 }
 
 int
-SDL1Start(const int *lboard, int lsize) {
+sdl1_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -231,8 +231,13 @@ SDL1Start(const int *lboard, int lsize) {
 }
 
 void
-SDL1Destroy() {
+sdl1_destroy() {
     SDL_FreeSurface(flag);
     TTF_Quit();
     SDL_Quit();
 }
+
+const char *sdl1_name() {
+    return "sdl1";
+}
+

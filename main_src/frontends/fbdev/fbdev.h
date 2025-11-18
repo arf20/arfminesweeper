@@ -21,7 +21,14 @@
 #ifndef _FBDEV_H
 #define _FBDEV_H
 
-int fbdevStart(const int *lboard, int lsize);
-void fbdevDestroy();
+#ifdef _MODULE_
+#define fbdev_start   start
+#define fbdev_destroy destroy
+#define fbdev_name    name
+#endif
+
+int fbdev_start(const int *lboard, int lsize);
+void fbdev_destroy();
+const char *fbdev_name();
 
 #endif /* _FBDEV_H */

@@ -1,11 +1,17 @@
 if (WIN32)
-    if (SHARED AND NOT NO_GDI)
-
+    if (MODULE_GDI)
+        add_library(gdi MODULE "gdi.c")
+        target_compile_definitions(gdi PUBLIC _MODULE_)
+        target_link_libraries(gdi msimg32)
+        add_custom_target(symlink_gdi ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS gdi module_dir)
+        message(STATUS "Building with module gdi")
     else()
-        message(STATUS "Not building with shared gdi")
+        message(STATUS "Not building with module gdi")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_GDI)
+    if (STATIC_GDI)
         target_sources(arfminesweeper PRIVATE "gdi.c")
         target_link_libraries(arfminesweeper msimg32)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_GDI)

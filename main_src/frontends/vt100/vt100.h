@@ -21,7 +21,14 @@
 #ifndef _VT100_H
 #define _VT100_H
 
-int vt100Start(const int *lboard, int lsize);
-void vt100Destroy();
+#ifdef _MODULE_
+#define vt100_start   start
+#define vt100_destroy destroy
+#define vt100_name    name
+#endif
+
+int vt100_start(const int *lboard, int lsize);
+void vt100_destroy();
+const char *vt100_name();
 
 #endif /* _VT100_H */

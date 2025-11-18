@@ -1,12 +1,19 @@
 if (wxWidgets_FOUND)
     include(UsewxWidgets)
-    if (SHARED AND NOT NO_WXWIDGETS)
-
+    if (MODULE_WXWIDGETS)
+        add_library(wxwidgets MODULE "wxwidgets.cpp")
+        target_compile_definitions(wxwidgets PUBLIC _MODULE_)
+        target_include_directories(wxwidgets PUBLIC ${wxWidgets_INCLUDE_DIRS})
+        target_link_libraries(wxwidgets wxWidgets::wxWidgets)
+        add_custom_target(symlink_wxwidgets ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS wxwidgets module_dir)
+        message(STATUS "Building with module wxwidgets")
     else()
-        message(STATUS "Not building with shared wxwidgets")
+        message(STATUS "Not building with module wxwidgets")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_WXWIDGETS)
+    if (STATIC_WXWIDGETS)
         target_sources(arfminesweeper PRIVATE "wxwidgets.cpp")
         target_include_directories(arfminesweeper PUBLIC ${wxWidgets_INCLUDE_DIRS})
         target_link_libraries(arfminesweeper wxWidgets::wxWidgets)
@@ -16,6 +23,6 @@ if (wxWidgets_FOUND)
         message(STATUS "Not building with static wxwidgets")
     endif()
 else()
-    message(STATUS "No WXWIDGETS found")
+    message(STATUS "No wxWidgets found")
 endif()
 

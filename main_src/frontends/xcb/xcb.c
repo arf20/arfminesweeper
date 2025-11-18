@@ -149,7 +149,7 @@ render() {
 }
 
 int
-xcbStart(const int *lboard, int lsize) {
+xcb_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -248,6 +248,12 @@ xcbStart(const int *lboard, int lsize) {
 }
 
 void
-xcbDestroy() {
+xcb_destroy() {
     xcb_disconnect(c);
 }
+
+const char *
+xcb_name() {
+    return "xcb";
+}
+

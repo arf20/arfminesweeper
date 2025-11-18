@@ -21,7 +21,14 @@
 #ifndef _GL33_H
 #define _GL33_H
 
-int GL33Start(const int *lboard, int lsize);
-void GL33Destroy();
+#ifdef _MODULE_
+#define gl33_start   start
+#define gl33_destroy destroy
+#define gl33_name    name
+#endif
+
+int gl33_start(const int *lboard, int lsize);
+void gl33_destroy();
+const char *gl33_name();
 
 #endif /* _GL33_H */

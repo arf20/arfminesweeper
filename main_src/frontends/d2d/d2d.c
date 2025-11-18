@@ -66,7 +66,7 @@ WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 }
 
 int
-d2dStart(const int* lboard, int lsize) {
+d2d_start(const int* lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -124,6 +124,12 @@ d2dStart(const int* lboard, int lsize) {
 }
 
 void
-d2dDestroy() {
+d2d_destroy() {
 
 }
+
+const char *
+d2d_name() {
+    return "d2d";
+}
+

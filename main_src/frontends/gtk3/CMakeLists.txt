@@ -1,11 +1,18 @@
 if (GTK3_FOUND)
-    if (SHARED AND NOT NO_GTK3)
-
+    if (MODULE_GTK3)
+        add_library(gtk3 MODULE "gtk3.c")
+        target_compile_definitions(gtk3 PUBLIC _MODULE_)
+        target_include_directories(gtk3 PUBLIC ${GTK3_INCLUDE_DIRS})
+        target_link_libraries(gtk3 ${GTK3_LIBRARIES})
+        add_custom_target(symlink_gtk3 ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS gtk3 module_dir)
+        message(STATUS "Building with module gtk3")
     else()
-        message(STATUS "Not building with shared gtk3")
+        message(STATUS "Not building with module gtk3")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_GTK3)
+    if (STATIC_GTK3)
         target_sources(arfminesweeper PRIVATE "gtk3.c")
         target_include_directories(arfminesweeper PUBLIC ${GTK3_INCLUDE_DIRS})
         target_link_libraries(arfminesweeper ${GTK3_LIBRARIES})

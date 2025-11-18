@@ -174,7 +174,7 @@ render() {
 }
 
 int
-SDL2Start(const int *lboard, int lsize) {
+sdl2_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -244,9 +244,15 @@ SDL2Start(const int *lboard, int lsize) {
 }
 
 void
-SDL2Destroy() {
+sdl2_destroy() {
     SDL_DestroyRenderer(r);
     SDL_DestroyWindow(w);
     TTF_Quit();
     SDL_Quit();
 }
+
+const char *
+sdl2_name() {
+    return "sdl2";
+}
+

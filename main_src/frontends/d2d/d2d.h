@@ -21,7 +21,14 @@
 #ifndef _D2D_H
 #define _D2D_H
 
-int d2dStart(const int* lboard, int lsize);
-void d2dDestroy();
+#ifdef _MODULE_
+#define d2d_start   start
+#define d2d_destroy destroy
+#define d2d_name    name
+#endif
+
+int d2d_start(const int* lboard, int lsize);
+void d2d_destroy();
+const char *d2d_name();
 
 #endif /* _D2D_H */

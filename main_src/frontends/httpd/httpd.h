@@ -21,8 +21,15 @@
 #ifndef _HTTPD_H
 #define _HTTPD_H
 
-int httpdStart(const int *lboard, int lsize);
-void httpdDestroy();
+#ifdef _MODULE_
+#define httpd_start   start
+#define httpd_destroy destroy
+#define httpd_name    name
+#endif
+
+int httpd_start(const int *lboard, int lsize);
+void httpd_destroy();
+const char *httpd_name();
 
 #endif /* _HTTPD_H */
 

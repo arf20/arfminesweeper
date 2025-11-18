@@ -1,12 +1,18 @@
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    if (SHARED AND NOT NO_FBDEV)
-
+    if (MODULE_FBDEV)
+        add_library(fbdev MODULE "fbdev.c" "../common/fb.c" "../common/stb_image_impl.c")
+        target_compile_definitions(fbdev PUBLIC _MODULE_)
+        target_link_libraries(fbdev m)
+        add_custom_target(symlink_fbdev ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS fbdev module_dir)
+        message(STATUS "Building with module fbdev")
     else()
-        message(STATUS "Not building with shared fbdev")
+        message(STATUS "Not building with module fbdev")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_FBDEV)
-        target_sources(arfminesweeper PRIVATE "fbdev.c" "../common/fb.c")
+    if (STATIC_FBDEV)
+        target_sources(arfminesweeper PRIVATE "fbdev.c" "../common/fb.c" "../common/stb_image_impl.c")
         target_link_libraries(arfminesweeper m)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_FBDEV)
         message(STATUS "Building with static fbdev")

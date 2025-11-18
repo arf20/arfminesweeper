@@ -40,20 +40,29 @@ find_package(wxWidgets COMPONENTS core base)
 
 file (GLOB SRC
     "main.c"
+    "frontend.c"
     "${PROJECT_SOURCE_DIR}/common/game.c"
 )
 
 add_executable(arfminesweeper ${SRC})
 
+set_target_properties(arfminesweeper PROPERTIES ENABLE_EXPORTS TRUE)
+
 target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_VERSION="${ARFMINESWEEPER_VERSION}")
 target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_NUM_COMMIT="${ARFMINESWEEPER_NUM_COMMIT}")
 
-target_include_directories(arfminesweeper PUBLIC "${PROJECT_SOURCE_DIR}/" "frontends/")
+include_directories(arfminesweeper PUBLIC "${PROJECT_SOURCE_DIR}/" "frontends/")
+
+# module dir
+set(MODULE_DIR "${CMAKE_BINARY_DIR}/main_src/modules/")
 
 add_subdirectory("frontends/")
 
 # taget propieties
 set_property(TARGET arfminesweeper PROPERTY VERSION ${ARFMINESWEEPER_VERSION})
+
+# for modules
+target_link_libraries(arfminesweeper dl)
 
 # target install
 install(TARGETS arfminesweeper RUNTIME DESTINATION bin)

@@ -64,7 +64,7 @@ static const struct wl_registry_listener registry_listener = {
 };
 
 int
-WaylandStart(const int *lboard, int lsize) {
+wayland_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -110,6 +110,12 @@ WaylandStart(const int *lboard, int lsize) {
 }
 
 void
-WaylandDestroy() {
+wayland_destroy() {
     wl_display_disconnect(display);
 }
+
+const char *
+wayland_name() {
+    return "wayland";
+}
+

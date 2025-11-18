@@ -1,11 +1,17 @@
 if (WAYLAND_FOUND)
-    if (SHARED AND NOT NO_WAYLAND)
-
+    if (MODULE_WAYLAND)
+        add_library(wayland MODULE "wayland.c")
+        target_compile_definitions(wayland PUBLIC _MODULE_)
+        target_link_libraries(wayland wayland-client)
+        add_custom_target(symlink_wayland ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS wayland module_dir)
+        message(STATUS "Building with module wayland")
     else()
-        message(STATUS "Not building with shared wayland")
+        message(STATUS "Not building with module wayland")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_WAYLAND)
+    if (STATIC_WAYLAND)
         target_sources(arfminesweeper PRIVATE "wayland.c")
         target_link_libraries(arfminesweeper wayland-client)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_WAYLAND)

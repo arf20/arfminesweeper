@@ -142,7 +142,7 @@ render() {
 }
 
 int
-XlibStart(const int *lboard, int lsize) {
+xlib_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -221,7 +221,12 @@ XlibStart(const int *lboard, int lsize) {
 }
 
 void
-XlibDestroy() {
+xlib_destroy() {
     XDestroyWindow(d, w);
     XCloseDisplay(d);
 }
+
+const char *xlib_name() {
+    return "xlib";
+}
+

@@ -1,11 +1,17 @@
 if (CURSES_FOUND)
-    if (SHARED AND NOT NO_CONSOLE)
-
+    if (MODULE_CURSES)
+        add_library(curses MODULE "curses.c")
+        target_compile_definitions(curses PUBLIC _MODULE_)
+        target_link_libraries(curses ${CURSES_LIBRARIES})
+        add_custom_target(symlink_curses ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS curses module_dir)
+        message(STATUS "Building with module curses")
     else()
-        message(STATUS "Not building with shared console")
+        message(STATUS "Not building with module curses")
     endif()
 
-    if (NOT NO_STATIC AND NOT NO_CONSOLE)
+    if (STATIC_CURSES)
         target_sources(arfminesweeper PRIVATE "curses.c")
         target_link_libraries(arfminesweeper ${CURSES_LIBRARIES})
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_CURSES)

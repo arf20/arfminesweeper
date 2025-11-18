@@ -116,7 +116,7 @@ mouseCallback(int button, int state, int x, int y) {
 
 
 int
-GL11Start(const int *lboard, int lsize) {
+gl11_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -158,7 +158,12 @@ GL11Start(const int *lboard, int lsize) {
 }
 
 void
-GL11Destroy() {
+gl11_destroy() {
     glutDestroyWindow(window);
+}
+
+const char *
+gl11_name() {
+    return "gl11";
 }
 
