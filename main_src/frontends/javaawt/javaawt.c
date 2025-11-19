@@ -26,17 +26,35 @@
 
 #include <common/frontconf.h>
 
-#include "java.h"
+#include "javaawt.h"
 
 JavaVM *jvm;       /* denotes a Java VM */
 
-int java_start(const int *lboard, int lsize) {
+static const int *board = NULL;
+static int size = 0;
+
+const int *
+javaawt_getboard() {
+    return board;
+}
+
+int
+javaawt_getsize() {
+    return size;
+}
+
+int javaawt_start(const int *lboard, int lsize) {
+    board = lboard;
+    size = lsize;
+
     JNIEnv *env;       /* pointer to native method interface */
     JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
-    JavaVMOption *options = malloc(sizeof(JavaVMOption) * 1);
+    JavaVMOption options[3];
     options[0].optionString = "-Djava.class.path=" JAVA_CLASS_PATH;
+    options[1].optionString = "-Djava.library.path=" JAVA_LIBRARY_PATH;
+    options[2].optionString = "-Xlog:library=info"; /* for debug */
     vm_args.version = JNI_VERSION_1_6;
-    vm_args.nOptions = 1;
+    vm_args.nOptions = 2;
     vm_args.options = options;
     vm_args.ignoreUnrecognized = 0;
 
@@ -46,8 +64,6 @@ int java_start(const int *lboard, int lsize) {
     if (ret != JNI_OK)  {
         printf("Error JNI_CreateJavaVM\n");
     }
-
-    free(options);
 
     /* invoke the Main.test method using the JNI */
     jclass class = (*env)->FindClass(env, "awt");
@@ -73,12 +89,12 @@ int java_start(const int *lboard, int lsize) {
 
 }
 
-void java_destroy() {
+void javaawt_destroy() {
     (*jvm)->DestroyJavaVM(jvm);
 }
 
 const char *
-java_name() {
-    return "java";
+javaawt_name() {
+    return "javaawt";
 }
 

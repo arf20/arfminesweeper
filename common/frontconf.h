@@ -30,6 +30,7 @@
 #define GL3_VS_PATH         "../assets/msboard.vs"
 #define GL3_FS_PATH         "../assets/msboard.fs"
 #define JAVA_CLASS_PATH     "../assets/"
+#define JAVA_LIBRARY_PATH   "./main_src/:./main_src/modules/"
 #define MODULE_SEARCH_PATH  "main_src/modules"
 
 #define HEADER_HEIGHT 60

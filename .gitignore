@@ -13,4 +13,5 @@ mod_src/Module.symvers
 *.mod
 *.mod.c
 *.order
+main_src/frontends/java/Backend.h
 

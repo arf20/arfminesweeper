@@ -53,7 +53,7 @@
 #include <drmfb/drmfb.h>
 #include <vt100/vt100.h>
 #include <ansi/ansi.h>
-#include <java/java.h>
+#include <javaawt/javaawt.h>
 #include <glx/glx.h>
 #include <curses/curses.h>
 #include <fltk/fltk.hpp>
@@ -147,8 +147,8 @@ frontend_load_static() {
     #ifdef FRONTEND_ANSI
     frontend_insert(&(frontend_t){ TYPE_STATIC, ansi_name(), ansi_start, ansi_destroy });
     #endif
-    #ifdef FRONTEND_JAVA
-    frontend_insert(&(frontend_t){ TYPE_STATIC, java_name(), java_start, java_destroy });
+    #ifdef FRONTEND_JAVAAWT
+    frontend_insert(&(frontend_t){ TYPE_STATIC, javaawt_name(), javaawt_start, javaawt_destroy });
     #endif
     #ifdef FRONTEND_GLX
     frontend_insert(&(frontend_t){ TYPE_STATIC, glx_name(), glx_start, glx_destroy });
