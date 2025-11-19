@@ -71,6 +71,70 @@ JNIEXPORT jint JNICALL Java_Backend_getCellMargin
 JNIEXPORT jint JNICALL Java_Backend_getWindowMargin
   (JNIEnv *, jobject);
 
+/*
+ * Class:     Backend
+ * Method:    getCellBitMine
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Backend_getCellBitMine
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
+ * Method:    getCellBitFlag
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Backend_getCellBitFlag
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
+ * Method:    getCellBitClear
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Backend_getCellBitClear
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
+ * Method:    gameGetState
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Backend_gameGetState
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
+ * Method:    gameGetSurroundingMines
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_Backend_gameGetSurroundingMines
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     Backend
+ * Method:    gameGetFlagsLeft
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Backend_gameGetFlagsLeft
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
+ * Method:    gameClearCell
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_Backend_gameClearCell
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     Backend
+ * Method:    gameFlagCell
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_Backend_gameFlagCell
+  (JNIEnv *, jobject, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif
