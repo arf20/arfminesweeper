@@ -44,7 +44,28 @@ class MessageBox extends Dialog implements ActionListener {
 }
 
 class Cell extends Button {
+    private final Image flag;
+    private boolean paintFlag = false;
 
+    public Cell(Image flag) {
+        super();
+        this.flag = flag;
+    }
+
+    public void setPaintFlag(boolean paint) {
+        paintFlag = paint;
+    }
+
+    public void update(Graphics g) {
+        super.update(g);
+
+        if (!paintFlag)
+            return;
+
+        g.drawImage(flag, 0, 0, flag.getWidth(null), flag.getHeight(null), null);
+
+        System.out.println("painted");
+    }
 }
 
 class MinesweeperAwt extends Frame implements MouseListener {   
@@ -61,7 +82,7 @@ class MinesweeperAwt extends Frame implements MouseListener {
     final Image flag;
     
     final Label flagLabel;
-    Button[] buttons = new Button[1]; // java sucks
+    Cell[] cells = new Cell[1]; // java sucks
     Label[] numbers = new Label[1]; // java sucks
     
     MinesweeperAwt(int lsize) {
@@ -106,7 +127,7 @@ class MinesweeperAwt extends Frame implements MouseListener {
 
         flag = Toolkit.getDefaultToolkit().getImage(FLAG_PNG_PATH);
 
-        buttons = new Button[size*size];
+        cells = new Cell[size*size];
         numbers = new Label[size*size];
 
         for (int y = 0; y < size; y++) {
@@ -115,10 +136,10 @@ class MinesweeperAwt extends Frame implements MouseListener {
                 int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN)) + insets.top;
                 int btni = (y*size) + x;
 
-                buttons[btni] = new Button();
-                buttons[btni].setBounds(cX, cY, CELL_SIZE, CELL_SIZE);
-                buttons[btni].addMouseListener(this);
-                add(buttons[btni]);
+                cells[btni] = new Cell(flag);
+                cells[btni].setBounds(cX, cY, CELL_SIZE, CELL_SIZE);
+                cells[btni].addMouseListener(this);
+                add(cells[btni]);
 
                 numbers[btni] = new Label();
                 numbers[btni].setBounds(cX, cY, CELL_SIZE, CELL_SIZE);
@@ -149,7 +170,7 @@ class MinesweeperAwt extends Frame implements MouseListener {
         Object btn = e.getSource();
         int btni = -1;
         for (int i = 0; i < size * size; i++) {
-            if (buttons[i] == btn) {
+            if (cells[i] == btn) {
                 btni = i;
                 break;
             }
@@ -179,15 +200,18 @@ class MinesweeperAwt extends Frame implements MouseListener {
                 int btni = (y * size) + x;
 
                 if (CHECK_CLEAR(BOARDXY(x, y))) {
-                    buttons[btni].setVisible(false);
+                    cells[btni].setVisible(false);
                     numbers[btni].setVisible(true);
                 } else if (CHECK_FLAG(BOARDXY(x, y))) {
-                    buttons[btni].setLabel("F");
+                    cells[btni].setPaintFlag(true);
                 } else {
-                    buttons[btni].setLabel("");
+                    cells[btni].setPaintFlag(false);
                 }
+
+                cells[btni].repaint(1);
             }
         }
+        repaint(1);
 
         int state = backend.gameGetState();
         if (state == STATE_LOST) {
@@ -201,10 +225,7 @@ class MinesweeperAwt extends Frame implements MouseListener {
         }
     }
 
-    public void paint(Graphics g) {
-        //g.drawImage(flag, 0, 0, 200, 200, null);
-    }
-
+    /* bit test macros */
     private boolean CHECK_MINE(int x) { return  (((x) >> CELL_BIT_MINE) & 1) == 1; };
     private boolean CHECK_FLAG(int x) { return  (((x) >> CELL_BIT_FLAG) & 1) == 1; };
     private boolean CHECK_CLEAR(int x) { return (((x) >> CELL_BIT_CLEAR) & 1) == 1; };
