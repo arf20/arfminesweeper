@@ -113,8 +113,23 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
 
             buttons[btni] = new Cell(x, y);
             buttons[btni]->setFixedSize(QSize(CELL_SIZE, CELL_SIZE));
-            numbers[btni] = new QLabel();
 
+            numbers[btni] = new QLabel();
+            int n = gameGetSurroundingMines(x, y);
+            if (n) {
+                numbers[btni]->setText(QString(std::to_string(n).c_str()));
+
+                switch (n) {
+                    case 1: numbers[btni]->setStyleSheet("color: blue"); break;
+                    case 2: numbers[btni]->setStyleSheet("color: green"); break;
+                    case 3: numbers[btni]->setStyleSheet("color: red"); break;
+                    case 4: numbers[btni]->setStyleSheet("color: darkcyan"); break;
+                    case 5: numbers[btni]->setStyleSheet("color: darkred"); break;
+                    case 6: numbers[btni]->setStyleSheet("color: cyan"); break;
+                    case 7: numbers[btni]->setStyleSheet("color: black"); break;
+                    case 8: numbers[btni]->setStyleSheet("color: grey"); break;
+                }
+            }
             numbers[btni]->hide();
 
             buttonGridLayout->addWidget(buttons[btni], y, x);
@@ -135,6 +150,8 @@ Minesweeper::Minesweeper(QWidget *parent, const int *lboard, int lsize) : QWidge
     setLayout(mainLayout);
     setWindowTitle(tr(TXT_TITLE));
 
+    setFixedSize(sizeHint());
+
     update();
 }
 
@@ -147,24 +164,7 @@ void Minesweeper::update() {
 
             if (CHECK_CLEAR(BOARDXY(x, y))) {
                 buttons[btni]->hide();
-
-                int n = gameGetSurroundingMines(x, y);
-                if (n) {
-                    numbers[btni]->setText(QString(std::to_string(n).c_str()));
-
-                    switch (n) {
-                        case 1: numbers[btni]->setStyleSheet("color: blue"); break;
-                        case 2: numbers[btni]->setStyleSheet("color: green"); break;
-                        case 3: numbers[btni]->setStyleSheet("color: red"); break;
-                        case 4: numbers[btni]->setStyleSheet("color: darkcyan"); break;
-                        case 5: numbers[btni]->setStyleSheet("color: darkred"); break;
-                        case 6: numbers[btni]->setStyleSheet("color: cyan"); break;
-                        case 7: numbers[btni]->setStyleSheet("color: black"); break;
-                        case 8: numbers[btni]->setStyleSheet("color: grey"); break;
-                    }
-
-                    numbers[btni]->show();
-                }
+                numbers[btni]->show();
             }
             else if (CHECK_FLAG(BOARDXY(x, y))) {
                 // Set flag
