@@ -24,20 +24,47 @@ import java.util.Arrays;
 import java.awt.*;
 import java.awt.event.*;
 
-class awt_frame extends Frame implements MouseListener {   
+class MessageBox extends Dialog implements ActionListener {
+    public MessageBox(Frame parent, String title, String text) {
+        super(parent, title, true);
+        setSize(400, 250);
+        TextArea txt = new TextArea(text, 80, 10, TextArea.SCROLLBARS_NONE);
+        txt.setEditable(false);
+        add(txt, BorderLayout.CENTER);
+        Button ok = new Button("Ok");
+        ok.addActionListener(this);
+        add(ok, BorderLayout.SOUTH);
+        doLayout();
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {  
+        dispose();
+    }
+}
+
+class Cell extends Button {
+
+}
+
+class MinesweeperAwt extends Frame implements MouseListener {   
     final int size, wWidth, wHeight;
 
     /* macro values from native frontconf.h */
-    final String TXT_TITLE, TXT_LOST, TXT_WON;
-    final int HEADER_HEIGHT, CELL_SIZE, CELL_MARGIN, W_MARGIN;
-    final int CELL_BIT_MINE, CELL_BIT_FLAG, CELL_BIT_CLEAR;
+    final String TXT_TITLE, TXT_LOST, TXT_WON, FLAG_PNG_PATH;
+    final int HEADER_HEIGHT, CELL_SIZE, CELL_MARGIN, W_MARGIN,
+          CELL_BIT_MINE, CELL_BIT_FLAG, CELL_BIT_CLEAR, STATE_LOST, STATE_WON;
 
     /* interface to C functions */
     final Backend backend;
+
+    final Image flag;
     
+    final Label flagLabel;
     Button[] buttons = new Button[1]; // java sucks
+    Label[] numbers = new Label[1]; // java sucks
     
-    awt_frame(int lsize) {
+    MinesweeperAwt(int lsize) {
         backend = new Backend();
 
         /* initialize values from native */
@@ -51,6 +78,9 @@ class awt_frame extends Frame implements MouseListener {
         CELL_BIT_MINE = backend.getCellBitMine();
         CELL_BIT_FLAG = backend.getCellBitFlag();
         CELL_BIT_CLEAR = backend.getCellBitClear(); 
+        FLAG_PNG_PATH = backend.getFlagPNGPath(); 
+        STATE_LOST = backend.getStateLost();
+        STATE_WON = backend.getStateWon();
 
         size = lsize;
 
@@ -59,34 +89,60 @@ class awt_frame extends Frame implements MouseListener {
             ((size - 1) * CELL_MARGIN);
 
         setResizable(false);
+        setLayout(null);
+        setTitle(TXT_TITLE);
+        
+        setVisible(true);
+        Insets insets = getInsets();
+        setSize(wWidth + insets.left + insets.right, wHeight + insets.top + insets.bottom);
 
         Label titleLabel = new Label(TXT_TITLE);
-        titleLabel.setBounds(5, 15, 100, 20);
+        titleLabel.setBounds(5 + insets.left, 15 + insets.top, 100, 20);
         add(titleLabel);
 
-        Label flagLabel = new Label("10");
-        flagLabel.setBounds(wWidth - 25, 35, 50, 20);
+        flagLabel = new Label(Integer.toString(backend.gameGetFlagsLeft()));
+        flagLabel.setBounds(wWidth - 25 + insets.left, 35 + insets.top, 50, 20);
         add(flagLabel);
 
+        flag = Toolkit.getDefaultToolkit().getImage(FLAG_PNG_PATH);
+
         buttons = new Button[size*size];
+        numbers = new Label[size*size];
 
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN));
-                int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN));
+                int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN)) + insets.left;
+                int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN)) + insets.top;
                 int btni = (y*size) + x;
+
                 buttons[btni] = new Button();
                 buttons[btni].setBounds(cX, cY, CELL_SIZE, CELL_SIZE);
                 buttons[btni].addMouseListener(this);
                 add(buttons[btni]);
+
+                numbers[btni] = new Label();
+                numbers[btni].setBounds(cX, cY, CELL_SIZE, CELL_SIZE);
+                numbers[btni].setVisible(false);
+
+                int n = backend.gameGetSurroundingMines(x, y);
+                if (n > 0) {
+                    numbers[btni].setText(Integer.toString(n));
+
+                    switch (n) {
+                        case 1: numbers[btni].setForeground(Color.blue); break;
+                        case 2: numbers[btni].setForeground(Color.green); break;
+                        case 3: numbers[btni].setForeground(Color.red); break;
+                        case 4: numbers[btni].setForeground(Color.cyan.darker()); break;
+                        case 5: numbers[btni].setForeground(Color.red.darker()); break;
+                        case 6: numbers[btni].setForeground(Color.cyan); break;
+                        case 7: numbers[btni].setForeground(Color.black); break;
+                        case 8: numbers[btni].setForeground(Color.gray); break;
+                    }
+                }
+                    
+                add(numbers[btni]);
             }
         }
-
-        setSize(wWidth, wHeight);
-        setUndecorated(true);
-        setTitle(TXT_TITLE);
-        setLayout(null);
-        setVisible(true);
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -107,7 +163,7 @@ class awt_frame extends Frame implements MouseListener {
         else if (e.getButton() == MouseEvent.BUTTON3)
             backend.gameFlagCell(btni % size, btni / size);
 
-        updateBoard();
+        update();
     }
 
     public void mouseExited(MouseEvent e) { }
@@ -115,20 +171,38 @@ class awt_frame extends Frame implements MouseListener {
     public void mousePressed(MouseEvent e) { }
     public void mouseReleased(MouseEvent e) { }
 
-    private void updateBoard() {
+    private void update() {
+        flagLabel.setText(Integer.toString(backend.gameGetFlagsLeft()));
+
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 int btni = (y * size) + x;
 
                 if (CHECK_CLEAR(BOARDXY(x, y))) {
                     buttons[btni].setVisible(false);
+                    numbers[btni].setVisible(true);
                 } else if (CHECK_FLAG(BOARDXY(x, y))) {
-
+                    buttons[btni].setLabel("F");
                 } else {
-
+                    buttons[btni].setLabel("");
                 }
             }
         }
+
+        int state = backend.gameGetState();
+        if (state == STATE_LOST) {
+            MessageBox dialog = new MessageBox(this, TXT_TITLE, TXT_LOST);
+            dispose();
+            System.exit(0);
+        } else if (state == STATE_WON) {
+            MessageBox dialog = new MessageBox(this, TXT_TITLE, TXT_WON);
+            dispose();
+            System.exit(0);
+        }
+    }
+
+    public void paint(Graphics g) {
+        //g.drawImage(flag, 0, 0, 200, 200, null);
     }
 
     private boolean CHECK_MINE(int x) { return  (((x) >> CELL_BIT_MINE) & 1) == 1; };
@@ -141,17 +215,30 @@ class awt_frame extends Frame implements MouseListener {
 }
 
 class Backend {
-    static {
-        try {
-            System.loadLibrary("arfminesweeper");
-        } catch (UnsatisfiedLinkError e) {
-            System.out.println(e);
-        }
+    boolean linked = false;
+
+    Backend() {
+        UnsatisfiedLinkError exception = new UnsatisfiedLinkError();
 
         try {
-            System.loadLibrary("javaawt");
+            System.loadLibrary("arfminesweeper");
+            linked = true;
         } catch (UnsatisfiedLinkError e) {
-            System.out.println(e);
+            exception = e;
+        }
+
+        if (!linked) {
+            try {
+                System.loadLibrary("javaawt");
+                linked = true;
+            } catch (UnsatisfiedLinkError e) {
+                exception = e;
+            }
+        }
+
+        if (!linked) {
+            System.out.println("Could not find library to link against or error linking with it");
+            throw exception;
         }
     }
 
@@ -166,6 +253,9 @@ class Backend {
     public native int getCellBitMine();
     public native int getCellBitFlag();
     public native int getCellBitClear(); 
+    public native String getFlagPNGPath(); 
+    public native int getStateLost(); 
+    public native int getStateWon(); 
 
     /* game interface */
     public native int gameGetState();
@@ -177,7 +267,7 @@ class Backend {
 
 public class awt {
     static void main(int lsize)  {
-        awt_frame f = new awt_frame(lsize);
+        MinesweeperAwt f = new MinesweeperAwt(lsize);
 
         f.addWindowListener(new WindowAdapter() {    
             public void windowClosing(WindowEvent e) {    

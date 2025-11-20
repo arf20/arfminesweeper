@@ -97,6 +97,30 @@ JNIEXPORT jint JNICALL Java_Backend_getCellBitClear
 
 /*
  * Class:     Backend
+ * Method:    getFlagPNGPath
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_Backend_getFlagPNGPath
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
+ * Method:    getStateLost
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Backend_getStateLost
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
+ * Method:    getStateWon
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Backend_getStateWon
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Backend
  * Method:    gameGetState
  * Signature: ()I
  */

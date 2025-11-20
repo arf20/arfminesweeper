@@ -62,17 +62,17 @@ Java_Backend_getWindowMargin(JNIEnv *env, jobject this) {
 
 JNIEXPORT jstring JNICALL
 Java_Backend_getTextLost(JNIEnv *env, jobject this) {
-    jstring jni_string_copy = (*env)->NewStringUTF(env, TXT_LOST);
+    return (*env)->NewStringUTF(env, TXT_LOST);
 }
 
 JNIEXPORT jstring JNICALL
 Java_Backend_getTextWon(JNIEnv *env, jobject this) {
-    jstring jni_string_copy = (*env)->NewStringUTF(env, TXT_WON);
+    return (*env)->NewStringUTF(env, TXT_WON);
 }
 
 JNIEXPORT jstring JNICALL
 Java_Backend_getTextTitle(JNIEnv *env, jobject this) {
-    jstring jni_string_copy = (*env)->NewStringUTF(env, TXT_TITLE);
+    return (*env)->NewStringUTF(env, TXT_TITLE);
 }
 
 JNIEXPORT jint JNICALL
@@ -88,6 +88,21 @@ Java_Backend_getCellBitFlag(JNIEnv *env, jobject this) {
 JNIEXPORT jint JNICALL
 Java_Backend_getCellBitClear(JNIEnv *env, jobject this) {
     return CELL_BIT_CLEAR;
+}
+
+JNIEXPORT jstring JNICALL
+Java_Backend_getFlagPNGPath(JNIEnv *env, jobject this) {
+    return (*env)->NewStringUTF(env, FLAG_PNG_PATH);
+}
+
+JNIEXPORT jint JNICALL
+Java_Backend_getStateLost(JNIEnv *env, jobject this) {
+    return STATE_LOST;
+}
+
+JNIEXPORT jint JNICALL
+Java_Backend_getStateWon(JNIEnv *env, jobject this) {
+    return STATE_WON;
 }
 
 /* game interface */

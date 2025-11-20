@@ -8,7 +8,7 @@ add_custom_command(
 
 if (JNI_FOUND AND JAVAC)
     find_program(JAVAC javac)
-    if (MODULE_JAVAWT OR STATIC_JAVAAWT)
+    if (MODULE_JAVAAWT OR STATIC_JAVAAWT)
         add_custom_target(awt_class_java ALL
             DEPENDS "${PROJECT_SOURCE_DIR}/assets/awt.class"
         )
