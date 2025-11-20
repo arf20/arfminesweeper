@@ -68,52 +68,52 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 
 | Toolkit/Library/Thing      | NAME      | STATE|Linux|BSD|Mac|Win |
 |----------------------------|-----------|------|-----|---|---|----|
-|   console                  | console   | DONE |[X]  |[X]|[X]|[X] |
-|   vt100 escapes            | vt100     | DONE |[X]  |[X]|[X]|[X] |
-|   ANSI color escapes       | ansi      | DONE |[X]  |[X]|[X]|[X] |
-|   curses/ncurses           | curses    | DONE |[X]  |[X]|[X]|[X] |
-|   fbdev                    | fbdev     | DONE |[X]  |[ ]|[ ]|[ ] |
-|   X11 Xlib                 | xlib      | DONE |[X]  |[X]|[X]|[X] |
-|   X11 XCB                  | xcb       | WIP  |[X]  |[X]|[X]|[X] |
-|   Wayland                  | wayland   | WIP  |[X]  |[X]|[ ]|[ ] |
-|   XForms                   | xforms    | DONE |[X]  |[X]|[ ]|[ ] |
-|   FLTK                     | fltk      | WIP  |[X]  |[X]|[X]|[X] |
-|   Motif (Xm/Xt)            | motif     | WIP  |[X]  |[X]|[ ]|[ ] |
-|   XView (OpenLook/Xt)      |           |      |[X]  |[X]|[ ]|[ ] |
-|   Athena (Xaw/Xt)          | xaw       | WIP  |[X]  |[X]|[ ]|[ ] |
-|   Xaw3d                    |           |      |[X]  |[X]|[ ]|[ ] |
-|   X Toolkit (Xt)           |           |      |[X]  |[X]|[ ]|[ ] |
-|   Tcl/Tk                   |           |      |[X]  |[X]|[ ]|[X] |
-|   raylib                   |           |      |[X]  |[X]|[X]|[X] |
-|   SDL3                     |           |      |[X]  |[X]|[X]|[X] |
-|   SDL2                     | sdl2      | DONE |[X]  |[X]|[X]|[X] |
-|   SDL1.2                   | sdl1      | WIP  |[X]  |[X]|[X]|[X] |
-|   DRI DRM fb               | drmfb     | WIP  |[X]  |[ ]|[ ]|[ ] |
-|   GLIDE (with Voodoo)      |           |      |[X]  |[X]|[ ]|[X] |
-|   OpenGL GLX               | glx       |      |[X]  |[X]|[ ]|[ ] |
-|   OpenGL 2.2 FFP/FreeGLUT  | gl11      | DONE |[X]  |[X]|[X]|[X] |
-|   OpenGL 3.3/GLFW/GLAD     | gl33      | WIP  |[X]  |[X]|[X]|[X] |
-|   ImGui                    |           |      |[X]  |[X]|[X]|[X] |
-|   Vulkan/GLFW              | vulkan    | WIP  |[X]  |[X]|[X]|[X] |
-|   Metal                    |           |      |[ ]  |[ ]|[ ]|[X] |
-|   Gtk2                     |           |      |[X]  |[X]|[X]|[X] |
-|   Gtk3                     | gtk3      | DONE |[X]  |[X]|[X]|[X] |
-|   Gtk4 + libadwaita        |           |      |[X]  |[X]|[X]|[X] |
-|   Qt4                      |           |      |[X]  |[X]|[X]|[X] |
-|   Qt5                      | qt5       | DONE |[X]  |[X]|[X]|[X] |
-|   Qt6                      |           |      |[X]  |[X]|[X]|[X] |
-|   wxWidgets                | wxwidgets | WIP  |[X]  |[X]|[X]|[X] |
-|   WinAPI                   | win32     | WIP  |[ ]  |[ ]|[ ]|[X] |
-|   Win32 GDI                | gdi       | WIP  |[ ]  |[ ]|[ ]|[X] |
-|   Direct2D                 | d2d       | WIP  |[ ]  |[ ]|[ ]|[X] |
-|   .NET WinForms            |           |      |[ ]  |[ ]|[ ]|[X] |
-|   .NET WPF                 |           |      |[ ]  |[ ]|[ ]|[X] |
-|   Win UWP                  |           |      |[ ]  |[ ]|[ ]|[X] |
-|   WinUI 3                  |           |      |[ ]  |[ ]|[ ]|[X] |
-|   .NET MAUI                |           |      |[ ]  |[ ]|[ ]|[X] |
-|   Java JNI AWT             | javaawt   | DONE |[X]  |[X]|[X]|[X] |
-|   Java JNI Swing           |           |      |[X]  |[X]|[X]|[X] |
-|   Webapp                   | httpd     | DONE |[X]  |[X]|[X]|[X] |
+|   console                  | console   | DONE |X    |X  |X  |X   |
+|   vt100 escapes            | vt100     | DONE |X    |X  |X  |X   |
+|   ANSI color escapes       | ansi      | DONE |X    |X  |X  |X   |
+|   curses/ncurses           | curses    | DONE |X    |X  |X  |X   |
+|   fbdev                    | fbdev     | DONE |X    |   |   |    |
+|   X11 Xlib                 | xlib      | DONE |X    |X  |X  |X   |
+|   X11 XCB                  | xcb       | WIP  |X    |X  |X  |X   |
+|   Wayland                  | wayland   | WIP  |X    |X  |   |    |
+|   XForms                   | xforms    | DONE |X    |X  |   |    |
+|   FLTK                     | fltk      | WIP  |X    |X  |X  |X   |
+|   Motif (Xm/Xt)            | motif     | WIP  |X    |X  |   |    |
+|   XView (OpenLook/Xt)      |           |      |X    |X  |   |    |
+|   Athena (Xaw/Xt)          | xaw       | WIP  |X    |X  |   |    |
+|   Xaw3d                    |           |      |X    |X  |   |    |
+|   X Toolkit (Xt)           |           |      |X    |X  |   |    |
+|   Tcl/Tk                   |           |      |X    |X  |   |X   |
+|   raylib                   |           |      |X    |X  |X  |X   |
+|   SDL3                     |           |      |X    |X  |X  |X   |
+|   SDL2                     | sdl2      | DONE |X    |X  |X  |X   |
+|   SDL1.2                   | sdl1      | WIP  |X    |X  |X  |X   |
+|   DRI DRM fb               | drmfb     | WIP  |X    |   |   |    |
+|   GLIDE (with Voodoo)      |           |      |X    |X  |   |X   |
+|   OpenGL GLX               | glx       |      |X    |X  |   |    |
+|   OpenGL 2.2 FFP/FreeGLUT  | gl11      | DONE |X    |X  |X  |X   |
+|   OpenGL 3.3/GLFW/GLAD     | gl33      | WIP  |X    |X  |X  |X   |
+|   ImGui                    |           |      |X    |X  |X  |X   |
+|   Vulkan/GLFW              | vulkan    | WIP  |X    |X  |X  |X   |
+|   Metal                    |           |      |     |   |   |X   |
+|   Gtk2                     |           |      |X    |X  |X  |X   |
+|   Gtk3                     | gtk3      | DONE |X    |X  |X  |X   |
+|   Gtk4 + libadwaita        |           |      |X    |X  |X  |X   |
+|   Qt4                      |           |      |X    |X  |X  |X   |
+|   Qt5                      | qt5       | DONE |X    |X  |X  |X   |
+|   Qt6                      |           |      |X    |X  |X  |X   |
+|   wxWidgets                | wxwidgets | WIP  |X    |X  |X  |X   |
+|   WinAPI                   | win32     | WIP  |     |   |   |X   |
+|   Win32 GDI                | gdi       | WIP  |     |   |   |X   |
+|   Direct2D                 | d2d       | WIP  |     |   |   |X   |
+|   .NET WinForms            |           |      |     |   |   |X   |
+|   .NET WPF                 |           |      |     |   |   |X   |
+|   Win UWP                  |           |      |     |   |   |X   |
+|   WinUI 3                  |           |      |     |   |   |X   |
+|   .NET MAUI                |           |      |     |   |   |X   |
+|   Java JNI AWT             | javaawt   | DONE |X    |X  |X  |X   |
+|   Java JNI Swing           |           |      |X    |X  |X  |X   |
+|   Webapp                   | httpd     | DONE |X    |X  |X  |X   |
 
 ### LINUX MODULE TARGET
 
@@ -129,11 +129,11 @@ Using Android NDK
 
 | Mode type                 | STATE|BIOS|UEFI|
 |---------------------------|------|----|----|
-| VGA text mode console     | DONE |[X] |[X] |
-| VGA text mode             | DONE |[X] |[X] |
-| VGA text w/graphic char   | DONE |[X] |[X] |
-| VGA graphic mode          | WIP  |[X] |[X] |
-| VESA graphic mode         | UEFI DONE|[X] |[X] |
+| VGA text mode console     | DONE |X   |X   |
+| VGA text mode             | DONE |X   |X   |
+| VGA text w/graphic char   | DONE |X   |X   |
+| VGA graphic mode          | WIP  |X   |X   |
+| VESA graphic mode         | UEFI DONE|X |X |
 
 ### UEFI APPLICATION TARGET
 
