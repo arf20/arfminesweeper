@@ -36,8 +36,6 @@
 #include <netinet/tcp.h>
 #endif
 
-#include <pthread.h>
-
 #include <common/frontconf.h>
 #include "httpd.h"
 #include <common/game.h>
@@ -264,10 +262,8 @@ generate404Response() {
     convertcrlf(sendBuffer, BUFF_SIZE);
 }
 
-static void*
-clientThread(void* data) {
-    int cfd = *(int*)data;
-
+static void
+clientServe(int cfd) {
     char recvBuff[BUFF_SIZE];
     char tmpBuff[256];
 
@@ -278,11 +274,11 @@ clientThread(void* data) {
         int r = recv(cfd, recvBuff, BUFF_SIZE, 0);
         if (r < 0) {
             printf("Error receiving \n");
-            return NULL;
+            return;
         }
         else if (r == 0) {
             printf("Client exited \n");
-            return NULL;
+            return;
         }
 
         /*fwrite(recvBuff, 1, r, stdout);*/
@@ -305,14 +301,19 @@ clientThread(void* data) {
                 if (strncmp(recvBuff + 6, "clear=", 6) == 0) {
                     cpynum(recvBuff + 12, tmpBuff, 256);
                     int btni = atoi(tmpBuff);
+                    if ((btni < 0) || (btni >= (size * size)))
+                        goto response;
                     gameClearCell(btni % size, btni / size);
                 }
                 else if (strncmp(recvBuff + 6, "flag=", 5) == 0) {
                     cpynum(recvBuff + 11, tmpBuff, 256);
                     int btni = atoi(tmpBuff);
+                    if ((btni < 0) || (btni >= (size * size)))
+                        goto response;
                     gameFlagCell(btni % size, btni / size);
                 }
 
+            response:
                 generateBoardResponse();
                 send(cfd, sendBuffer, strlen(sendBuffer), 0);
                 printf("GET ");
@@ -330,12 +331,12 @@ clientThread(void* data) {
         }
         else {
             printf("Warning: Only GET supported\n");
-            return NULL;
+            return;
         }
 
         close(cfd);
         printf("Connection closed\n");
-        return NULL;
+        return;
     }
 }
 
@@ -406,7 +407,6 @@ httpd_start(const int* lboard, int lsize) {
 
     printf("Listening on 0.0.0.0:8080\n");
 
-    pthread_t cthread;
     int cfd = -1;
 
     /* Accept loop */
@@ -417,8 +417,7 @@ httpd_start(const int* lboard, int lsize) {
             continue;
         }
 
-        pthread_create(&cthread, NULL, clientThread, &cfd);
-        pthread_detach(cthread);
+        clientServe(cfd);
     }
 
     return 0;
