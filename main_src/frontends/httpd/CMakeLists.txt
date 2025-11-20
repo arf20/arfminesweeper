@@ -1,7 +1,6 @@
 if (MODULE_HTTPD)
     add_library(httpd MODULE "httpd.c")
     target_compile_definitions(httpd PUBLIC _MODULE_)
-    target_link_libraries(httpd Threads::Threads)
     add_custom_target(symlink_httpd ALL
         COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
         DEPENDS httpd module_dir)
@@ -12,7 +11,6 @@ endif()
 
 if (STATIC_HTTPD)
     target_sources(arfminesweeper PRIVATE "httpd.c")
-    target_link_libraries(arfminesweeper Threads::Threads)
     target_compile_definitions(arfminesweeper PUBLIC FRONTEND_HTTPD)
     if (WIN32)
         target_link_libraries(arfminesweeper ws2_32)
