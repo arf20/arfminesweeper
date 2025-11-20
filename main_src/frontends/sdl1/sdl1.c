@@ -101,23 +101,22 @@ render() {
 
     SDL_FillRect(screen, NULL, 0x000000);
 
-    /* Draw title */
-    renderText(TXT_TITLE, font, 5, 5, 0, SDLColor(C_WHITE));
-
     /* Check game state*/
     switch (gameGetState()) {
         case STATE_LOST: {
-            //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            //    "Game Over", TXT_LOST, w);
-            run = 0;
+            renderText(TXT_LOST, font, 5, 5, 0, SDLColor(C_WHITE));
+            SDL_UpdateRect(screen, 0, 0, 0, 0);
             return;
         } break;
         case STATE_WON: {
-            //SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            //    "Game Over", TXT_WON, w);
-            run = 0;
+            renderText(TXT_WON, font, 5, 5, 0, SDLColor(C_WHITE));
+            SDL_UpdateRect(screen, 0, 0, 0, 0);
+            return;
         } break;
     }
+
+    /* Draw title */
+    renderText(TXT_TITLE, font, 5, 5, 0, SDLColor(C_WHITE));
 
     /* Print flags left */
     snprintf(buff, 256, "%d", gameGetFlagsLeft());
@@ -193,12 +192,13 @@ sdl1_start(const int *lboard, int lsize) {
     if (!(font = TTF_OpenFont(FONT_TTF_PATH, 16)))
         printf("Error opening font: %s\n", TTF_GetError());
 
-    if (!(flag = SDL_LoadBMP(FLAG_PNG_PATH)))
+    if (!(flag = SDL_LoadBMP(FLAG_BMP_PATH)))
         printf("Error loading texture: %s\n", SDL_GetError());
 
     /* SDL event loop */
     SDL_Event e;
     while (run) {
+        
         render();
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
@@ -208,10 +208,11 @@ sdl1_start(const int *lboard, int lsize) {
                 case SDL_MOUSEBUTTONDOWN: {
                     /* Coordinates */
                     int ix = (e.button.x - W_MARGIN) /
-                    (CELL_SIZE + CELL_MARGIN);
+                        (CELL_SIZE + CELL_MARGIN);
                     int iy = (e.button.y - HEADER_HEIGHT) /
                         (CELL_SIZE + CELL_MARGIN);
-                    if (ix < 0 || ix >= size || iy < 0 || iy >= size) continue;
+                    if (ix < 0 || ix >= size || iy < 0 || iy >= size)
+                        continue;
 
                     switch (e.button.button) {
                         case SDL_BUTTON_LEFT: {

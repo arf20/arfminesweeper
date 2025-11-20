@@ -114,13 +114,13 @@ render() {
     switch (gameGetState()) {
         case STATE_LOST: {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                "Game Over", TXT_LOST, w);
+                TXT_TITLE, TXT_LOST, w);
             run = 0;
             return;
         } break;
         case STATE_WON: {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                "Game Over", TXT_WON, w);
+                TXT_TITLE, TXT_WON, w);
             run = 0;
         } break;
     }
