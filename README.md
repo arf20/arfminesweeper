@@ -1,6 +1,16 @@
 # arfminesweeper
 
-Minesweeper, but in every way possible
+This project attempts to answer the first question, the universal question:
+
+<p style="text-align: center; font-style: italic;">How many ways are there to build an application?</p>
+
+The answer is: yes<super>*</super>.
+
+I happen to think that the classic game Minesweeper is a good benchmark for the majority of... things.
+
+So I bring you: Minesweeper, but in every way I could think of.
+
+<super>*</super>: See below
 
 ## Build on Debian GNU/Linux
 
@@ -53,74 +63,91 @@ Use -DMODULE\_ALL=TRUE to build all modules, -DMODULE\_\<frontend> to build spec
 Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build specific static frontends
 
 ## TODO frontends
-```
-MAIN TARGET                 NAME        STATE Linux BSD Mac Win
-    console                 console     DONE  X     X   X   X
-    vt100 escapes           vt100       DONE  X     X   X   X
-    ANSI color escapes      ansi        DONE  X     X   X   X
-    curses/ncurses          curses      DONE  X     X   X   
-    fbdev                   fbdev       DONE  X
-    X11 Xlib                xlib        DONE  X     X   X   X
-    X11 XCB                 xcb         WIP   X     X   X   X
-    Wayland                 wayland     WIP   X     X
-    XForms                  xforms      DONE  X     X
-    FLTK                    fltk        WIP   X     X   X   X
-    Motif (Xm/Xt)           motif       WIP   X     X
-    XView (OpenLook/Xt)                       X     X
-    Athena (Xaw/Xt)         xaw         WIP   X     X
-    Xaw3d                                     X     X
-    X Toolkit (Xt)                            X     X
-    Tcl/Tk                                    X     X       X
-    raylib                              NO    X     X   X   X  incompatible with gl33
-    SDL3                                      X     X   X   X
-    SDL2                    sdl2        DONE  X     X   X   X
-    SDL1.2                  sdl1        WIP   X     X   X   X
-    DRI DRM fb              drmfb       WIP   X
-    GLIDE (with Voodoo)                       X     X       X
-    OpenGL GLX              glx               X     X
-    OpenGL 2.2 FFP/FreeGLUT gl11        DONE  X     X   X   X
-    OpenGL 3.3/GLFW/GLAD    gl33        WIP   X     X   X   X
-    ImGui                                     X     X   X   X
-    Vulkan/GLFW             vulkan      WIP   X     X   X   X
-    Metal                                                   X
-    Gtk2                                      X     X   X   X
-    Gtk3                    gtk3        DONE  X     X   X   X
-    Gtk4 + libadwaita                         X     X   X   X
-    Qt4                                       X     X   X   X
-    Qt5                     qt5         DONE  X     X   X   X
-    Qt6                                       X     X   X   X
-    wxWidgets               wxwidgets   WIP   X     X   X   X
-    WinAPI                  win32       WIP                 X
-    Win32 GDI               gdi         WIP                 X
-    Direct2D                d2d         WIP                 X
-    .NET WinForms                                           X
-    .NET WPF                                                X
-    Win UWP                                                 X
-    WinUI 3                                                 X
-    .NET MAUI                                               X
-    Java JNI AWT            java        WIP   X     X   X   X  Architectural limitation
-    Java JNI Swing                            X     X   X   X
-    Webapp                  httpd       DONE  X     X   X   X
 
-LINUX MODULE TARGET
-    Kernel module           DONE
+### MAIN TARGET
 
-ANDROID TARGET
-    Android NDK
+| Toolkit/Library/Thing      | NAME      | STATE|Linux|BSD|Mac|Win |
+|----------------------------|-----------|------|-----|---|---|----|
+|   console                  | console   | DONE |[X]  |[X]|[X]|[X] |
+|   vt100 escapes            | vt100     | DONE |[X]  |[X]|[X]|[X] |
+|   ANSI color escapes       | ansi      | DONE |[X]  |[X]|[X]|[X] |
+|   curses/ncurses           | curses    | DONE |[X]  |[X]|[X]|[X] |
+|   fbdev                    | fbdev     | DONE |[X]  |[ ]|[ ]|[ ] |
+|   X11 Xlib                 | xlib      | DONE |[X]  |[X]|[X]|[X] |
+|   X11 XCB                  | xcb       | WIP  |[X]  |[X]|[X]|[X] |
+|   Wayland                  | wayland   | WIP  |[X]  |[X]|[ ]|[ ] |
+|   XForms                   | xforms    | DONE |[X]  |[X]|[ ]|[ ] |
+|   FLTK                     | fltk      | WIP  |[X]  |[X]|[X]|[X] |
+|   Motif (Xm/Xt)            | motif     | WIP  |[X]  |[X]|[ ]|[ ] |
+|   XView (OpenLook/Xt)      |           |      |[X]  |[X]|[ ]|[ ] |
+|   Athena (Xaw/Xt)          | xaw       | WIP  |[X]  |[X]|[ ]|[ ] |
+|   Xaw3d                    |           |      |[X]  |[X]|[ ]|[ ] |
+|   X Toolkit (Xt)           |           |      |[X]  |[X]|[ ]|[ ] |
+|   Tcl/Tk                   |           |      |[X]  |[X]|[ ]|[X] |
+|   raylib                   |           |      |[X]  |[X]|[X]|[X] |
+|   SDL3                     |           |      |[X]  |[X]|[X]|[X] |
+|   SDL2                     | sdl2      | DONE |[X]  |[X]|[X]|[X] |
+|   SDL1.2                   | sdl1      | WIP  |[X]  |[X]|[X]|[X] |
+|   DRI DRM fb               | drmfb     | WIP  |[X]  |[ ]|[ ]|[ ] |
+|   GLIDE (with Voodoo)      |           |      |[X]  |[X]|[ ]|[X] |
+|   OpenGL GLX               | glx       |      |[X]  |[X]|[ ]|[ ] |
+|   OpenGL 2.2 FFP/FreeGLUT  | gl11      | DONE |[X]  |[X]|[X]|[X] |
+|   OpenGL 3.3/GLFW/GLAD     | gl33      | WIP  |[X]  |[X]|[X]|[X] |
+|   ImGui                    |           |      |[X]  |[X]|[X]|[X] |
+|   Vulkan/GLFW              | vulkan    | WIP  |[X]  |[X]|[X]|[X] |
+|   Metal                    |           |      |[ ]  |[ ]|[ ]|[X] |
+|   Gtk2                     |           |      |[X]  |[X]|[X]|[X] |
+|   Gtk3                     | gtk3      | DONE |[X]  |[X]|[X]|[X] |
+|   Gtk4 + libadwaita        |           |      |[X]  |[X]|[X]|[X] |
+|   Qt4                      |           |      |[X]  |[X]|[X]|[X] |
+|   Qt5                      | qt5       | DONE |[X]  |[X]|[X]|[X] |
+|   Qt6                      |           |      |[X]  |[X]|[X]|[X] |
+|   wxWidgets                | wxwidgets | WIP  |[X]  |[X]|[X]|[X] |
+|   WinAPI                   | win32     | WIP  |[ ]  |[ ]|[ ]|[X] |
+|   Win32 GDI                | gdi       | WIP  |[ ]  |[ ]|[ ]|[X] |
+|   Direct2D                 | d2d       | WIP  |[ ]  |[ ]|[ ]|[X] |
+|   .NET WinForms            |           |      |[ ]  |[ ]|[ ]|[X] |
+|   .NET WPF                 |           |      |[ ]  |[ ]|[ ]|[X] |
+|   Win UWP                  |           |      |[ ]  |[ ]|[ ]|[X] |
+|   WinUI 3                  |           |      |[ ]  |[ ]|[ ]|[X] |
+|   .NET MAUI                |           |      |[ ]  |[ ]|[ ]|[X] |
+|   Java JNI AWT             | javaawt   | DONE |[X]  |[X]|[X]|[X] |
+|   Java JNI Swing           |           |      |[X]  |[X]|[X]|[X] |
+|   Webapp                   | httpd     | DONE |[X]  |[X]|[X]|[X] |
 
-BIOS KERNEL TARGET          STATE BIOS UEFI
-    VGA text mode console   DONE  X    X
-    VGA text mode           DONE  X    X
-    VGA text w/graphic char DONE  X    X
-    VGA graphic mode        WIP   X    X
-    VESA graphic mode                  X
-UEFI APPLICATION TARGET
-    UEFI console                       X
+### LINUX MODULE TARGET
 
-HARDWARE TARGET
-    SystemVerilog
-    VHDL
-```
+Exposes a /dev/arfminesweeper character device that you can cat, and echo the same commands as `console` into
+
+DONE
+
+### ANDROID TARGET
+
+Using Android NDK
+
+### KERNEL TARGET
+
+| Mode type                 | STATE|BIOS|UEFI|
+|---------------------------|------|----|----|
+| VGA text mode console     | DONE |[X] |[X] |
+| VGA text mode             | DONE |[X] |[X] |
+| VGA text w/graphic char   | DONE |[X] |[X] |
+| VGA graphic mode          | WIP  |[X] |[X] |
+| VESA graphic mode         | UEFI DONE|[X] |[X] |
+
+### UEFI APPLICATION TARGET
+
+UEFI console
+
+WIP
+
+### HARDWARE TARGET
+
+The only one that doesnt compile against game.c
+
+ - SystemVerilog
+ - VHDL
+
 I apologize.
 
 ### Notes:
@@ -129,13 +156,9 @@ I apologize.
 
 Does not work on Intel iGPUs apparently, for some god unknown reason, maybe the bit shit?
 
+Mutually exclusive with raylib on static builds
+
 #### Win32
 
 Currently I think it only builds correctly under MSVC
-
-#### Kernel module
-
-Exposes a character device at /dev/arfminesweeper.
-`cat` it to get the board, and send commands like echo 'c 0 0' > /dev/arfminesweer
-Usage is c|f x y, c for clear f for flag
 
