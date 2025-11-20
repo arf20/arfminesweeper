@@ -18,21 +18,21 @@
 
 */
 
-#ifndef _JAVAAWT_H
-#define _JAVAAWT_H
+#ifndef _AWT_H
+#define _AWT_H
 
 #ifdef _MODULE_
-#define javaawt_start   start
-#define javaawt_destroy destroy
-#define javaawt_name    name
+#define awt_start   start
+#define awt_destroy destroy
+#define awt_name    name
 #endif
 
-int javaawt_start(const int *lboard, int lsize);
-void javaawt_destroy();
-const char *javaawt_name();
+int awt_start(const int *lboard, int lsize);
+void awt_destroy();
+const char *awt_name();
 
-const int *javaawt_getboard();
-int javaawt_getsize();
+const int *awt_getboard();
+int awt_getsize();
 
-#endif /* _JAVAAWT_H */
+#endif /* _AWT_H */
 

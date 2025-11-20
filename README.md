@@ -111,9 +111,11 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   Win UWP                  |           |      |     |   |   |X   |
 |   WinUI 3                  |           |      |     |   |   |X   |
 |   .NET MAUI                |           |      |     |   |   |X   |
-|   Java JNI AWT             | javaawt   | DONE |X    |X  |X  |X   |
-|   Java JNI Swing           |           |      |X    |X  |X  |X   |
+|   Java JNI AWT             | awt       | DONE |X    |X  |X  |X   |
+|   Java JNI Swing           | swing     | WIP  |X    |X  |X  |X   |
 |   Webapp                   | httpd     | DONE |X    |X  |X  |X   |
+|   Objective-C ?            |           |      |     |   |X  |    |
+|   Swift ?                  |           |      |     |   |X  |    |
 
 ### LINUX MODULE TARGET
 

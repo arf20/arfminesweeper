@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    java.c: Java frontend
+    swing.c: Java Swing frontend
 
 */
 
@@ -27,14 +27,14 @@
 
 #include <common/frontconf.h>
 
-#include "javaawt.h"
+#include "swing.h"
 
 JavaVM *jvm;       /* denotes a Java VM */
 
 static const int *board = NULL;
 static int size = 0;
 
-int javaawt_start(const int *lboard, int lsize) {
+int swing_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -65,7 +65,7 @@ int javaawt_start(const int *lboard, int lsize) {
     }
 
     /* invoke the Main.test method using the JNI */
-    jclass class = (*env)->FindClass(env, "awt");
+    jclass class = (*env)->FindClass(env, "swing");
     if (class == NULL)  {
         printf("Error FindClass failed: not found\n");
         return -1;
@@ -88,12 +88,12 @@ int javaawt_start(const int *lboard, int lsize) {
 
 }
 
-void javaawt_destroy() {
+void swing_destroy() {
     (*jvm)->DestroyJavaVM(jvm);
 }
 
 const char *
-javaawt_name() {
-    return "javaawt";
+swing_name() {
+    return "swing";
 }
 

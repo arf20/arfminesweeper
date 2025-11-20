@@ -53,11 +53,12 @@
 #include <drmfb/drmfb.h>
 #include <vt100/vt100.h>
 #include <ansi/ansi.h>
-#include <javaawt/javaawt.h>
+#include <awt/awt.h>
 #include <glx/glx.h>
 #include <curses/curses.h>
 #include <fltk/fltk.hpp>
 #include <wxwidgets/wxwidgets.hpp>
+#include <swing/swing.h>
 
 typedef const char *(name_func_t)();
 
@@ -147,8 +148,8 @@ frontend_load_static() {
     #ifdef FRONTEND_ANSI
     frontend_insert(&(frontend_t){ TYPE_STATIC, ansi_name(), ansi_start, ansi_destroy });
     #endif
-    #ifdef FRONTEND_JAVAAWT
-    frontend_insert(&(frontend_t){ TYPE_STATIC, javaawt_name(), javaawt_start, javaawt_destroy });
+    #ifdef FRONTEND_AWT
+    frontend_insert(&(frontend_t){ TYPE_STATIC, awt_name(), awt_start, awt_destroy });
     #endif
     #ifdef FRONTEND_GLX
     frontend_insert(&(frontend_t){ TYPE_STATIC, glx_name(), glx_start, glx_destroy });
@@ -161,6 +162,9 @@ frontend_load_static() {
     #endif
     #ifdef FRONTEND_WXWIDGETS
     frontend_insert(&(frontend_t){ TYPE_STATIC, wxwidgets_name(), wxwidgets_start, wxwidgets_destroy });
+    #endif
+    #ifdef FRONTEND_SWING
+    frontend_insert(&(frontend_t){ TYPE_STATIC, swing_name(), swing_start, swing_destroy });
     #endif
 
 }

@@ -221,7 +221,7 @@ class MinesweeperAwt extends Frame implements MouseListener {
 
 
 
-public class javaawt {
+public class awt {
     static void main(int lsize)  {
         MinesweeperAwt f = new MinesweeperAwt(lsize);
 
