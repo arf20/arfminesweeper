@@ -10,10 +10,18 @@ extern "C" {
 /*
  * Class:     ArfBackend
  * Method:    getBoardCopy
- * Signature: (I)[I
+ * Signature: ()[I
  */
 JNIEXPORT jintArray JNICALL Java_ArfBackend_getBoardCopy
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     ArfBackend
+ * Method:    gameGetSize
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_ArfBackend_gameGetSize
+  (JNIEnv *, jobject);
 
 /*
  * Class:     ArfBackend

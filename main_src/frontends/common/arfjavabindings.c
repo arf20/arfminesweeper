@@ -27,12 +27,18 @@
 #include <common/game.h>
 
 JNIEXPORT jintArray JNICALL 
-Java_ArfBackend_getBoardCopy(JNIEnv *env, jobject this, jint size) {
+Java_ArfBackend_getBoardCopy(JNIEnv *env, jobject this) {
+    int size = gameGetSize();
     jintArray jni_board_copy = (*env)->NewIntArray(env, size * size);
     (*env)->SetIntArrayRegion(env, jni_board_copy, 0, size * size,
         gameGetBoard());
 
     return jni_board_copy;
+}
+
+JNIEXPORT jint JNICALL
+Java_ArfBackend_gameGetSize(JNIEnv *env, jobject this) {
+    return gameGetSize();
 }
 
 JNIEXPORT jint JNICALL

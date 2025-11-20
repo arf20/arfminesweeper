@@ -29,7 +29,7 @@
 
 #include "awt.h"
 
-JavaVM *jvm;       /* denotes a Java VM */
+static JavaVM *jvm;       /* denotes a Java VM */
 
 static const int *board = NULL;
 static int size = 0;

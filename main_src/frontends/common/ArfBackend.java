@@ -15,15 +15,27 @@ public class ArfBackend {
         FLAG_PNG_PATH = getFlagPNGPath(); 
         STATE_LOST = getStateLost();
         STATE_WON = getStateWon();
+        size = gameGetSize();
     }
 
     /* macro values from native frontconf.h */
     public final String TXT_TITLE, TXT_LOST, TXT_WON, FLAG_PNG_PATH;
     public final int HEADER_HEIGHT, CELL_SIZE, CELL_MARGIN, W_MARGIN,
-          CELL_BIT_MINE, CELL_BIT_FLAG, CELL_BIT_CLEAR, STATE_LOST, STATE_WON;
+          CELL_BIT_MINE, CELL_BIT_FLAG, CELL_BIT_CLEAR, STATE_LOST, STATE_WON, 
+          size;
+
+    /* bit test macros */
+    public boolean CHECK_MINE(int x) { return  (((x) >> CELL_BIT_MINE) & 1) == 1; };
+    public boolean CHECK_FLAG(int x) { return  (((x) >> CELL_BIT_FLAG) & 1) == 1; };
+    public boolean CHECK_CLEAR(int x) { return (((x) >> CELL_BIT_CLEAR) & 1) == 1; };
+
+    public int BOARDXY(int x, int y) {
+        return getBoardCopy()[(y * size) + x];
+    }
 
     /* game interface */
-    public native int[] getBoardCopy(int size);
+    public native int[] getBoardCopy();
+    public native int gameGetSize();
     public native int gameGetState();
     public native int gameGetSurroundingMines(int x, int y);
     public native int gameGetFlagsLeft();

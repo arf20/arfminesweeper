@@ -48,7 +48,8 @@
 
 int gameInit(int size, int mines);
 void gameDestroy(void);
-const int * gameGetBoard(void);
+const int *gameGetBoard(void);
+int gameGetSize(void);
 int gameGetState(void);
 void gameSetState(int s);
 int gameGetSurroundingMines(int x, int y);

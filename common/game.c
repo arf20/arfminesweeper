@@ -116,6 +116,11 @@ gameGetBoard() {
 }
 
 int
+gameGetSize() {
+    return size;
+}
+
+int
 gameGetState() {
     return state;
 }

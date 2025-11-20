@@ -83,9 +83,6 @@ class MinesweeperAwt extends Frame implements MouseListener {
     MinesweeperAwt(int lsize) {
         backend = new ArfBackend();
 
-        /* initialize values from native */
-        
-
         size = lsize;
 
         wWidth = (2 * backend.W_MARGIN) + (size * backend.CELL_SIZE) +
@@ -168,7 +165,7 @@ class MinesweeperAwt extends Frame implements MouseListener {
         else if (e.getButton() == MouseEvent.BUTTON3)
             backend.gameFlagCell(btni % size, btni / size);
 
-        update();
+        updateBoard();
     }
 
     public void mouseExited(MouseEvent e) { }
@@ -176,17 +173,17 @@ class MinesweeperAwt extends Frame implements MouseListener {
     public void mousePressed(MouseEvent e) { }
     public void mouseReleased(MouseEvent e) { }
 
-    private void update() {
+    private void updateBoard() {
         flagLabel.setText(Integer.toString(backend.gameGetFlagsLeft()));
 
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 int btni = (y * size) + x;
 
-                if (CHECK_CLEAR(BOARDXY(x, y))) {
+                if (backend.CHECK_CLEAR(backend.BOARDXY(x, y))) {
                     cells[btni].setVisible(false);
                     numbers[btni].setVisible(true);
-                } else if (CHECK_FLAG(BOARDXY(x, y))) {
+                } else if (backend.CHECK_FLAG(backend.BOARDXY(x, y))) {
                     cells[btni].setPaintFlag(true);
                 } else {
                     cells[btni].setPaintFlag(false);
@@ -207,15 +204,6 @@ class MinesweeperAwt extends Frame implements MouseListener {
             dispose();
             System.exit(0);
         }
-    }
-
-    /* bit test macros */
-    private boolean CHECK_MINE(int x) { return  (((x) >> backend.CELL_BIT_MINE) & 1) == 1; };
-    private boolean CHECK_FLAG(int x) { return  (((x) >> backend.CELL_BIT_FLAG) & 1) == 1; };
-    private boolean CHECK_CLEAR(int x) { return (((x) >> backend.CELL_BIT_CLEAR) & 1) == 1; };
-
-    private int BOARDXY(int x, int y) {
-        return backend.getBoardCopy(size)[(y * size) + x];
     }
 }
 
