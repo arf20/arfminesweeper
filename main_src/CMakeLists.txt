@@ -56,6 +56,7 @@ include_directories(arfminesweeper PUBLIC "${PROJECT_SOURCE_DIR}/" "frontends/")
 
 # module dir
 set(MODULE_DIR "${CMAKE_BINARY_DIR}/main_src/modules/")
+set(BINDINGS_DIR "${CMAKE_BINARY_DIR}/main_src/bindings/")
 
 add_subdirectory("frontends/")
 

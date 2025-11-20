@@ -20,7 +20,9 @@
 
 */
 
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
+import java.lang.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -63,21 +65,14 @@ class Cell extends Button {
             return;
 
         g.drawImage(flag, 0, 0, flag.getWidth(null), flag.getHeight(null), null);
-
-        System.out.println("painted");
     }
 }
 
 class MinesweeperAwt extends Frame implements MouseListener {   
     final int size, wWidth, wHeight;
 
-    /* macro values from native frontconf.h */
-    final String TXT_TITLE, TXT_LOST, TXT_WON, FLAG_PNG_PATH;
-    final int HEADER_HEIGHT, CELL_SIZE, CELL_MARGIN, W_MARGIN,
-          CELL_BIT_MINE, CELL_BIT_FLAG, CELL_BIT_CLEAR, STATE_LOST, STATE_WON;
-
-    /* interface to C functions */
-    final Backend backend;
+    /* interface to C core */
+    final ArfBackend backend;
 
     final Image flag;
     
@@ -86,38 +81,27 @@ class MinesweeperAwt extends Frame implements MouseListener {
     Label[] numbers = new Label[1]; // java sucks
     
     MinesweeperAwt(int lsize) {
-        backend = new Backend();
+        backend = new ArfBackend();
 
         /* initialize values from native */
-        TXT_TITLE = backend.getTextTitle();
-        TXT_LOST = backend.getTextLost();
-        TXT_WON = backend.getTextWon();
-        HEADER_HEIGHT = backend.getHeaderHeight();
-        CELL_SIZE = backend.getCellSize();
-        CELL_MARGIN = backend.getCellMargin();
-        W_MARGIN = backend.getWindowMargin();
-        CELL_BIT_MINE = backend.getCellBitMine();
-        CELL_BIT_FLAG = backend.getCellBitFlag();
-        CELL_BIT_CLEAR = backend.getCellBitClear(); 
-        FLAG_PNG_PATH = backend.getFlagPNGPath(); 
-        STATE_LOST = backend.getStateLost();
-        STATE_WON = backend.getStateWon();
+        
 
         size = lsize;
 
-        wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
-        wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
-            ((size - 1) * CELL_MARGIN);
+        wWidth = (2 * backend.W_MARGIN) + (size * backend.CELL_SIZE) +
+            ((size - 1) * backend.CELL_MARGIN);
+        wHeight = backend.HEADER_HEIGHT + backend.W_MARGIN +
+            (size * backend.CELL_SIZE) + ((size - 1) * backend.CELL_MARGIN);
 
         setResizable(false);
         setLayout(null);
-        setTitle(TXT_TITLE);
+        setTitle(backend.TXT_TITLE);
         
         setVisible(true);
         Insets insets = getInsets();
         setSize(wWidth + insets.left + insets.right, wHeight + insets.top + insets.bottom);
 
-        Label titleLabel = new Label(TXT_TITLE);
+        Label titleLabel = new Label(backend.TXT_TITLE);
         titleLabel.setBounds(5 + insets.left, 15 + insets.top, 100, 20);
         add(titleLabel);
 
@@ -125,24 +109,24 @@ class MinesweeperAwt extends Frame implements MouseListener {
         flagLabel.setBounds(wWidth - 25 + insets.left, 35 + insets.top, 50, 20);
         add(flagLabel);
 
-        flag = Toolkit.getDefaultToolkit().getImage(FLAG_PNG_PATH);
+        flag = Toolkit.getDefaultToolkit().getImage(backend.FLAG_PNG_PATH);
 
         cells = new Cell[size*size];
         numbers = new Label[size*size];
 
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                int cX = W_MARGIN + (x * (CELL_SIZE + CELL_MARGIN)) + insets.left;
-                int cY = HEADER_HEIGHT + (y * (CELL_SIZE + CELL_MARGIN)) + insets.top;
+                int cX = backend.W_MARGIN + (x * (backend.CELL_SIZE + backend.CELL_MARGIN)) + insets.left;
+                int cY = backend.HEADER_HEIGHT + (y * (backend.CELL_SIZE + backend.CELL_MARGIN)) + insets.top;
                 int btni = (y*size) + x;
 
                 cells[btni] = new Cell(flag);
-                cells[btni].setBounds(cX, cY, CELL_SIZE, CELL_SIZE);
+                cells[btni].setBounds(cX, cY, backend.CELL_SIZE, backend.CELL_SIZE);
                 cells[btni].addMouseListener(this);
                 add(cells[btni]);
 
                 numbers[btni] = new Label();
-                numbers[btni].setBounds(cX, cY, CELL_SIZE, CELL_SIZE);
+                numbers[btni].setBounds(cX, cY, backend.CELL_SIZE, backend.CELL_SIZE);
                 numbers[btni].setVisible(false);
 
                 int n = backend.gameGetSurroundingMines(x, y);
@@ -214,79 +198,30 @@ class MinesweeperAwt extends Frame implements MouseListener {
         repaint(1);
 
         int state = backend.gameGetState();
-        if (state == STATE_LOST) {
-            MessageBox dialog = new MessageBox(this, TXT_TITLE, TXT_LOST);
+        if (state == backend.STATE_LOST) {
+            MessageBox dialog = new MessageBox(this, backend.TXT_TITLE, backend.TXT_LOST);
             dispose();
             System.exit(0);
-        } else if (state == STATE_WON) {
-            MessageBox dialog = new MessageBox(this, TXT_TITLE, TXT_WON);
+        } else if (state == backend.STATE_WON) {
+            MessageBox dialog = new MessageBox(this, backend.TXT_TITLE, backend.TXT_WON);
             dispose();
             System.exit(0);
         }
     }
 
     /* bit test macros */
-    private boolean CHECK_MINE(int x) { return  (((x) >> CELL_BIT_MINE) & 1) == 1; };
-    private boolean CHECK_FLAG(int x) { return  (((x) >> CELL_BIT_FLAG) & 1) == 1; };
-    private boolean CHECK_CLEAR(int x) { return (((x) >> CELL_BIT_CLEAR) & 1) == 1; };
+    private boolean CHECK_MINE(int x) { return  (((x) >> backend.CELL_BIT_MINE) & 1) == 1; };
+    private boolean CHECK_FLAG(int x) { return  (((x) >> backend.CELL_BIT_FLAG) & 1) == 1; };
+    private boolean CHECK_CLEAR(int x) { return (((x) >> backend.CELL_BIT_CLEAR) & 1) == 1; };
 
     private int BOARDXY(int x, int y) {
-        return backend.getBoardCopy()[(y * size) + x];
+        return backend.getBoardCopy(size)[(y * size) + x];
     }
 }
 
-class Backend {
-    boolean linked = false;
 
-    Backend() {
-        UnsatisfiedLinkError exception = new UnsatisfiedLinkError();
 
-        try {
-            System.loadLibrary("arfminesweeper");
-            linked = true;
-        } catch (UnsatisfiedLinkError e) {
-            exception = e;
-        }
-
-        if (!linked) {
-            try {
-                System.loadLibrary("javaawt");
-                linked = true;
-            } catch (UnsatisfiedLinkError e) {
-                exception = e;
-            }
-        }
-
-        if (!linked) {
-            System.out.println("Could not find library to link against or error linking with it");
-            throw exception;
-        }
-    }
-
-    public native int[] getBoardCopy();
-    public native String getTextLost();
-    public native String getTextWon();
-    public native String getTextTitle();
-    public native int getHeaderHeight();
-    public native int getCellSize();
-    public native int getCellMargin();
-    public native int getWindowMargin();
-    public native int getCellBitMine();
-    public native int getCellBitFlag();
-    public native int getCellBitClear(); 
-    public native String getFlagPNGPath(); 
-    public native int getStateLost(); 
-    public native int getStateWon(); 
-
-    /* game interface */
-    public native int gameGetState();
-    public native int gameGetSurroundingMines(int x, int y);
-    public native int gameGetFlagsLeft();
-    public native void gameClearCell(int x, int y);
-    public native void gameFlagCell(int x, int y);
-}
-
-public class awt {
+public class javaawt {
     static void main(int lsize)  {
         MinesweeperAwt f = new MinesweeperAwt(lsize);
 

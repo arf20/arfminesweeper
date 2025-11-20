@@ -21,6 +21,7 @@
 */
 
 #include <stdlib.h>
+#include <dlfcn.h>
 
 #include <jni.h>
 
@@ -33,19 +34,16 @@ JavaVM *jvm;       /* denotes a Java VM */
 static const int *board = NULL;
 static int size = 0;
 
-const int *
-javaawt_getboard() {
-    return board;
-}
-
-int
-javaawt_getsize() {
-    return size;
-}
-
 int javaawt_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
+
+    /* sufficient to link the bindings to this process */
+    void *bindingshandle = dlopen(LIB_BINDINGS_JAVA, RTLD_NOW);
+    if (bindingshandle == NULL) {
+        fprintf(stderr, "Error: loading %s\n", dlerror());
+        return -1;
+    }
 
     JNIEnv *env;       /* pointer to native method interface */
     JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */
@@ -63,6 +61,7 @@ int javaawt_start(const int *lboard, int lsize) {
     jint ret = JNI_CreateJavaVM(&jvm, (void**)&env, &vm_args);
     if (ret != JNI_OK)  {
         printf("Error JNI_CreateJavaVM\n");
+        return -1;
     }
 
     /* invoke the Main.test method using the JNI */

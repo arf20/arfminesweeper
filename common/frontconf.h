@@ -21,17 +21,20 @@
 #ifndef _FRONTCONF_H
 #define _FRONTCONF_H
 
-#define FLAG_PNG_PATH       "../assets/flag.png"
-#define FLAG_BMP_PATH       "../assets/flag.bmp"
-#define FLAG_XBM_PATH       "../assets/flag.xbm"
-#define FLAG_ICO_PATH       "../assets/flag.ico"
-#define FONT_TTF_PATH       "../assets/FSEX300.ttf"
-#define FONT_BMP_PATH       "../assets/charstrip.bmp"
-#define GL3_VS_PATH         "../assets/msboard.vs"
-#define GL3_FS_PATH         "../assets/msboard.fs"
-#define JAVA_CLASS_PATH     "../assets/"
-#define JAVA_LIBRARY_PATH   "./main_src/:./main_src/modules/"
+#define ASSET_DIR           "../assets/"
+
+#define FLAG_PNG_PATH       ASSET_DIR "flag.png"
+#define FLAG_BMP_PATH       ASSET_DIR "flag.bmp"
+#define FLAG_XBM_PATH       ASSET_DIR "flag.xbm"
+#define FLAG_ICO_PATH       ASSET_DIR "flag.ico"
+#define FONT_TTF_PATH       ASSET_DIR "FSEX300.ttf"
+#define FONT_BMP_PATH       ASSET_DIR "charstrip.bmp"
+#define GL3_VS_PATH         ASSET_DIR "msboard.vs"
+#define GL3_FS_PATH         ASSET_DIR "msboard.fs"
 #define MODULE_SEARCH_PATH  "main_src/modules"
+#define JAVA_CLASS_PATH     ASSET_DIR
+#define JAVA_LIBRARY_PATH   "./main_src/bindings/"
+#define LIB_BINDINGS_JAVA   "main_src/bindings/libarfjavabindings.so"
 
 #define HEADER_HEIGHT 60
 #define CELL_SIZE     20

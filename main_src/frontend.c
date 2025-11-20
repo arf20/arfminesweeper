@@ -3,7 +3,7 @@
     arfminesweeper: Cross-plataform multi-frontend game
     Copyright (C) 2023 arf20 (Ángel Ruiz Fernandez)
 
-    This program is free software: you can redistribute it and/or modify
+    This program is free software: you can redistribute it and/or handleify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
@@ -183,27 +183,27 @@ frontend_load_modules() {
             continue;
 
         snprintf(path, 256, "%s/%s", MODULE_SEARCH_PATH, entry->d_name);
-        void *mod = dlopen(path, RTLD_NOW);
-        if (mod == NULL) {
+        void *handle = dlopen(path, RTLD_NOW);
+        if (handle == NULL) {
             fprintf(stderr, "Error: loading %s\n", dlerror());
             continue;
         }
         
-        name_func_t *name_func = dlsym(mod, "name");
+        name_func_t *name_func = dlsym(handle, "name");
         if (!name_func) {
             fprintf(stderr, "Error: retrieving symbol %s in %s: %s\n", "name",
                 path, dlerror());
             continue;
         }
 
-        start_func_t *start_func = dlsym(mod, "start");
+        start_func_t *start_func = dlsym(handle, "start");
         if (!start_func) {
             fprintf(stderr, "Error: retrieving symbol %s in %s: %s\n", "start",
                 path, dlerror());
             continue;
         }
 
-        destroy_func_t *destroy_func = dlsym(mod, "destroy");
+        destroy_func_t *destroy_func = dlsym(handle, "destroy");
         if (!start_func) {
             fprintf(stderr, "Error: retrieving symbol %s in %s: %s\n", "destroy",
                 path, dlerror());

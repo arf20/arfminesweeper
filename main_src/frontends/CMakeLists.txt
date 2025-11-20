@@ -58,8 +58,8 @@ if (NOT NO_STATIC)
     set(STATIC_XLIB BOOL TRUE)
 endif()
 
-add_custom_target(module_dir ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${MODULE_DIR})
+# common targets
+add_subdirectory("common")
 
 add_subdirectory("javaawt")
 add_subdirectory("qt5")
