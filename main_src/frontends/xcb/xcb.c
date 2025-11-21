@@ -24,14 +24,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-
 #include <unistd.h>
 
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
+#include <xcb/xcb_icccm.h>
 
 #include <common/frontconf.h>
 #include <common/game.h>
+
+#include "xcbutil.h"
+
 #include "xcb.h"
 
 #define TXT_OFFX    5
@@ -50,166 +53,6 @@ static xcb_gcontext_t gc;
 static uint32_t blue, green, red, darkblue, darkred, darkcyan, /*black*/ darkgrey;
 static xcb_font_t font;
 
-
-
-static const char *
-error_code_str(uint8_t err) {
-    static const char *error_code[17] = {
-        "Request",
-        "Value",
-        "Window",
-        "Pixmap",
-        "Atom",
-        "Cursor",
-        "Font",
-        "Match",
-        "Drawable",
-        "Access",
-        "Alloc",
-        "Colormap",
-        "GContext",
-        "IDChoice",
-        "Name",
-        "Length",
-        "Implementation", 
-    };
-
-    if (err >= 0 && err <= 17)
-        return error_code[err];
-    else
-        return NULL;
-}
-
-static const char *
-opcode_str(uint8_t op) {
-    static const char *opcode[120] = {
-        "CreateWindow",
-        "ChangeWindowAttributes",
-        "GetWindowAttributes",
-        "DestroyWindow",
-        "DestroySubwindows",
-        "ChangeSaveSet",
-        "ReparentWindow",
-        "MapWindow",
-        "MapSubWindows",
-        "UnmapWindow",
-        "UnmapSubWindows",
-        "ConfigureWindow",
-        "CirculateWindow",
-        "GetGeometry",
-        "QueryTree",
-        "InternAtom",
-        "GetAtomName",
-        "ChangeProperty",
-        "DeleteProperty",
-        "GetProperty",
-        "ListProperties",
-        "SetSelectionOwner",
-        "GetSelectionOwner",
-        "ConvertSelection",
-        "SendEvent",
-        "GrabPointer",
-        "UngrabPointer",
-        "GrabButton",
-        "UngrabButton",
-        "ChangeActivePointerGrab",
-        "GrabKeyboard",
-        "UngrabKeyboard",
-        "GrabKey",
-        "UngrabKey",
-        "AllowEvents",
-        "GrabServer",
-        "UngrabServer",
-        "QueryPointer",
-        "GetMotionEvents",
-        "TranslateCoordinates",
-        "WarpPointer",
-        "SetInputFocus",
-        "GetInputFocus",
-        "QueryKeymap",
-        "OpenFont",
-        "CloseFont",
-        "QueryFont",
-        "QueryTextExtents",
-        "ListFonts",
-        "ListFontsWithInfo",
-        "SetFontPath",
-        "GetFontPath",
-        "CreatePixmap",
-        "FreePixmap",
-        "CreateGC",
-        "ChangeGC",
-        "CopyGC",
-        "SetDashes",
-        "SetClipRectangles",
-        "FreeGC",
-        "ClearArea",
-        "CopyArea",
-        "CopyPlane",
-        "PolyPoint",
-        "PolyLine",
-        "PolySegment",
-        "PolyRectangle",
-        "PolyArc",
-        "FillPoly",
-        "PolyFillRectangle",
-        "PolyFillArc",
-        "PutImage",
-        "GetImage",
-        "PolyText8",
-        "PolyText16",
-        "ImageText8",
-        "ImageText16",
-        "CreateColormap",
-        "FreeColormap",
-        "CopyColormapAndFree",
-        "InstallColormap",
-        "UninstallColormap",
-        "ListInstalledColormaps",
-        "AllocColor",
-        "AllocNamedColor",
-        "AllocColorCells",
-        "AllocColorPlanes",
-        "FreeColors",
-        "StoreColors",
-        "StoreNamedColors",
-        "QueryColors",
-        "LookupColor",
-        "CreateCursor",
-        "CreateClyphCursor",
-        "FreeCursor",
-        "RecolorCursor",
-        "QueryBestSize",
-        "QueryExtension",
-        "ListExtensions",
-        "ChangeKeyboardMapping",
-        "GetKeyboarMapping",
-        "ChangeKeyboardControl",
-        "GetKeyboardControl",
-        "Bell",
-        "ChangePointerControl",
-        "GetPointerControl",
-        "SetScreenSaver",
-        "GetScreenSaver",
-        "ChangeHosts",
-        "ListHosts",
-        "SetAccessControl",
-        "SetCloseDownMode",
-        "KillClient",
-        "RotateProperties",
-        "ForceScreenSaver",
-        "SetPointerMapping",
-        "GetPointerMapping",
-        "SetModifierMapping",
-        "GetModifierMapping",
-        "NoOperation"
-    };
-
-    if (op >= 0 && op <= 120)
-        return opcode[op];
-    else
-        return NULL;
-}
 
 static void
 drawFlag(int x, int y) {
@@ -243,7 +86,10 @@ drawTextMultiline(int x, int y, const char *str) {
 void
 render() {
     /* clear screen */
-    xcb_clear_area(c, 1, w, 0, 0, wWidth, wHeight);
+    /* xcb_clear_area(c, 1, w, 0, 0, wWidth, wHeight); */ /*BROKEN*/
+    xcb_change_gc(c, gc, XCB_GC_FOREGROUND, &s->black_pixel);
+    xcb_poly_fill_rectangle(c, w, gc, 1,
+        &(xcb_rectangle_t){ 0, 0, wWidth, wHeight });
     /* set foreground and font */
     xcb_change_gc(c, gc, XCB_GC_FOREGROUND | XCB_GC_FONT, (uint32_t[]){ s->white_pixel, font });
 
@@ -331,8 +177,6 @@ xcb_start(const int *lboard, int lsize) {
         return -1;
     }
 
-    printf("Your screen is %d x %d pixels\n\n", s->width_in_pixels, s->height_in_pixels);
-
     /* create window */
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     uint32_t values[2] = {
@@ -356,6 +200,12 @@ xcb_start(const int *lboard, int lsize) {
         mask, values);                  /* masks, not used yet */
 
 
+    xcb_size_hints_t hints;
+    xcb_icccm_size_hints_set_min_size(&hints, wWidth, wHeight);
+    xcb_icccm_size_hints_set_max_size(&hints, wWidth, wHeight);
+    xcb_icccm_set_wm_size_hints(c, w, XCB_ATOM_WM_NORMAL_HINTS,
+        &hints);
+
     /* set window name */
     xcb_change_property(c, XCB_PROP_MODE_REPLACE, w,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
@@ -365,13 +215,10 @@ xcb_start(const int *lboard, int lsize) {
     xcb_flush(c);
 
     /* create graphic context */
-    mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
+    mask = XCB_GC_FOREGROUND | XCB_GC_BACKGROUND;
     uint32_t gc_values[2] = {
         s->white_pixel,
-        XCB_EVENT_MASK_EXPOSURE       | XCB_EVENT_MASK_BUTTON_PRESS   |
-        XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
-        XCB_EVENT_MASK_ENTER_WINDOW   | XCB_EVENT_MASK_LEAVE_WINDOW   |
-        XCB_EVENT_MASK_KEY_PRESS      | XCB_EVENT_MASK_KEY_RELEASE
+        s->black_pixel
     };
 
     gc = xcb_generate_id(c);
@@ -420,14 +267,31 @@ xcb_start(const int *lboard, int lsize) {
             case 0: {
                 xcb_generic_error_t *error = (xcb_generic_error_t*)e;
 
-                fprintf(stderr, "XCB %s %s error. Minor opcode %d\n\n",
+                fprintf(stderr, "XCB %s opcode %s error %d minor\n",
                     opcode_str(error->major_code),
                     error_code_str(error->error_code), error->minor_code);
             } break;
             case XCB_EXPOSE: {
-                //render();
+                xcb_expose_event_t *exp = (xcb_expose_event_t*)e;
+                render();
                 xcb_flush(c);
-                
+            } break;
+            case XCB_BUTTON_RELEASE: {
+                xcb_button_press_event_t *rel = (xcb_button_press_event_t*)e;
+
+                int ix = (rel->event_x - W_MARGIN) /
+                    (CELL_SIZE + CELL_MARGIN);
+                int iy = (rel->event_y - HEADER_HEIGHT) /
+                    (CELL_SIZE + CELL_MARGIN);
+                if (ix < 0 || ix >= size || iy < 0 || iy >= size) continue;
+
+                if (rel->state & XCB_BUTTON_MASK_1)
+                    gameClearCell(ix, iy);
+                else if (rel->state & XCB_BUTTON_MASK_3)
+                    gameFlagCell(ix, iy);
+
+                render();
+                xcb_flush(c);
             } break;
         }
     }

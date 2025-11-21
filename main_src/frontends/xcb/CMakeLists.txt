@@ -1,8 +1,8 @@
-if (X11_FOUND AND X11_xcb_FOUND)
+if (X11_FOUND AND X11_xcb_FOUND AND X11_xcb_icccm_FOUND)
     if (MODULE_XCB)
-        add_library(arfminesweeper-xcb MODULE "xcb.c")
+        add_library(arfminesweeper-xcb MODULE "xcb.c" "xcbutil.c")
         target_compile_definitions(arfminesweeper-xcb PUBLIC _MODULE_)
-        target_link_libraries(arfminesweeper-xcb X11::xcb)
+        target_link_libraries(arfminesweeper-xcb X11::xcb X11::xcb_icccm)
         add_custom_target(symlink_arfminesweeper-xcb ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
             DEPENDS arfminesweeper-xcb module_dir)
@@ -12,8 +12,8 @@ if (X11_FOUND AND X11_xcb_FOUND)
     endif()
 
     if (STATIC_XCB)
-        target_sources(arfminesweeper PRIVATE "xcb.c")
-        target_link_libraries(arfminesweeper X11::xcb)
+        target_sources(arfminesweeper PRIVATE "xcb.c" "xcbutil.c")
+        target_link_libraries(arfminesweeper X11::xcb X11::xcb_icccm)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_XCB)
         message(STATUS "Building with static xcb")
     else()

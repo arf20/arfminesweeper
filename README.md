@@ -37,7 +37,7 @@ vulkan:     libvulkan-dev
 wayland:    libwayland-dev
 wxwidgets:  libwxgtk3.2-dev
 xaw:        libxaw7-dev
-xcb:        libxcb1-dev
+xcb:        libxcb1-dev libxcb-icccm4-dev
 xforms:     libforms-dev
 xlib:       libx11-dev
 ```
