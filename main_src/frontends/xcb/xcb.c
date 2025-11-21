@@ -51,6 +51,166 @@ static uint32_t blue, green, red, darkblue, darkred, darkcyan, /*black*/ darkgre
 static xcb_font_t font;
 
 
+
+static const char *
+error_code_str(uint8_t err) {
+    static const char *error_code[17] = {
+        "Request",
+        "Value",
+        "Window",
+        "Pixmap",
+        "Atom",
+        "Cursor",
+        "Font",
+        "Match",
+        "Drawable",
+        "Access",
+        "Alloc",
+        "Colormap",
+        "GContext",
+        "IDChoice",
+        "Name",
+        "Length",
+        "Implementation", 
+    };
+
+    if (err >= 0 && err <= 17)
+        return error_code[err];
+    else
+        return NULL;
+}
+
+static const char *
+opcode_str(uint8_t op) {
+    static const char *opcode[120] = {
+        "CreateWindow",
+        "ChangeWindowAttributes",
+        "GetWindowAttributes",
+        "DestroyWindow",
+        "DestroySubwindows",
+        "ChangeSaveSet",
+        "ReparentWindow",
+        "MapWindow",
+        "MapSubWindows",
+        "UnmapWindow",
+        "UnmapSubWindows",
+        "ConfigureWindow",
+        "CirculateWindow",
+        "GetGeometry",
+        "QueryTree",
+        "InternAtom",
+        "GetAtomName",
+        "ChangeProperty",
+        "DeleteProperty",
+        "GetProperty",
+        "ListProperties",
+        "SetSelectionOwner",
+        "GetSelectionOwner",
+        "ConvertSelection",
+        "SendEvent",
+        "GrabPointer",
+        "UngrabPointer",
+        "GrabButton",
+        "UngrabButton",
+        "ChangeActivePointerGrab",
+        "GrabKeyboard",
+        "UngrabKeyboard",
+        "GrabKey",
+        "UngrabKey",
+        "AllowEvents",
+        "GrabServer",
+        "UngrabServer",
+        "QueryPointer",
+        "GetMotionEvents",
+        "TranslateCoordinates",
+        "WarpPointer",
+        "SetInputFocus",
+        "GetInputFocus",
+        "QueryKeymap",
+        "OpenFont",
+        "CloseFont",
+        "QueryFont",
+        "QueryTextExtents",
+        "ListFonts",
+        "ListFontsWithInfo",
+        "SetFontPath",
+        "GetFontPath",
+        "CreatePixmap",
+        "FreePixmap",
+        "CreateGC",
+        "ChangeGC",
+        "CopyGC",
+        "SetDashes",
+        "SetClipRectangles",
+        "FreeGC",
+        "ClearArea",
+        "CopyArea",
+        "CopyPlane",
+        "PolyPoint",
+        "PolyLine",
+        "PolySegment",
+        "PolyRectangle",
+        "PolyArc",
+        "FillPoly",
+        "PolyFillRectangle",
+        "PolyFillArc",
+        "PutImage",
+        "GetImage",
+        "PolyText8",
+        "PolyText16",
+        "ImageText8",
+        "ImageText16",
+        "CreateColormap",
+        "FreeColormap",
+        "CopyColormapAndFree",
+        "InstallColormap",
+        "UninstallColormap",
+        "ListInstalledColormaps",
+        "AllocColor",
+        "AllocNamedColor",
+        "AllocColorCells",
+        "AllocColorPlanes",
+        "FreeColors",
+        "StoreColors",
+        "StoreNamedColors",
+        "QueryColors",
+        "LookupColor",
+        "CreateCursor",
+        "CreateClyphCursor",
+        "FreeCursor",
+        "RecolorCursor",
+        "QueryBestSize",
+        "QueryExtension",
+        "ListExtensions",
+        "ChangeKeyboardMapping",
+        "GetKeyboarMapping",
+        "ChangeKeyboardControl",
+        "GetKeyboardControl",
+        "Bell",
+        "ChangePointerControl",
+        "GetPointerControl",
+        "SetScreenSaver",
+        "GetScreenSaver",
+        "ChangeHosts",
+        "ListHosts",
+        "SetAccessControl",
+        "SetCloseDownMode",
+        "KillClient",
+        "RotateProperties",
+        "ForceScreenSaver",
+        "SetPointerMapping",
+        "GetPointerMapping",
+        "SetModifierMapping",
+        "GetModifierMapping",
+        "NoOperation"
+    };
+
+    if (op >= 0 && op <= 120)
+        return opcode[op];
+    else
+        return NULL;
+}
+
 static void
 drawFlag(int x, int y) {
     static xcb_point_t flag[5] = {
@@ -164,39 +324,58 @@ xcb_start(const int *lboard, int lsize) {
     /* get screen */
     s = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
 
-    /* create window */
-    uint32_t values[2];
-    uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    values[0] = s->black_pixel;
-    values[1] = XCB_EVENT_MASK_EXPOSURE;
+    xcb_flush(c);
 
+    if (xcb_connection_has_error(c)) {
+        fprintf(stderr, "Error in connection with X server\n");
+        return -1;
+    }
+
+    printf("Your screen is %d x %d pixels\n\n", s->width_in_pixels, s->height_in_pixels);
+
+    /* create window */
+    uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    uint32_t values[2] = {
+        s->black_pixel,
+        XCB_EVENT_MASK_EXPOSURE       | XCB_EVENT_MASK_BUTTON_PRESS   |
+        XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
+        XCB_EVENT_MASK_ENTER_WINDOW   | XCB_EVENT_MASK_LEAVE_WINDOW   |
+        XCB_EVENT_MASK_KEY_PRESS      | XCB_EVENT_MASK_KEY_RELEASE
+    };
 
     w = xcb_generate_id(c);
-    xcb_create_window(c,      /* Connection          */
-        XCB_COPY_FROM_PARENT,          /* depth (same as root)*/
-        w,                        /* window Id           */
-        s->root,                  /* parent window       */
-        0, 0,                          /* x, y                */
-        wWidth, wHeight,               /* width, height       */
-        10,                            /* border_width        */
-        XCB_WINDOW_CLASS_INPUT_OUTPUT, /* class               */
-        s->root_visual,                /* visual              */
-        mask, values);                 /* masks, not used yet */
+    xcb_create_window(c,                /* Connection          */
+        XCB_COPY_FROM_PARENT,           /* depth (same as root)*/
+        w,                              /* window Id           */
+        s->root,                        /* parent window       */
+        0, 0,                           /* x, y                */
+        wWidth, wHeight,                /* width, height       */
+        5,                              /* border_width        */
+        XCB_WINDOW_CLASS_INPUT_OUTPUT,  /* class               */
+        s->root_visual,                 /* visual              */
+        mask, values);                  /* masks, not used yet */
 
-    xcb_map_window(c, w);
 
     /* set window name */
     xcb_change_property(c, XCB_PROP_MODE_REPLACE, w,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
         sizeof(TXT_TITLE), TXT_TITLE);
 
+    xcb_map_window(c, w);
+    xcb_flush(c);
+
     /* create graphic context */
     mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
-    values[0] = s->white_pixel;
-    values[1] = 0;
+    uint32_t gc_values[2] = {
+        s->white_pixel,
+        XCB_EVENT_MASK_EXPOSURE       | XCB_EVENT_MASK_BUTTON_PRESS   |
+        XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
+        XCB_EVENT_MASK_ENTER_WINDOW   | XCB_EVENT_MASK_LEAVE_WINDOW   |
+        XCB_EVENT_MASK_KEY_PRESS      | XCB_EVENT_MASK_KEY_RELEASE
+    };
 
     gc = xcb_generate_id(c);
-    xcb_create_gc(c, gc, w, mask, values);
+    xcb_create_gc(c, gc, w, mask, gc_values);
 
     /* allocate colors */
     xcb_colormap_t cm = s->default_colormap;
@@ -238,11 +417,18 @@ xcb_start(const int *lboard, int lsize) {
     xcb_generic_event_t *e;
     while ((e = xcb_wait_for_event(c))) {
         switch (e->response_type & ~0x80) {
+            case 0: {
+                xcb_generic_error_t *error = (xcb_generic_error_t*)e;
+
+                fprintf(stderr, "XCB %s %s error. Minor opcode %d\n\n",
+                    opcode_str(error->major_code),
+                    error_code_str(error->error_code), error->minor_code);
+            } break;
             case XCB_EXPOSE: {
-                render();
+                //render();
                 xcb_flush(c);
-                break;
-            }
+                
+            } break;
         }
     }
 }

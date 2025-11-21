@@ -87,7 +87,7 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   raylib                   |           |      |X    |X  |X  |X   |
 |   SDL3                     |           |      |X    |X  |X  |X   |
 |   SDL2                     | sdl2      | DONE |X    |X  |X  |X   |
-|   SDL1.2                   | sdl1      | WIP  |X    |X  |X  |X   |
+|   SDL1.2                   | sdl1      | DONE |X    |X  |X  |X   |
 |   DRI DRM fb               | drmfb     | WIP  |X    |   |   |    |
 |   GLIDE (with Voodoo)      |           |      |X    |X  |   |X   |
 |   OpenGL GLX               | glx       |      |X    |X  |   |    |
@@ -117,7 +117,7 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   Objective-C ?            |           |      |     |   |X  |    |
 |   Swift ?                  |           |      |     |   |X  |    |
 
-14/48 (29%)
+15/48 (29%)
 
 ### LINUX MODULE TARGET
 
