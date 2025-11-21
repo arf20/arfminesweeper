@@ -1,11 +1,11 @@
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (MODULE_FBDEV)
-        add_library(fbdev MODULE "fbdev.c" "../common/fb.c" "../common/stb_image_impl.c")
-        target_compile_definitions(fbdev PUBLIC _MODULE_)
-        target_link_libraries(fbdev m)
-        add_custom_target(symlink_fbdev ALL
+        add_library(arfminesweeper-fbdev MODULE "fbdev.c" "../common/fb.c" "../common/stb_image_impl.c")
+        target_compile_definitions(arfminesweeper-fbdev PUBLIC _MODULE_)
+        target_link_libraries(arfminesweeper-fbdev m)
+        add_custom_target(symlink_arfminesweeper-fbdev ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS fbdev module_dir)
+            DEPENDS arfminesweeper-fbdev module_dir)
         message(STATUS "Building with module fbdev")
     else()
         message(STATUS "Not building with module fbdev")

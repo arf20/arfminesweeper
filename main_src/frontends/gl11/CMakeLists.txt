@@ -1,11 +1,11 @@
 if (OpenGL_OpenGL_FOUND AND GLUT_FOUND)
     if (MODULE_GL11)
-        add_library(gl11 MODULE "gl11.c" "../common/gl_ffp.c")
-        target_compile_definitions(gl11 PUBLIC _MODULE_)
-        target_link_libraries(gl11 OpenGL::GL ${GLUT_LIBRARIES})
-        add_custom_target(symlink_gl11 ALL
+        add_library(arfminesweeper-gl11 MODULE "gl11.c" "../common/gl_ffp.c")
+        target_compile_definitions(arfminesweeper-gl11 PUBLIC _MODULE_)
+        target_link_libraries(arfminesweeper-gl11 OpenGL::GL ${GLUT_LIBRARIES})
+        add_custom_target(symlink_arfminesweeper-gl11 ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS gl11 module_dir)
+            DEPENDS arfminesweeper-gl11 module_dir)
         message(STATUS "Building with module gl11")
     else()
         message(STATUS "Not building with module gl11")

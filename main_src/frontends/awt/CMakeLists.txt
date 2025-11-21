@@ -13,14 +13,14 @@ if (JNI_FOUND AND JAVAC)
     endif()
 
     if (MODULE_AWT)
-        add_library(awt MODULE "awt.c")
-        target_compile_definitions(awt PUBLIC _MODULE_)
-        target_include_directories(awt PUBLIC ${JNI_INCLUDE_DIRS})
-        target_link_libraries(awt ${JNI_LIBRARIES} dl)
-        add_dependencies(awt java_class_arfbackend java_class_awt)
-        add_custom_target(symlink_awt ALL
+        add_library(arfminesweeper-awt MODULE "awt.c")
+        target_compile_definitions(arfminesweeper-awt PUBLIC _MODULE_)
+        target_include_directories(arfminesweeper-awt PUBLIC ${JNI_INCLUDE_DIRS})
+        target_link_libraries(arfminesweeper-awt ${JNI_LIBRARIES} dl)
+        add_dependencies(arfminesweeper-awt java_class_arfbackend java_class_awt)
+        add_custom_target(symlink_arfminesweeper-awt ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS awt module_dir
+            DEPENDS arfminesweeper-awt module_dir
         )
         message(STATUS "Building with module awt")
     else()

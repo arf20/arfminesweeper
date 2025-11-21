@@ -1,9 +1,9 @@
 if (MODULE_HTTPD)
-    add_library(httpd MODULE "httpd.c")
-    target_compile_definitions(httpd PUBLIC _MODULE_)
-    add_custom_target(symlink_httpd ALL
+    add_library(arfminesweeper-httpd MODULE "httpd.c")
+    target_compile_definitions(arfminesweeper-httpd PUBLIC _MODULE_)
+    add_custom_target(symlink_arfminesweeper-httpd ALL
         COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-        DEPENDS httpd module_dir)
+        DEPENDS arfminesweeper-httpd module_dir)
     message(STATUS "Building with module httpd")
 else()
     message(STATUS "Not building with dynamic httpd")

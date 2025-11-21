@@ -16,13 +16,13 @@ add_custom_command(
 
 if (Vulkan_FOUND AND glfw3_FOUND)
     if (MODULE_VK)
-        add_library(vk MODULE "vk.c" "../common/glad/glad.c")
-        target_compile_definitions(vk PUBLIC _MODULE_)
-        target_include_directories(vk PUBLIC "../common/glad/include/")
-        target_link_libraries(vk Vulkan::Vulkan glfw)
-        add_custom_target(symlink_vk ALL
+        add_library(arfminesweeper-vk MODULE "vk.c" "../common/glad/glad.c")
+        target_compile_definitions(arfminesweeper-vk PUBLIC _MODULE_)
+        target_include_directories(arfminesweeper-vk PUBLIC "../common/glad/include/")
+        target_link_libraries(arfminesweeper-vk Vulkan::Vulkan glfw)
+        add_custom_target(symlink_arfminesweeper-vk ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS vk module_dir)
+            DEPENDS arfminesweeper-vk module_dir)
         message(STATUS "Building with module vk")
     else()
         message(STATUS "Not building with module vk")

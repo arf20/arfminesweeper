@@ -1,11 +1,11 @@
 if (WIN32)
     if (MODULE_D2D)
-        add_library(d2d MODULE "d2d.c")
-        target_compile_definitions(d2d PUBLIC _MODULE_)
-        target_link_libraries(d2d D2d1)
-        add_custom_target(symlink_d2d ALL
+        add_library(arfminesweeper-d2d MODULE "d2d.c")
+        target_compile_definitions(arfminesweeper-d2d PUBLIC _MODULE_)
+        target_link_libraries(arfminesweeper-d2d D2d1)
+        add_custom_target(symlink_arfminesweeper-d2d ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS d2d module_dir)
+            DEPENDS arfminesweeper-d2d module_dir)
         message(STATUS "Building with module d2d")
     else()
         message(STATUS "Not building with module d2d")

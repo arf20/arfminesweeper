@@ -1,9 +1,9 @@
 if (MODULE_CONSOLE)
-    add_library(console MODULE "console.c")
-    target_compile_definitions(console PUBLIC _MODULE_)
-    add_custom_target(symlink_console ALL
+    add_library(arfminesweeper-console MODULE "console.c")
+    target_compile_definitions(arfminesweeper-console PUBLIC _MODULE_)
+    add_custom_target(symlink_arfminesweeper-console ALL
         COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-        DEPENDS console module_dir)
+        DEPENDS arfminesweeper-console module_dir)
     message(STATUS "Building with module console")
 else()
     message(STATUS "Not building with module console")

@@ -1,11 +1,11 @@
 if (X11_FOUND AND MOTIF_FOUND)
     if (MODULE_MOTIF)
-        add_library(motif MODULE "motif.c")
-        target_compile_definitions(motif PUBLIC _MODULE_)
-        target_link_libraries(motif ${MOTIF_LIBRARIES} Xt)
-        add_custom_target(symlink_motif ALL
+        add_library(arfminesweeper-motif MODULE "motif.c")
+        target_compile_definitions(arfminesweeper-motif PUBLIC _MODULE_)
+        target_link_libraries(arfminesweeper-motif ${MOTIF_LIBRARIES} Xt)
+        add_custom_target(symlink_arfminesweeper-motif ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS motif module_dir)
+            DEPENDS arfminesweeper-motif module_dir)
         message(STATUS "Building with module motif")
     else()
         message(STATUS "Not building with module motif")

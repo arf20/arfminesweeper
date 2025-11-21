@@ -13,14 +13,14 @@ if (JNI_FOUND AND JAVAC)
     endif()
 
     if (MODULE_SWING)
-        add_library(swing MODULE "swing.c")
-        target_compile_definitions(swing PUBLIC _MODULE_)
-        target_include_directories(swing PUBLIC ${JNI_INCLUDE_DIRS})
-        target_link_libraries(swing ${JNI_LIBRARIES} dl)
-        add_dependencies(swing java_class_arfbackend java_class_swing)
-        add_custom_target(symlink_swing ALL
+        add_library(arfminesweeper-swing MODULE "swing.c")
+        target_compile_definitions(arfminesweeper-swing PUBLIC _MODULE_)
+        target_include_directories(arfminesweeper-swing PUBLIC ${JNI_INCLUDE_DIRS})
+        target_link_libraries(arfminesweeper-swing ${JNI_LIBRARIES} dl)
+        add_dependencies(arfminesweeper-swing java_class_arfbackend java_class_swing)
+        add_custom_target(symlink_arfminesweeper-swing ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS swing module_dir
+            DEPENDS arfminesweeper-swing module_dir
         )
         message(STATUS "Building with module swing")
     else()

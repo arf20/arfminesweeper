@@ -1,11 +1,11 @@
 if (X11_FOUND AND XAW_FOUND)
     if (MODULE_XAW)
-        add_library(xaw MODULE "xaw.c")
-        target_compile_definitions(xaw PUBLIC _MODULE_)
-        target_link_libraries(xaw ${XAW_LIBRARIES})
-        add_custom_target(symlink_xaw ALL
+        add_library(arfminesweeper-xaw MODULE "xaw.c")
+        target_compile_definitions(arfminesweeper-xaw PUBLIC _MODULE_)
+        target_link_libraries(arfminesweeper-xaw ${XAW_LIBRARIES})
+        add_custom_target(arfminesweeper-symlink_xaw ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS xaw module_dir)
+            DEPENDS arfminesweeper-xaw module_dir)
         message(STATUS "Building with module xaw")
     else()
         message(STATUS "Not building with module xaw")

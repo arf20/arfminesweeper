@@ -1,13 +1,13 @@
 if (wxWidgets_FOUND)
     include(UsewxWidgets)
     if (MODULE_WXWIDGETS)
-        add_library(wxwidgets MODULE "wxwidgets.cpp")
-        target_compile_definitions(wxwidgets PUBLIC _MODULE_)
-        target_include_directories(wxwidgets PUBLIC ${wxWidgets_INCLUDE_DIRS})
-        target_link_libraries(wxwidgets wxWidgets::wxWidgets)
-        add_custom_target(symlink_wxwidgets ALL
+        add_library(arfminesweeper-wxwidgets MODULE "wxwidgets.cpp")
+        target_compile_definitions(arfminesweeper-wxwidgets PUBLIC _MODULE_)
+        target_include_directories(arfminesweeper-wxwidgets PUBLIC ${wxWidgets_INCLUDE_DIRS})
+        target_link_libraries(arfminesweeper-wxwidgets wxWidgets::wxWidgets)
+        add_custom_target(symlink_arfminesweeper-wxwidgets ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
-            DEPENDS wxwidgets module_dir)
+            DEPENDS arfminesweeper-wxwidgets module_dir)
         message(STATUS "Building with module wxwidgets")
     else()
         message(STATUS "Not building with module wxwidgets")
