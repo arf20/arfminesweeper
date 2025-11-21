@@ -74,7 +74,7 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   curses/ncurses           | curses    | DONE |X    |X  |X  |X   |
 |   fbdev                    | fbdev     | DONE |X    |   |   |    |
 |   X11 Xlib                 | xlib      | DONE |X    |X  |X  |X   |
-|   X11 XCB                  | xcb       | WIP  |X    |X  |X  |X   |
+|   X11 XCB                  | xcb       | DONE |X    |X  |X  |X   |
 |   Wayland                  | wayland   | WIP  |X    |X  |   |    |
 |   XForms                   | xforms    | DONE |X    |X  |   |    |
 |   FLTK                     | fltk      | WIP  |X    |X  |X  |X   |
@@ -95,7 +95,6 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   OpenGL 3.3/GLFW/GLAD     | gl33      | WIP  |X    |X  |X  |X   |
 |   ImGui                    |           |      |X    |X  |X  |X   |
 |   Vulkan/GLFW              | vulkan    | WIP  |X    |X  |X  |X   |
-|   Metal                    |           |      |     |   |   |X   |
 |   Gtk2                     |           |      |X    |X  |X  |X   |
 |   Gtk3                     | gtk3      | DONE |X    |X  |X  |X   |
 |   Gtk4 + libadwaita        |           |      |X    |X  |X  |X   |
@@ -114,10 +113,11 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   Java JNI AWT             | awt       | DONE |X    |X  |X  |X   |
 |   Java JNI Swing           | swing     | DONE |X    |X  |X  |X   |
 |   Webapp                   | httpd     | DONE |X    |X  |X  |X   |
+|   Metal                    |           |      |     |   |X  |    |
 |   Objective-C ?            |           |      |     |   |X  |    |
 |   Swift ?                  |           |      |     |   |X  |    |
 
-15/48 (29%)
+16/48 (29%)
 
 ### LINUX MODULE TARGET
 
