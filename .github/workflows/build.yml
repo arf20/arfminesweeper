@@ -18,7 +18,7 @@ jobs:
         fetch-depth: 0
 
     - name: Configure CMake
-      run: cmake -B build
+      run: cmake -B build -DMODULE_ALL=TRUE
 
     - name: Build
       run: cmake --build build --verbose
