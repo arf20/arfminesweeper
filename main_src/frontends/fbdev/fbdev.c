@@ -45,7 +45,6 @@
 static const int *board = NULL;
 static int size = 0;
 
-static int wWidth = 0, wHeight = 0;
 
 static const unsigned char *font = NULL;
 static const unsigned char *flag = NULL;
@@ -61,8 +60,8 @@ fbdev_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
-    wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
-    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
+    int wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
+    int wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
         ((size - 1) * CELL_MARGIN);
 
     /* Read bitmap font */
@@ -137,7 +136,8 @@ fbdev_start(const int *lboard, int lsize) {
     /* cursor */
     int curx = 0, cury = 0;
 
-    fbRenderInit(board, size, wWidth, wHeight, fbp, sWidth, sHeight, font, fontw, fonth, flag, flagw, flagh, &curx, &cury);
+    fbRenderInit(board, size, wWidth, wHeight, fbp, sWidth, sHeight, font,
+        fontw, fonth, flag, flagw, flagh, &curx, &cury);
 
     fbRender();
     char input[8] = { 0 };

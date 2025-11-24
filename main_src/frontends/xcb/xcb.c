@@ -283,7 +283,8 @@ xcb_start(const int *lboard, int lsize) {
                     (CELL_SIZE + CELL_MARGIN);
                 int iy = (rel->event_y - HEADER_HEIGHT) /
                     (CELL_SIZE + CELL_MARGIN);
-                if (ix < 0 || ix >= size || iy < 0 || iy >= size) continue;
+                if (ix < 0 || ix >= size || iy < 0 || iy >= size)
+                    continue;
 
                 if (rel->state & XCB_BUTTON_MASK_1)
                     gameClearCell(ix, iy);

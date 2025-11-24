@@ -1,8 +1,8 @@
 if (WAYLAND_FOUND)
     if (MODULE_WAYLAND)
-        add_library(arfminesweeper-wayland MODULE "wayland.c" "wl_util.c" "xdg-shell-protocol.c")
+        add_library(arfminesweeper-wayland MODULE "wayland.c" "wl_util.c" "xdg-shell-protocol.c" "../common/fb.c" "../common/stb_image_impl.c")
         target_compile_definitions(arfminesweeper-wayland PUBLIC _MODULE_)
-        target_link_libraries(arfminesweeper-wayland wayland-client)
+        target_link_libraries(arfminesweeper-wayland wayland-client m)
         add_custom_target(symlink_arfminesweeper-wayland ALL
             COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
             DEPENDS arfminesweeper-wayland module_dir)
@@ -12,8 +12,8 @@ if (WAYLAND_FOUND)
     endif()
 
     if (STATIC_WAYLAND)
-        target_sources(arfminesweeper PRIVATE "wayland.c" "wl_util.c" "xdg-shell-protocol.c")
-        target_link_libraries(arfminesweeper wayland-client)
+        target_sources(arfminesweeper PRIVATE "wayland.c" "wl_util.c" "xdg-shell-protocol.c" "../common/fb.c" "../common/stb_image_impl.c")
+        target_link_libraries(arfminesweeper wayland-client m)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_WAYLAND)
         message(STATUS "Building with static wayland")
     else()

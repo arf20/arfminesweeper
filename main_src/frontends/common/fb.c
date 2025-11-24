@@ -53,6 +53,7 @@ static const unsigned char *flag = NULL;
 static int flagw = 0, flagh = 0;
 
 /* cursor */
+static int curen = 0;
 static const int *curx = 0, *cury = 0;
 
 /* colors */
@@ -144,6 +145,12 @@ drawFlag(int ix, int iy) {
 }
 
 void
+fbRenderFb(bgra_t *_fbp) {
+    fbp = _fbp;
+    fbRender();
+}
+
+void
 fbRender() {
     fbClear();
     fbDrawString(5, 15, FB_WHITE, TXT_TITLE, sizeof(TXT_TITLE));
@@ -201,7 +208,7 @@ fbRender() {
             }
 
             /* draw cursor */
-            if (x == *curx && y == *cury) {
+            if (curen && x == *curx && y == *cury) {
                 fbHLine(cX, CELL_SIZE, cY, FB_RED);
                 fbHLine(cX, CELL_SIZE, cY + CELL_SIZE - 1, FB_RED);
                 fbVLine(cX, CELL_SIZE, cY, FB_RED);
@@ -216,7 +223,7 @@ fbRenderInit(const int *_board, int _size, int _wWidth, int _wHeight,
     void *_fbp, int _sWidth, int _sHeight,
     const unsigned char *_font, int _fontw, int _fonth,
     const unsigned char *_flag, int _flagw, int _flagh,
-    const int *_curx, const int *_cury)
+    int _curen, const int *_curx, const int *_cury)
 {
     board = _board;
     size = _size;
@@ -233,4 +240,6 @@ fbRenderInit(const int *_board, int _size, int _wWidth, int _wHeight,
     flagh = _flagh;
     curx = _curx;
     cury = _cury;
+    curen = _curen;
 }
+

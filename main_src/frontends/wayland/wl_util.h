@@ -51,7 +51,7 @@ typedef struct {
     struct xdg_wm_base *xdg_wm_base;
     struct wl_seat *wl_seat;
     /* objects */
-    struct wl_surface *surface;
+    struct wl_surface *wl_surface;
     struct xdg_surface *xdg_surface;
     struct xdg_toplevel *xdg_toplevel;
     struct wl_pointer *wl_pointer;

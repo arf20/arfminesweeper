@@ -29,10 +29,17 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <linux/input-event-codes.h>
+
 #include <wayland-client.h>
 #include "xdg-shell-client-protocol.h"
 
+#include <common/stb_image.h>
+
 #include <common/frontconf.h>
+#include <common/game.h>
+
+#include <common/fb.h>
 
 #include "wl_util.h"
 
@@ -44,6 +51,8 @@ static int size = 0;
 static int wWidth = 0, wHeight = 0;
 
 
+static const unsigned char *font = NULL;
+static const unsigned char *flag = NULL;
 
 
 static state_t state = { 0 };
@@ -51,8 +60,6 @@ static state_t state = { 0 };
 static const struct wl_buffer_listener wl_buffer_listener = {
     .release = wl_buffer_release,
 };
-
-
 
 
 
@@ -77,19 +84,11 @@ draw_frame(state_t *state)
 
     struct wl_shm_pool *pool = wl_shm_create_pool(state->wl_shm, fd, size);
     struct wl_buffer *buffer = wl_shm_pool_create_buffer(pool, 0,
-            wWidth, wHeight, stride, WL_SHM_FORMAT_XRGB8888);
+        wWidth, wHeight, stride, WL_SHM_FORMAT_XRGB8888);
     wl_shm_pool_destroy(pool);
     close(fd);
 
-    /* Draw checkerboxed background */
-    for (int y = 0; y < wHeight; ++y) {
-        for (int x = 0; x < wWidth; ++x) {
-            if ((x + y / 8 * 8) % 16 < 8)
-                data[y * wWidth + x] = 0xFF666666;
-            else
-                data[y * wWidth + x] = 0xFFEEEEEE;
-        }
-    }
+    fbRenderFb((bgra_t*)data);
 
     munmap(data, size);
     wl_buffer_add_listener(buffer, &wl_buffer_listener, NULL);
@@ -104,8 +103,8 @@ xdg_surface_configure(void *data,
     xdg_surface_ack_configure(xdg_surface, serial);
 
     struct wl_buffer *buffer = draw_frame(state);
-    wl_surface_attach(state->surface, buffer, 0, 0);
-    wl_surface_commit(state->surface);
+    wl_surface_attach(state->wl_surface, buffer, 0, 0);
+    wl_surface_commit(state->wl_surface);
 }
 
 
@@ -123,28 +122,50 @@ wl_pointer_frame(void *data, struct wl_pointer *wl_pointer)
         pointer_y = wl_fixed_to_double(event->surface_y);
     }
 
-    if (event->event_mask & POINTER_EVENT_BUTTON) {
-        char *state = event->state == WL_POINTER_BUTTON_STATE_RELEASED ?
-            "released" : "pressed";
-        fprintf(stderr, "button %d %s at %d,%d\n", event->button, state,
-            pointer_x, pointer_y);
+    if (!(event->event_mask & POINTER_EVENT_BUTTON) ||
+        event->state != WL_POINTER_BUTTON_STATE_RELEASED
+    )
+        return;
+
+    int ix = (pointer_x - W_MARGIN) /
+        (CELL_SIZE + CELL_MARGIN);
+    int iy = (pointer_y - HEADER_HEIGHT) /
+        (CELL_SIZE + CELL_MARGIN);
+    if (ix < 0 || ix >= size || iy < 0 || iy >= size)
+        return;
+
+    switch (event->button) {
+        case BTN_LEFT: {
+            gameClearCell(ix, iy);
+        } break;
+        case BTN_RIGHT: {
+            gameFlagCell(ix, iy);
+        } break;
+
     }
     
     memset(event, 0, sizeof(*event));
+
+    /* cause redraw */
+    struct wl_buffer *buffer = draw_frame(state);
+    wl_surface_damage(state->wl_surface, 0, 0, wWidth, wHeight);
+    wl_surface_attach(state->wl_surface, buffer, 0, 0);
+    wl_surface_commit(state->wl_surface);
+    wl_display_flush(state->wl_display);
 }
 
 
 
 static const struct wl_pointer_listener wl_pointer_listener = {
-       .enter = wl_pointer_enter,
-       .leave = wl_pointer_leave,
-       .motion = wl_pointer_motion,
-       .button = wl_pointer_button,
-       .axis = wl_pointer_axis,
-       .frame = wl_pointer_frame,
-       .axis_source = wl_pointer_axis_source,
-       .axis_stop = wl_pointer_axis_stop,
-       .axis_discrete = wl_pointer_axis_discrete,
+    .enter = wl_pointer_enter,
+    .leave = wl_pointer_leave,
+    .motion = wl_pointer_motion,
+    .button = wl_pointer_button,
+    .axis = wl_pointer_axis,
+    .frame = wl_pointer_frame,
+    .axis_source = wl_pointer_axis_source,
+    .axis_stop = wl_pointer_axis_stop,
+    .axis_discrete = wl_pointer_axis_discrete,
 };
 
 static void
@@ -234,14 +255,14 @@ wayland_start(const int *lboard, int lsize) {
     } else printf("Found shm\n");
 
     /* create surface and xdg surface */
-    state.surface = wl_compositor_create_surface(state.wl_compositor);
-    if (!state.surface) {
+    state.wl_surface = wl_compositor_create_surface(state.wl_compositor);
+    if (!state.wl_surface) {
         fprintf(stderr, "Error: Cannot get surface\n");
         return -1;
     } printf("Got surface\n");
 
     state.xdg_surface = xdg_wm_base_get_xdg_surface(state.xdg_wm_base,
-        state.surface);
+        state.wl_surface);
 
     static const struct xdg_surface_listener xdg_surface_listener = {
         .configure = xdg_surface_configure,
@@ -251,7 +272,32 @@ wayland_start(const int *lboard, int lsize) {
     state.xdg_toplevel = xdg_surface_get_toplevel(state.xdg_surface);
     xdg_toplevel_set_title(state.xdg_toplevel, TXT_TITLE);
 
-    wl_surface_commit(state.surface);
+    wl_surface_commit(state.wl_surface);
+
+    /* read textures */
+    const unsigned char *font = NULL;
+    int fontw = 0, fonth = 0, ch = 0;
+    font = stbi_load(FONT_BMP_PATH, &fontw, &fonth, &ch, 1);
+    if (!font) {
+        printf("Error loading bitmap font: " FONT_BMP_PATH "\n");
+        return -1;
+    }
+    printf("Bitmap font: %dx%d, %dch\n", fontw, fonth, ch);
+
+    int flagw = 0, flagh = 0;
+    flag = stbi_load(FLAG_PNG_PATH, &flagw, &flagh, &ch, 1);
+    if (!flag) {
+        printf("Error loading flag: " FLAG_PNG_PATH "\n");
+        return -1;
+    }
+    printf("Bitmap flag: %dx%d, %dch\n", flagw, flagh, ch);
+
+    fbRenderInit(board, size, wWidth, wHeight,
+        NULL, wWidth, wHeight,
+        font, fontw, fonth,
+        flag, flagw, flagh,
+        0, NULL, NULL);
+
 
     while (wl_display_dispatch(state.wl_display)) {
 
