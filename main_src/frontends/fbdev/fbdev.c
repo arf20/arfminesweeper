@@ -137,7 +137,7 @@ fbdev_start(const int *lboard, int lsize) {
     int curx = 0, cury = 0;
 
     fbRenderInit(board, size, wWidth, wHeight, fbp, sWidth, sHeight, font,
-        fontw, fonth, flag, flagw, flagh, &curx, &cury);
+        fontw, fonth, flag, flagw, flagh, 1, &curx, &cury);
 
     fbRender();
     char input[8] = { 0 };

@@ -260,7 +260,7 @@ drmfb_start(const int *lboard, int lsize) {
     int curx = 0, cury = 0;
 
     fbRenderInit(board, size, wWidth, wHeight, dev->buf, dev->width,
-        dev->height, font, fontw, fonth, flag, flagw, flagh, &curx, &cury);
+        dev->height, font, fontw, fonth, flag, flagw, flagh, 1, &curx, &cury);
     fbRender();
 
     char input[8] = { 0 };

@@ -75,7 +75,7 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   fbdev                    | fbdev     | DONE |X    |   |   |    |
 |   X11 Xlib                 | xlib      | DONE |X    |X  |X  |X   |
 |   X11 XCB                  | xcb       | DONE |X    |X  |X  |X   |
-|   Wayland                  | wayland   | WIP  |X    |X  |   |    |
+|   Wayland                  | wayland   | DONE |X    |X  |   |    |
 |   XForms                   | xforms    | DONE |X    |X  |   |    |
 |   FLTK                     | fltk      | WIP  |X    |X  |X  |X   |
 |   Motif (Xm/Xt)            | motif     | WIP  |X    |X  |   |    |
