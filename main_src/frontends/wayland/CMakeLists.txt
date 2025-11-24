@@ -1,6 +1,6 @@
 if (WAYLAND_FOUND)
     if (MODULE_WAYLAND)
-        add_library(arfminesweeper-wayland MODULE "wayland.c")
+        add_library(arfminesweeper-wayland MODULE "wayland.c" "wl_util.c" "xdg-shell-protocol.c")
         target_compile_definitions(arfminesweeper-wayland PUBLIC _MODULE_)
         target_link_libraries(arfminesweeper-wayland wayland-client)
         add_custom_target(symlink_arfminesweeper-wayland ALL
@@ -12,7 +12,7 @@ if (WAYLAND_FOUND)
     endif()
 
     if (STATIC_WAYLAND)
-        target_sources(arfminesweeper PRIVATE "wayland.c")
+        target_sources(arfminesweeper PRIVATE "wayland.c" "wl_util.c" "xdg-shell-protocol.c")
         target_link_libraries(arfminesweeper wayland-client)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_WAYLAND)
         message(STATUS "Building with static wayland")
