@@ -32,7 +32,7 @@
 #include <linux/input-event-codes.h>
 
 #include <wayland-client.h>
-#include "xdg-shell-client-protocol.h"
+#include <wayland-xdg-shell-client-protocol.h>
 
 #include <common/stb_image.h>
 

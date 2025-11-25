@@ -117,7 +117,9 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   Objective-C ?            |           |      |     |   |X  |    |
 |   Swift ?                  |           |      |     |   |X  |    |
 
-16/48 (29%)
+ - DONE 17/48 (35%)
+ - WIP  10/48 (20%)
+ - unattempted 20/48 (41%)
 
 ### LINUX MODULE TARGET
 

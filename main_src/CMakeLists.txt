@@ -8,6 +8,10 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 find_package(PkgConfig)
+find_package(ECM)
+if (ECM_FOUND)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
+endif()
 
 find_package(Curses)
 pkg_check_modules(DRM libdrm)
@@ -16,6 +20,10 @@ find_package(Motif)
 pkg_check_modules(XAW xaw7)
 if (EXISTS "/usr/include/forms.h")
     set(XFORMS_FOUND true)
+endif()
+if (ECM_FOUND)
+    find_package(WaylandScanner)
+    find_package(WaylandProtocols)
 endif()
 pkg_check_modules(WAYLAND wayland-client)
 pkg_check_modules(GTK3 gtk+-3.0)
@@ -39,7 +47,7 @@ find_package(FLTK)
 find_package(wxWidgets COMPONENTS core base)
 
 
-file (GLOB SRC
+file(GLOB SRC
     "main.c"
     "frontend.c"
     "${PROJECT_SOURCE_DIR}/common/game.c"

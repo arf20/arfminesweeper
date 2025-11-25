@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #include <wayland-client.h>
-#include "xdg-shell-client-protocol.h"
+#include "wayland-xdg-shell-client-protocol.h"
 
 
 typedef struct {
