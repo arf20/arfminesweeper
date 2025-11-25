@@ -25,8 +25,8 @@
 #include <stdio.h>
 
 #include <wayland-client.h>
-#include <wayland-xdg-shell-client-protocol.h>
-#include <wayland-xdg-decoration-v1-client-protocol.h>
+#include <xdg-shell-client-protocol.h>
+#include <xdg-decoration-v1-client.h>
 
 
 typedef struct {

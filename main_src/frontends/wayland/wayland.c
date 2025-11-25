@@ -32,8 +32,8 @@
 #include <linux/input-event-codes.h>
 
 #include <wayland-client.h>
-#include <wayland-xdg-shell-client-protocol.h>
-#include <wayland-xdg-decoration-v1-client-protocol.h>
+#include <xdg-shell-client-protocol.h>
+#include <xdg-decoration-v1-client.h>
 
 #include <common/stb_image.h>
 
