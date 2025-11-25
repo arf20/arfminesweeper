@@ -7,8 +7,9 @@ CMakeSettings.json
 *.ccls-cache/
 *.spv
 *.class
-.*
 mod_src/Module.symvers
+mod_src/.*
+common/.*
 *.ko
 *.mod
 *.mod.c
