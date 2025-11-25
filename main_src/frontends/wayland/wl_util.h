@@ -25,7 +25,8 @@
 #include <stdio.h>
 
 #include <wayland-client.h>
-#include "wayland-xdg-shell-client-protocol.h"
+#include <wayland-xdg-shell-client-protocol.h>
+#include <wayland-xdg-decoration-v1-client-protocol.h>
 
 
 typedef struct {
@@ -58,6 +59,10 @@ typedef struct {
 
     int closed;
     pointer_event_t pointer_event;
+
+    struct zxdg_decoration_manager_v1 *decoration_manager;
+    struct zxdg_toplevel_decoration_v1 *decoration;
+    enum zxdg_toplevel_decoration_v1_mode current_mode;
 } state_t;
 
 enum pointer_event_mask {

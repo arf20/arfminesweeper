@@ -12,6 +12,14 @@ if (WaylandScanner_FOUND AND WaylandProtocols_FOUND)
         PROTOCOL ${WaylandProtocols_DATADIR}/stable/xdg-shell/xdg-shell.xml
         BASENAME xdg-shell
     )
+    ecm_add_wayland_client_protocol(
+        WAYLAND_SOURCES
+        BASENAME
+        xdg-decoration-v1
+        PROTOCOL
+        ${WaylandProtocols_DATADIR}/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml
+    )
+
     message(STATUS "Generating Wayland protocol files")
 else()
     message(STATUS "Not generating Wayland protocol files")

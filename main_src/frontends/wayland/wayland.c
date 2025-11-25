@@ -33,6 +33,7 @@
 
 #include <wayland-client.h>
 #include <wayland-xdg-shell-client-protocol.h>
+#include <wayland-xdg-decoration-v1-client-protocol.h>
 
 #include <common/stb_image.h>
 
@@ -213,9 +214,27 @@ global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
         state->wl_seat = wl_registry_bind(registry, id,
             &wl_seat_interface, 7);
         wl_seat_add_listener(state->wl_seat, &wl_seat_listener, state);
+    } else if (strcmp(interface, zxdg_decoration_manager_v1_interface.name) == 0) {
+        state->decoration_manager = wl_registry_bind(registry, id,
+            &zxdg_decoration_manager_v1_interface, 1);
     }
 }
 
+
+
+void
+decoration_handle_configure(void *data,
+    struct zxdg_toplevel_decoration_v1 *decoration,
+    enum zxdg_toplevel_decoration_v1_mode mode)
+{
+    state_t *state = data;
+    state->current_mode = mode;
+    printf("decoration_handle_configure: %d\n", mode);
+}
+
+static const struct zxdg_toplevel_decoration_v1_listener decoration_listener = {
+    .configure = decoration_handle_configure
+};
 
 
 int
@@ -253,6 +272,18 @@ wayland_start(const int *lboard, int lsize) {
         fprintf(stderr, "Error: Cannot get Wayland shm\n");
         return -1;
     } else printf("Found shm\n");
+
+    if (!state.decoration_manager) {
+        fprintf(stderr, "No server side decoration support\n");
+    } else {
+        printf("SSD enabled\n");
+        state.decoration = zxdg_decoration_manager_v1_get_toplevel_decoration(
+            state.decoration_manager,
+            state.xdg_toplevel
+        );
+        zxdg_toplevel_decoration_v1_add_listener(state.decoration,
+            &decoration_listener, NULL);
+    }
 
     /* create surface and xdg surface */
     state.wl_surface = wl_compositor_create_surface(state.wl_compositor);
