@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include <wayland-client.h>
+#include <libdecor.h>
 #include "wayland-xdg-shell-client-protocol.h"
 
 
@@ -43,6 +44,8 @@ typedef struct {
 } pointer_event_t;
 
 typedef struct {
+    int run;
+
     /* globals */
     struct wl_display *wl_display;
     struct wl_registry *wl_registry;
@@ -58,6 +61,10 @@ typedef struct {
 
     int closed;
     pointer_event_t pointer_event;
+
+    /* libdecor */
+    enum libdecor_window_state window_state;
+    struct libdecor_frame *frame;
 } state_t;
 
 enum pointer_event_mask {

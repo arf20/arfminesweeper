@@ -108,6 +108,15 @@ xdg_surface_configure(void *data,
 }
 
 
+static void
+redraw(state_t *state)
+{
+    struct wl_buffer *buffer = draw_frame(state);
+    wl_surface_damage(state->wl_surface, 0, 0, wWidth, wHeight);
+    wl_surface_attach(state->wl_surface, buffer, 0, 0);
+    wl_surface_commit(state->wl_surface);
+    wl_display_flush(state->wl_display);
+}
 
 static void
 wl_pointer_frame(void *data, struct wl_pointer *wl_pointer)
@@ -146,12 +155,7 @@ wl_pointer_frame(void *data, struct wl_pointer *wl_pointer)
     
     memset(event, 0, sizeof(*event));
 
-    /* cause redraw */
-    struct wl_buffer *buffer = draw_frame(state);
-    wl_surface_damage(state->wl_surface, 0, 0, wWidth, wHeight);
-    wl_surface_attach(state->wl_surface, buffer, 0, 0);
-    wl_surface_commit(state->wl_surface);
-    wl_display_flush(state->wl_display);
+    redraw(state);
 }
 
 
@@ -216,6 +220,55 @@ global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
     }
 }
 
+
+/* decoration */
+
+static void
+libdecor_configure(struct libdecor_frame *frame,
+    struct libdecor_configuration *configuration, void *data) 
+{
+    state_t *state = data;
+    struct libdecor_state *libdecor_state;
+
+    enum libdecor_window_state window_state;
+    if (!libdecor_configuration_get_window_state(configuration, &window_state))
+		window_state = LIBDECOR_WINDOW_STATE_NONE;
+    state->window_state = window_state;
+
+    libdecor_state = libdecor_state_new(wWidth, wHeight);
+    libdecor_frame_commit(frame, libdecor_state, configuration);
+    libdecor_state_free(libdecor_state);
+
+    redraw(state);
+}
+
+static void
+libdecor_close(struct libdecor_frame *frame, void *data)
+{
+    ((state_t*)data)->run = 0;
+}
+
+static void
+libdecor_commit(struct libdecor_frame *frame, void *data)
+{
+    state_t *state = data;
+	wl_surface_commit(state->wl_surface);
+}
+
+static void
+libdecor_dismiss_popup(struct libdecor_frame *frame, const char *seat_name,
+    void *user_data)
+{
+
+}
+
+static void
+libdecor_error(struct libdecor *context, enum libdecor_error error,
+	const char *message)
+{
+	fprintf(stderr, "Caught error (%d): %s\n", error, message);
+	exit(EXIT_FAILURE);
+}
 
 
 int
@@ -292,6 +345,27 @@ wayland_start(const int *lboard, int lsize) {
     }
     printf("Bitmap flag: %dx%d, %dch\n", flagw, flagh, ch);
 
+
+    /* decor */
+    struct libdecor_frame_interface libdecor_frame_iface = {
+        libdecor_configure,
+        libdecor_close,
+        libdecor_commit,
+        libdecor_dismiss_popup,
+    };
+
+    struct libdecor_interface libdecor_iface = {
+        .error = libdecor_error
+    };
+
+    struct libdecor *context = libdecor_new(state.wl_display, &libdecor_iface);
+    state.frame = libdecor_decorate(context, state.wl_surface,
+	    &libdecor_frame_iface, &state);
+    libdecor_frame_set_app_id(state.frame, TXT_TITLE);
+	libdecor_frame_set_title(state.frame, TXT_TITLE);
+	libdecor_frame_map(state.frame);
+
+
     fbRenderInit(board, size, wWidth, wHeight,
         NULL, wWidth, wHeight,
         font, fontw, fonth,
@@ -299,9 +373,18 @@ wayland_start(const int *lboard, int lsize) {
         0, NULL, NULL);
 
 
+    /*
     while (wl_display_dispatch(state.wl_display)) {
 
-    }
+    }*/
+    
+
+    state.run = 1;
+    while (state.run && (libdecor_dispatch(context, -1) >= 0)) {
+
+	}
+
+    printf("exit");
 
     return 0;
     
