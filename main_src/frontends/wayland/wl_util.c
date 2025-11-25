@@ -195,7 +195,7 @@ wl_pointer_axis_discrete(void *data, struct wl_pointer *wl_pointer,
 void
 wl_seat_name(void *data, struct wl_seat *wl_seat, const char *name)
 {
-       fprintf(stderr, "seat name: %s\n", name);
+
 }
 
 

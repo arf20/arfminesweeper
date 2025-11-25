@@ -197,7 +197,6 @@ static void
 global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
     const char *interface, uint32_t version)
 {
-    printf("Got a registry event for %s id %d\n", interface, id);
     state_t *state = (state_t*)data;
 
     if (strcmp(interface, wl_compositor_interface.name) == 0) {
@@ -229,7 +228,6 @@ decoration_handle_configure(void *data,
 {
     state_t *state = data;
     state->current_mode = mode;
-    printf("decoration_handle_configure: %d\n", mode);
 }
 
 static const struct zxdg_toplevel_decoration_v1_listener decoration_listener = {
@@ -266,31 +264,20 @@ wayland_start(const int *lboard, int lsize) {
     if (state.wl_compositor == NULL) {
         fprintf(stderr, "Error: Compositor not found\n");
         return -1;
-    } else printf("Found compositor\n");
+    }
 
     if (state.wl_shm == NULL) {
         fprintf(stderr, "Error: Cannot get Wayland shm\n");
         return -1;
-    } else printf("Found shm\n");
-
-    if (!state.decoration_manager) {
-        fprintf(stderr, "No server side decoration support\n");
-    } else {
-        printf("SSD enabled\n");
-        state.decoration = zxdg_decoration_manager_v1_get_toplevel_decoration(
-            state.decoration_manager,
-            state.xdg_toplevel
-        );
-        zxdg_toplevel_decoration_v1_add_listener(state.decoration,
-            &decoration_listener, NULL);
     }
 
+    
     /* create surface and xdg surface */
     state.wl_surface = wl_compositor_create_surface(state.wl_compositor);
     if (!state.wl_surface) {
         fprintf(stderr, "Error: Cannot get surface\n");
         return -1;
-    } printf("Got surface\n");
+    }
 
     state.xdg_surface = xdg_wm_base_get_xdg_surface(state.xdg_wm_base,
         state.wl_surface);
@@ -303,6 +290,18 @@ wayland_start(const int *lboard, int lsize) {
     state.xdg_toplevel = xdg_surface_get_toplevel(state.xdg_surface);
     xdg_toplevel_set_title(state.xdg_toplevel, TXT_TITLE);
 
+    /* decoration */
+    if (!state.decoration_manager) {
+        fprintf(stderr, "No server side decoration support\n");
+    } else {
+        state.decoration = zxdg_decoration_manager_v1_get_toplevel_decoration(
+            state.decoration_manager,
+            state.xdg_toplevel
+        );
+        zxdg_toplevel_decoration_v1_add_listener(state.decoration,
+            &decoration_listener, &state);
+    }
+
     wl_surface_commit(state.wl_surface);
 
     /* read textures */
@@ -313,7 +312,6 @@ wayland_start(const int *lboard, int lsize) {
         printf("Error loading bitmap font: " FONT_BMP_PATH "\n");
         return -1;
     }
-    printf("Bitmap font: %dx%d, %dch\n", fontw, fonth, ch);
 
     int flagw = 0, flagh = 0;
     flag = stbi_load(FLAG_PNG_PATH, &flagw, &flagh, &ch, 1);
@@ -321,7 +319,6 @@ wayland_start(const int *lboard, int lsize) {
         printf("Error loading flag: " FLAG_PNG_PATH "\n");
         return -1;
     }
-    printf("Bitmap flag: %dx%d, %dch\n", flagw, flagh, ch);
 
     fbRenderInit(board, size, wWidth, wHeight,
         NULL, wWidth, wHeight,
