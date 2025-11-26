@@ -1,7 +1,7 @@
 if (OpenGL_OpenGL_FOUND AND glfw3_FOUND AND CGLM_FOUND)
     if (MODULE_GL3D)
         add_library(arfminesweeper-gl3d MODULE "gl3d.c" "../common/glutil.c"
-            "../common/glad/glad.c")
+            "glutil3d.c" "models.c" "../common/glad/glad.c")
         target_compile_definitions(arfminesweeper-gl3d PUBLIC _MODULE_)
         target_include_directories(arfminesweeper-gl3d PUBLIC "../common/glad/include/" CGLM_INCLUDE_DIRS)
         target_link_libraries(arfminesweeper-gl3d OpenGL::GL glfw dl cglm)
@@ -15,7 +15,7 @@ if (OpenGL_OpenGL_FOUND AND glfw3_FOUND AND CGLM_FOUND)
 
     if (STATIC_GL3D)
         target_sources(arfminesweeper PRIVATE "gl3d.c" "../common/glutil.c"
-            "../common/glad/glad.c")
+            "glutil3d.c" "models.c" "../common/glad/glad.c")
         target_include_directories(arfminesweeper PUBLIC "../common/glad/include/" CGLM_INCLUDE_DIRS)
         target_link_libraries(arfminesweeper OpenGL::GL glfw dl cglm)
         target_compile_definitions(arfminesweeper PUBLIC FRONTEND_GL3D)

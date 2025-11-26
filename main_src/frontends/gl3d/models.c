@@ -16,21 +16,9 @@
     You should have received a copy of the GNU General Public License
     along with this shader.  If not, see <https://www.gnu.org/licenses/>.
 
+    models.c: OpenGL 3D models
+
 */
 
-#ifndef _GLUTIL_H
-#define _GLUTIL_H
 
-#include "glad/include/glad/glad.h"
-
-GLint shader_new(const char *vsp, const char *gsp, const char *fsp);
-
-void shader_set_int(GLint pid, const char *name, int v);
-void shader_set_float(GLint pid, const char *name, float v);
-void shader_set_float2(GLint pid, const char *name, float v0, float v1);
-void shader_set_float3(GLint pid, const char *name, float v0, float v1, float v2);
-void shader_set_uintv(GLint pid, const char *name, int size, const unsigned int *v);
-void shader_set_uint(GLint pid, const char *name, unsigned int v);
-
-#endif /* _GLUTIL_H */
 

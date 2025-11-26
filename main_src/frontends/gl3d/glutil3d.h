@@ -18,19 +18,23 @@
 
 */
 
-#ifndef _GLUTIL_H
-#define _GLUTIL_H
+#ifndef _GLUTIL3D_H
+#define _GLUTIL3D_H
 
-#include "glad/include/glad/glad.h"
+#include <common/glad/include/glad/glad.h>
 
-GLint shader_new(const char *vsp, const char *gsp, const char *fsp);
+#include <cglm/cglm.h>
 
-void shader_set_int(GLint pid, const char *name, int v);
-void shader_set_float(GLint pid, const char *name, float v);
-void shader_set_float2(GLint pid, const char *name, float v0, float v1);
-void shader_set_float3(GLint pid, const char *name, float v0, float v1, float v2);
-void shader_set_uintv(GLint pid, const char *name, int size, const unsigned int *v);
-void shader_set_uint(GLint pid, const char *name, unsigned int v);
+typedef struct {
+    GLuint vao;
+    size_t n;
+    mat4 mm;        GLuint loc_mm;
+    vec3 color;     GLuint loc_color;
+    GLint shader;
+} model_t;
 
-#endif /* _GLUTIL_H */
+model_t *model_new(vec3 *verts, size_t n, mat4 mm, vec3 color, GLint shader);
+model_t *model_draw(const model_t *m);
+
+#endif /* _GLUTIL3D_H */
 

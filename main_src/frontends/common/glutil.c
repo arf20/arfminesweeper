@@ -3,18 +3,18 @@
     arfminesweeper: Cross-plataform multi-frontend game
     Copyright (C) 2023 arf20 (Ángel Ruiz Fernandez)
 
-    This program is free software: you can redistribute it and/or modify
+    This shader is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
+    This shader is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this shader.  If not, see <https://www.gnu.org/licenses/>.
 
     gl33.c: OpenGL 3.3/GLFW/GLEW frontend
 
@@ -27,10 +27,8 @@
 #include <errno.h>
 #include <string.h>
 
-#include <cglm/cglm.h>
-
 GLint
-program_new(const char *vsp, const char *gsp, const char *fsp) {
+shader_new(const char *vsp, const char *gsp, const char *fsp) {
     /* 1. read vertex/fragment source */
     char *vsc, *gsc, *fsc;
     FILE *vsf, *gsf, *fsf;
@@ -139,7 +137,7 @@ program_new(const char *vsp, const char *gsp, const char *fsp) {
     glGetProgramiv(pid, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(pid, 1024, NULL, infoLog);
-        fprintf(stderr, "Error linking program: %s\n", infoLog);
+        fprintf(stderr, "Error linking shader: %s\n", infoLog);
         return -1;
     }
     
@@ -160,12 +158,6 @@ program_new(const char *vsp, const char *gsp, const char *fsp) {
     fclose(fsf);
 
     return pid;
-}
-
-
-model_t *
-model_new(vec3 *verts, size_t n) {
-
 }
 
 

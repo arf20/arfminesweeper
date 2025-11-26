@@ -27,6 +27,8 @@
 #include <cglm/cglm.h>
 
 #include <common/glutil.h>
+#include "glutil3d.h"
+#include "models.h"
 
 #include <common/frontconf.h>
 #include "gl3d.h"
@@ -49,20 +51,37 @@ static int size = 0;
 static int wWidth, wHeight;
 static GLFWwindow *window = NULL;
 
-static mat4 camera = { 0 };
+static GLuint default_shader = -1;
+static GLuint loc_camera = -1;
+
+static int orbit_az = 0, orbit_el = 0, orbit_d = 0;
+static float az = 0, el = M_PI / 4.0, d = -10;
+static mat4 pm, camera = { 0 };
+
+static model_t *model_cube = NULL;
+
+
 
 static void
 update_camera() {
     glViewport(0, 0, wWidth, wHeight);
 
-    vec3 obs = { 0.0f, 10.0f, -10.0f };
-    vec3 vrp = { 0.0f, 0.0f, 0.0f };
-    vec3 up = { 0.0f, 1.0f, 0.0f };
-    mat4 vm, pm;
+    vec3 obs = { 0, 0, d };
+    glm_vec3_rotate(obs, el, (vec3){1, 0, 0});
+    glm_vec3_rotate(obs, az, (vec3){0, 1, 0});
+    vec3 vrp = { 0, 0, 0 };
+    vec3 up = { 0, 1, 0 };
+    mat4 vm;
     glm_lookat(obs, vrp, up, vm);
-    glm_perspective(M_PI * 90.0f / 180.0f, wWidth / wHeight, 0.1f, 50.0f, pm);
 
     glm_mat4_mul(pm, vm, camera);
+}
+
+static void
+init_camera() {
+    glm_perspective(M_PI * 90.0f / 180.0f, (float)wWidth / (float)wHeight,
+        0.1f, 50.0f, pm);
+    update_camera();
 }
 
 static void
@@ -70,8 +89,15 @@ render(GLFWwindow *window) {
     glClearColor(C_BLACK, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /* Execute shader */
-    //glUseProgram(boardShader);
+    az += 0.0001f * orbit_az;
+    el += 0.0001f * orbit_el;
+    d  += 0.0002f * orbit_d;
+    if (orbit_az || orbit_el || orbit_d)
+        update_camera();
+
+    glUseProgram(default_shader);
+    glUniformMatrix4fv(loc_camera, 1, GL_FALSE, (float*)camera);
+    model_draw(model_cube);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -85,7 +111,33 @@ resizeCallback(GLFWwindow *window, int w, int h) {
 
 static void
 keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-
+    /* orbit az */
+    if (key == GLFW_KEY_A && action == GLFW_PRESS)
+        orbit_az--;
+    else if (key == GLFW_KEY_A && action == GLFW_RELEASE)
+        orbit_az++;
+    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
+        orbit_az++;
+    else if (key == GLFW_KEY_D && action == GLFW_RELEASE)
+        orbit_az--;
+    /* orbit el */
+    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+        orbit_el--;
+    else if (key == GLFW_KEY_S && action == GLFW_RELEASE)
+        orbit_el++;
+    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+        orbit_el++;
+    else if (key == GLFW_KEY_W && action == GLFW_RELEASE)
+        orbit_el--;
+    /* orbit el */
+    else if (key == GLFW_KEY_E && action == GLFW_PRESS)
+        orbit_d--;
+    else if (key == GLFW_KEY_E && action == GLFW_RELEASE)
+        orbit_d++;
+    else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+        orbit_d++;
+    else if (key == GLFW_KEY_Q && action == GLFW_RELEASE)
+        orbit_d--;
 }
 
 static void
@@ -105,7 +157,6 @@ mouseCallback(GLFWwindow* window, int button, int action, int mods) {
             gameFlagCell(ix, iy);
         }
     }
-
 }
 
 int
@@ -149,13 +200,17 @@ gl3d_start(const int *lboard, int lsize) {
     glEnable(GL_MULTISAMPLE);
 
     /* Compile shaders */
-    GLint default_shader = program_new(GL3D_SHADER_PATH "default.vs", NULL,
+    default_shader = shader_new(GL3D_SHADER_PATH "default.vs", NULL,
         GL3D_SHADER_PATH "default.fs");
     if (default_shader < 0) {
         return -1;
     }
+    loc_camera = glGetUniformLocation(default_shader, "camera");
 
-    update_camera();
+    init_camera();
+
+    model_cube = model_new(cube, sizeof(cube) / sizeof(vec3),
+        (mat4)GLM_MAT4_IDENTITY_INIT, (vec3){1.0f, 1.0f, 1.0f}, default_shader);
 
 
     /* Enter the infinite event-processing loop */

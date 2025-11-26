@@ -18,19 +18,60 @@
 
 */
 
-#ifndef _GLUTIL_H
-#define _GLUTIL_H
+#ifndef _MODELS_H
+#define _MODELS_H
 
-#include "glad/include/glad/glad.h"
+#include <cglm/cglm.h>
 
-GLint shader_new(const char *vsp, const char *gsp, const char *fsp);
+vec3 cube[] = {
+  1, 1, 1,
+  -1, 1, 1,
+  -1, -1, 1,
 
-void shader_set_int(GLint pid, const char *name, int v);
-void shader_set_float(GLint pid, const char *name, float v);
-void shader_set_float2(GLint pid, const char *name, float v0, float v1);
-void shader_set_float3(GLint pid, const char *name, float v0, float v1, float v2);
-void shader_set_uintv(GLint pid, const char *name, int size, const unsigned int *v);
-void shader_set_uint(GLint pid, const char *name, unsigned int v);
+  1, 1, 1,
+  -1, -1, 1,
+  1, -1, 1,
 
-#endif /* _GLUTIL_H */
+  1, -1, -1,
+  1, -1, 1,
+  -1, -1, 1,
+
+  1, -1, -1,
+  -1, -1, 1,
+  -1, -1, -1,
+
+  -1, -1, -1,
+  -1, -1, 1,
+  -1, 1, 1,
+
+  -1, -1, -1,
+  -1, 1, 1,
+  -1, 1, -1,
+
+  -1, 1, -1,
+  1, 1, -1,
+  1, -1, -1,
+
+  -1, 1, -1,
+  1, -1, -1,
+  -1, -1, -1,
+
+  1, 1, -1,
+  1, 1, 1,
+  1, -1, 1,
+
+  1, 1, -1,
+  1, -1, 1,
+  1, -1, -1,
+
+  -1, 1, -1,
+  -1, 1, 1,
+  1, 1, 1,
+
+  -1, 1, -1,
+  1, 1, 1,
+  1, 1, -1
+};
+
+#endif /* _MODELS_H */
 
