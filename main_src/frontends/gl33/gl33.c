@@ -149,14 +149,14 @@ gl33_start(const int *lboard, int lsize) {
     glEnable(GL_MULTISAMPLE);
 
     /* Compile shaders */
-    boardShader = program_new(
+    boardShader = shader_new(
         GL3_VS_PATH,
         NULL,
         GL3_FS_PATH);
     /* Set shader uniforms */
     glUseProgram(boardShader);
-    program_set_float2(boardShader, "sSize", wWidth, wHeight);
-    program_set_uint(boardShader, "size", size);
+    shader_set_float2(boardShader, "sSize", wWidth, wHeight);
+    shader_set_uint(boardShader, "size", size);
 
     /* Generate and bind dummy VAO, required in most OpenGL implementations */
     glGenVertexArrays(1, &dummyvao);
