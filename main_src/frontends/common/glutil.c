@@ -27,8 +27,10 @@
 #include <errno.h>
 #include <string.h>
 
+#include <cglm/cglm.h>
+
 GLint
-shader_new(const char *vsp, const char *gsp, const char *fsp) {
+program_new(const char *vsp, const char *gsp, const char *fsp) {
     /* 1. read vertex/fragment source */
     char *vsc, *gsc, *fsc;
     FILE *vsf, *gsf, *fsf;
@@ -41,6 +43,11 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
     if (vsp) {
         /* Read vertex shader source */
         vsf = fopen(vsp, "r");
+        if (!vsf) {
+            fprintf(stderr, "Error opening vertex shader %s: %s\n", vsp,
+                strerror(errno));
+            return -1;
+        }
         fseek(vsf, 0L, SEEK_END);
         vss = ftell(vsf);
         vsc = malloc(vss + 1);
@@ -56,14 +63,19 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
         glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(vs, 1024, NULL, infoLog);
-            printf("Error compiling vertex shader: %s\n", infoLog);
-            return 0;
+            fprintf(stderr, "Error compiling vertex shader: %s\n", infoLog);
+            return -1;
         }
     }
 
     if (gsp) {
         /* Read geometry shader source */
         gsf = fopen(gsp, "r");
+        if (!gsf) {
+            fprintf(stderr, "Error opening geometry shader %s: %s\n", gsp,
+                strerror(errno));
+            return -1;
+        }
         fseek(gsf, 0L, SEEK_END);
         gss = ftell(gsf);
         gsc = malloc(gss + 1);
@@ -79,13 +91,23 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
         glGetShaderiv(gs, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(gs, 1024, NULL, infoLog);
-            printf("Error compiling geometry shader: %s\n", infoLog);
-            return 0;
+            fprintf(stderr, "Error compiling geometry shader: %s\n", infoLog);
+            return -1;
         }
     }
 
-    /* Read geometry shader source */
+    if (!fsp) {
+        fprintf(stderr, "No fragment shader path passed\n");
+        return -1;
+    }
+
+    /* Read fragment shader source */
     fsf = fopen(fsp, "r");
+    if (!fsf) {
+        fprintf(stderr, "Error opening fragment shader %s: %s\n", fsp,
+            strerror(errno));
+        return -1;
+    }
     fseek(fsf, 0L, SEEK_END);
     fss = ftell(fsf);
     fsc = malloc(fss + 1);
@@ -101,8 +123,8 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
     glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(fs, 1024, NULL, infoLog);
-        printf("Error compiling fragment shader: %s\n", infoLog);
-        return 0;
+        fprintf(stderr, "Error compiling fragment shader: %s\n", infoLog);
+        return -1;
     }
     
     /* Shader Program */
@@ -117,8 +139,8 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
     glGetProgramiv(pid, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(pid, 1024, NULL, infoLog);
-        printf("Error linking program: %s\n", infoLog);
-        return 0;
+        fprintf(stderr, "Error linking program: %s\n", infoLog);
+        return -1;
     }
     
     if (vsp) {
@@ -139,6 +161,13 @@ shader_new(const char *vsp, const char *gsp, const char *fsp) {
 
     return pid;
 }
+
+
+model_t *
+model_new(vec3 *verts, size_t n) {
+
+}
+
 
 void
 shader_set_int(GLint pid, const char *name, int v) {

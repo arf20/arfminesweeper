@@ -45,6 +45,7 @@ find_package(JNI)
 find_program(JAVAC javac)
 find_package(FLTK)
 find_package(wxWidgets COMPONENTS core base)
+pkg_check_modules(CGLM cglm)
 
 
 file(GLOB SRC

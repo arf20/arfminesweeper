@@ -92,9 +92,10 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   GLIDE (with Voodoo)      |           |      |X    |X  |   |X   |
 |   OpenGL GLX               | glx       |      |X    |X  |   |    |
 |   OpenGL 2.2 FFP/FreeGLUT  | gl11      | DONE |X    |X  |X  |X   |
-|   OpenGL 3.3/GLFW/GLAD     | gl33      | WIP  |X    |X  |X  |X   |
-|   ImGui                    |           |      |X    |X  |X  |X   |
+|   OpenGL 3.3/GLFW/GLAD 2D  | gl33      | WIP  |X    |X  |X  |X   |
+|   OpenGL 3.3/GLFW/GLAD 3D  | gl3d      | WIP  |X    |X  |X  |X   |
 |   Vulkan/GLFW              | vulkan    | WIP  |X    |X  |X  |X   |
+|   ImGui                    |           |      |X    |X  |X  |X   |
 |   Gtk2                     |           |      |X    |X  |X  |X   |
 |   Gtk3                     | gtk3      | DONE |X    |X  |X  |X   |
 |   Gtk4 + libadwaita        |           |      |X    |X  |X  |X   |

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    gl33.c: OpenGL 3.3/GLFW/GLAD frontend
+    gl3d.c: OpenGL 3.3/GLFW/GLAD frontend
 
 */
 
@@ -24,11 +24,12 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <cglm/cglm.h>
 
 #include <common/glutil.h>
 
 #include <common/frontconf.h>
-#include "gl33.h"
+#include "gl3d.h"
 #include <common/game.h>
 
 #define C_WHITE  1.0f, 1.0f, 1.0f
@@ -46,9 +47,23 @@ static const int *board = NULL;
 static int size = 0;
 
 static int wWidth, wHeight;
-static GLFWwindow *g_window = NULL;
-static GLint boardShader, dummyvao, boardUBO;
-static unsigned int *boardUBOdata = NULL;
+static GLFWwindow *window = NULL;
+
+static mat4 camera = { 0 };
+
+static void
+update_camera() {
+    glViewport(0, 0, wWidth, wHeight);
+
+    vec3 obs = { 0.0f, 10.0f, -10.0f };
+    vec3 vrp = { 0.0f, 0.0f, 0.0f };
+    vec3 up = { 0.0f, 1.0f, 0.0f };
+    mat4 vm, pm;
+    glm_lookat(obs, vrp, up, vm);
+    glm_perspective(M_PI * 90.0f / 180.0f, wWidth / wHeight, 0.1f, 50.0f, pm);
+
+    glm_mat4_mul(pm, vm, camera);
+}
 
 static void
 render(GLFWwindow *window) {
@@ -56,14 +71,16 @@ render(GLFWwindow *window) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /* Execute shader */
-    glUseProgram(boardShader);
+    //glUseProgram(boardShader);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 static void
 resizeCallback(GLFWwindow *window, int w, int h) {
-    
+    wWidth = w;
+    wHeight = h;
+    update_camera();
 }
 
 static void
@@ -71,49 +88,32 @@ keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
 }
 
-void
-updateBoardUBO() {
-    glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(int)*size*size, board, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, boardUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
-}
-
 static void
 mouseCallback(GLFWwindow* window, int button, int action, int mods) {
-    //if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     if (action != GLFW_RELEASE) return;
 
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
-    int ix = ((int)x - W_MARGIN) /
-        (CELL_SIZE + CELL_MARGIN);
-    int iy = ((int)y - HEADER_HEIGHT) /
-        (CELL_SIZE + CELL_MARGIN);
-    if (ix < 0 || ix >= size || iy < 0 || iy >= size) return;
+    int ix = 0, iy = 0;
 
     switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: {
             gameClearCell(ix, iy);
-            updateBoardUBO();
         } break;
         case GLFW_MOUSE_BUTTON_RIGHT: {
             gameFlagCell(ix, iy);
-            updateBoardUBO();
         }
     }
 
 }
 
 int
-gl33_start(const int *lboard, int lsize) {
+gl3d_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
-    wWidth = (2 * W_MARGIN) + (size * CELL_SIZE) + ((size - 1) * CELL_MARGIN);
-    wHeight = HEADER_HEIGHT + W_MARGIN + (size * CELL_SIZE) +
-        ((size - 1) * CELL_MARGIN);
+    wWidth = 1280; wHeight = 720;
 
     /* Init glfw context */
     glfwInit();
@@ -123,13 +123,13 @@ gl33_start(const int *lboard, int lsize) {
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     /* Create window */
-    if ((g_window = glfwCreateWindow(wWidth, wHeight, TXT_TITLE, NULL, NULL))
+    if ((window = glfwCreateWindow(wWidth, wHeight, TXT_TITLE, NULL, NULL))
         == NULL)
     {
         printf("Error creating window\n");
         return -1;
     }
-    glfwMakeContextCurrent(g_window);
+    glfwMakeContextCurrent(window);
 
     /* Init glad */
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -138,9 +138,9 @@ gl33_start(const int *lboard, int lsize) {
     }
 
     /* Set callbacks */
-    glfwSetFramebufferSizeCallback(g_window, resizeCallback);
-    glfwSetKeyCallback(g_window, keyCallback);
-    glfwSetMouseButtonCallback(g_window, mouseCallback);
+    glfwSetFramebufferSizeCallback(window, resizeCallback);
+    glfwSetKeyCallback(window, keyCallback);
+    glfwSetMouseButtonCallback(window, mouseCallback);
     glfwSwapInterval(0);
 
     /* enable stuff */
@@ -149,42 +149,31 @@ gl33_start(const int *lboard, int lsize) {
     glEnable(GL_MULTISAMPLE);
 
     /* Compile shaders */
-    boardShader = program_new(
-        GL3_VS_PATH,
-        NULL,
-        GL3_FS_PATH);
-    /* Set shader uniforms */
-    glUseProgram(boardShader);
-    program_set_float2(boardShader, "sSize", wWidth, wHeight);
-    program_set_uint(boardShader, "size", size);
+    GLint default_shader = program_new(GL3D_SHADER_PATH "default.vs", NULL,
+        GL3D_SHADER_PATH "default.fs");
+    if (default_shader < 0) {
+        return -1;
+    }
 
-    /* Generate and bind dummy VAO, required in most OpenGL implementations */
-    glGenVertexArrays(1, &dummyvao);
-    glBindVertexArray(dummyvao);
+    update_camera();
 
-    /* Generate board UBO */
-    glGenBuffers(1, &boardUBO);
-    //boardUBO_idx = glGetUniformBlockIndex(boardShader, "BoardBlock");
-    glBindBuffer(GL_UNIFORM_BUFFER, boardUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(int)*size*size, board, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, boardUBO);
 
     /* Enter the infinite event-processing loop */
-    while (!glfwWindowShouldClose(g_window)) {
-        render(g_window);
-        glfwSwapBuffers(g_window);
+    while (!glfwWindowShouldClose(window)) {
+        render(window);
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 }
 
 void
-gl33_destroy() {
-    glfwDestroyWindow(g_window);
+gl3d_destroy() {
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
 
 const char *
-gl33_name() {
-    return "gl33";
+gl3d_name() {
+    return "gl3d";
 }
 

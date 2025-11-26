@@ -31,6 +31,7 @@
 #define FONT_BMP_PATH       ASSET_DIR "charstrip.bmp"
 #define GL3_VS_PATH         ASSET_DIR "msboard.vs"
 #define GL3_FS_PATH         ASSET_DIR "msboard.fs"
+#define GL3D_SHADER_PATH    ASSET_DIR "gl3d-shaders/"
 #define MODULE_SEARCH_PATH  "main_src/modules"
 #define JAVA_CLASS_PATH     ASSET_DIR
 #define JAVA_LIBRARY_PATH   "./main_src/bindings/"
