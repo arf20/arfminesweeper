@@ -25,6 +25,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void
+compute_normals(vec3 *verts, vec3 *normals, size_t n) {
+    vec3 u, v, normal;
+    for (size_t i = 0; i < n / 3; i += 3) {
+        glm_vec3_sub(verts[i + 1], verts[i + 0], u);
+        glm_vec3_sub(verts[i + 2], verts[i + 0], v);
+        glm_vec3_crossn(u, normal, normal);
+        glm_vec3_copy(normal, normals[i + 0]);
+        glm_vec3_copy(normal, normals[i + 1]);
+        glm_vec3_copy(normal, normals[i + 2]);
+    }
+}
+
 model_t *
 model_new(vec3 *verts, size_t n, mat4 mm, vec3 color, GLint shader) {
     model_t *m = malloc(sizeof(model_t));
@@ -34,15 +47,31 @@ model_new(vec3 *verts, size_t n, mat4 mm, vec3 color, GLint shader) {
     glGenVertexArrays(1, &m->vao);
     glBindVertexArray(m->vao);
 
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * n, verts,
-        GL_STATIC_DRAW);
+    GLuint vbo[2];
+    glGenBuffers(2, vbo);
 
+    /* vertices */
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * n, verts,
+        GL_STATIC_DRAW);
+    
     GLuint loc_vertex = glGetAttribLocation(shader, "vertex");
     glVertexAttribPointer(loc_vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(loc_vertex);
+    
+    /* normals */
+    vec3 *normals = malloc(sizeof(vec3) * n);
+    compute_normals(verts, normals, n);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * n, normals,
+        GL_STATIC_DRAW);
+
+    GLuint loc_normal = glGetAttribLocation(shader, "normal");
+    glVertexAttribPointer(loc_normal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(loc_normal);
+
+    free(normals);
 
     glm_mat4_copy(mm, m->mm);
     m->loc_mm = glGetUniformLocation(shader, "mm");

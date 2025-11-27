@@ -59,6 +59,7 @@
 #include <fltk/fltk.hpp>
 #include <wxwidgets/wxwidgets.hpp>
 #include <swing/swing.h>
+#include <gl3d/gl3d.h>
 
 typedef const char *(name_func_t)();
 
@@ -165,6 +166,9 @@ frontend_load_static() {
     #endif
     #ifdef FRONTEND_SWING
     frontend_insert(&(frontend_t){ TYPE_STATIC, swing_name(), swing_start, swing_destroy });
+    #endif
+    #ifdef FRONTEND_GL3D
+    frontend_insert(&(frontend_t){ TYPE_STATIC, gl3d_name(), gl3d_start, gl3d_destroy });
     #endif
 
 }

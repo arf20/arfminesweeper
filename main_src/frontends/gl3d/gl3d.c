@@ -52,11 +52,12 @@ static int wWidth, wHeight;
 static GLFWwindow *window = NULL;
 
 static GLuint default_shader = -1;
-static GLuint loc_camera = -1;
+static GLuint loc_pm = -1, loc_vm = -1, loc_light_dir = -1;
 
 static int orbit_az = 0, orbit_el = 0, orbit_d = 0;
-static float az = 0, el = M_PI / 4.0, d = -10;
-static mat4 pm, camera = { 0 };
+static float az = M_PI / 4.0, el = M_PI / 4.0, d = -4;
+static mat4 pm = { 0 }, vm = { 0 };
+static vec3 light_dir = { 0 };
 
 static model_t *model_cube = NULL;
 
@@ -71,10 +72,8 @@ update_camera() {
     glm_vec3_rotate(obs, az, (vec3){0, 1, 0});
     vec3 vrp = { 0, 0, 0 };
     vec3 up = { 0, 1, 0 };
-    mat4 vm;
-    glm_lookat(obs, vrp, up, vm);
 
-    glm_mat4_mul(pm, vm, camera);
+    glm_lookat(obs, vrp, up, vm);
 }
 
 static void
@@ -96,7 +95,8 @@ render(GLFWwindow *window) {
         update_camera();
 
     glUseProgram(default_shader);
-    glUniformMatrix4fv(loc_camera, 1, GL_FALSE, (float*)camera);
+    glUniformMatrix4fv(loc_pm, 1, GL_FALSE, (float*)pm);
+    glUniformMatrix4fv(loc_vm, 1, GL_FALSE, (float*)vm);
     model_draw(model_cube);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -205,11 +205,14 @@ gl3d_start(const int *lboard, int lsize) {
     if (default_shader < 0) {
         return -1;
     }
-    loc_camera = glGetUniformLocation(default_shader, "camera");
+    loc_pm = glGetUniformLocation(default_shader, "pm");
+    loc_vm = glGetUniformLocation(default_shader, "vm");
+    loc_light_dir = glGetUniformLocation(default_shader, "light_dir");
 
     init_camera();
+    glm_vec3_normalize_to((vec3){-1, -1, 0}, light_dir);
 
-    model_cube = model_new(cube, sizeof(cube) / sizeof(vec3),
+    model_cube = model_new(cube, cube_size / sizeof(vec3),
         (mat4)GLM_MAT4_IDENTITY_INIT, (vec3){1.0f, 1.0f, 1.0f}, default_shader);
 
 
