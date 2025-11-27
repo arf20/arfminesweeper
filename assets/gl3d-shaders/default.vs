@@ -12,10 +12,7 @@ out vec3 fcolor;
 
 
 vec3 diffuse(vec3 sco_norm, vec3 l) {
-    vec3 c = vec3(0);
-    if (dot(l, sco_norm) > 0)
-        c = color * dot(l, sco_norm);
-    return c;
+    return color * max(dot(l, sco_norm), 0);
 }
 
 void main() {

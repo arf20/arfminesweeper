@@ -28,10 +28,10 @@
 static void
 compute_normals(vec3 *verts, vec3 *normals, size_t n) {
     vec3 u, v, normal;
-    for (size_t i = 0; i < n / 3; i += 3) {
+    for (size_t i = 0; i < n; i += 3) {
         glm_vec3_sub(verts[i + 1], verts[i + 0], u);
         glm_vec3_sub(verts[i + 2], verts[i + 0], v);
-        glm_vec3_crossn(u, normal, normal);
+        glm_vec3_crossn(u, v, normal);
         glm_vec3_copy(normal, normals[i + 0]);
         glm_vec3_copy(normal, normals[i + 1]);
         glm_vec3_copy(normal, normals[i + 2]);
@@ -39,7 +39,7 @@ compute_normals(vec3 *verts, vec3 *normals, size_t n) {
 }
 
 model_t *
-model_new(vec3 *verts, size_t n, mat4 mm, vec3 color, GLint shader) {
+model_new(vec3 *verts, size_t n, vec3 scale, vec3 pos, vec3 color, GLint shader) {
     model_t *m = malloc(sizeof(model_t));
 
     m->n = n;
@@ -73,7 +73,8 @@ model_new(vec3 *verts, size_t n, mat4 mm, vec3 color, GLint shader) {
 
     free(normals);
 
-    glm_mat4_copy(mm, m->mm);
+    glm_vec3_copy(scale, m->scale);
+    glm_vec3_copy(pos, m->pos);
     m->loc_mm = glGetUniformLocation(shader, "mm");
 
     glm_vec3_copy(color, m->color);
@@ -85,8 +86,11 @@ model_new(vec3 *verts, size_t n, mat4 mm, vec3 color, GLint shader) {
 }
 
 model_t *
-model_draw(const model_t *m) {
-    glUniformMatrix4fv(m->loc_mm, 1, GL_FALSE, (float*)m->mm);
+model_draw(model_t *m) {
+    mat4 mm = GLM_MAT4_IDENTITY_INIT;
+    glm_scale(mm, m->scale);
+    glm_translate(mm, m->pos);
+    glUniformMatrix4fv(m->loc_mm, 1, GL_FALSE, (float*)mm);
     glUniform3fv(m->loc_color, 1, m->color);
 
     glBindVertexArray(m->vao);

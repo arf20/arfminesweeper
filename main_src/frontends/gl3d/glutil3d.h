@@ -26,15 +26,17 @@
 #include <cglm/cglm.h>
 
 typedef struct {
-    GLuint vao;
-    size_t n;
-    mat4 mm;        GLuint loc_mm;
-    vec3 color;     GLuint loc_color;
-    GLint shader;
+    GLuint  vao;
+    size_t  n;
+    vec3    scale, pos;
+                        GLuint  loc_mm;
+    vec3    color;      GLuint loc_color;
+    GLint   shader;
 } model_t;
 
-model_t *model_new(vec3 *verts, size_t n, mat4 mm, vec3 color, GLint shader);
-model_t *model_draw(const model_t *m);
+model_t *model_new(vec3 *verts, size_t n, vec3 scale, vec3 pos, vec3 color,
+    GLint shader);
+model_t *model_draw(model_t *m);
 
 #endif /* _GLUTIL3D_H */
 

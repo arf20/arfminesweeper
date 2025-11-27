@@ -45,6 +45,8 @@
 #define C_DCYAN  0.0f, 0.54f, 0.54f
 #define C_DGREY  0.66f, 0.66f, 0.66f
 
+#define CELL_PITCH  2.1
+
 static const int *board = NULL;
 static int size = 0;
 
@@ -55,11 +57,11 @@ static GLuint default_shader = -1;
 static GLuint loc_pm = -1, loc_vm = -1, loc_light_dir = -1;
 
 static int orbit_az = 0, orbit_el = 0, orbit_d = 0;
-static float az = M_PI / 4.0, el = M_PI / 4.0, d = -4;
+static float az = M_PI / 4.0, el = M_PI / 4.0, d = -10;
 static mat4 pm = { 0 }, vm = { 0 };
 static vec3 light_dir = { 0 };
 
-static model_t *model_cube = NULL;
+static model_t *base = NULL, *cell = NULL;
 
 
 
@@ -85,19 +87,54 @@ init_camera() {
 
 static void
 render(GLFWwindow *window) {
+    static float last_time = 0.0f;
+    float current_time = glfwGetTime();
+    float delta_time = current_time - last_time;
+    last_time = current_time;
+
     glClearColor(C_BLACK, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    az += 0.0001f * orbit_az;
-    el += 0.0001f * orbit_el;
-    d  += 0.0002f * orbit_d;
+    az += 1.f * delta_time * orbit_az;
+    el += 1.f * delta_time * orbit_el;
+    d  += 2.f * delta_time * orbit_d;
     if (orbit_az || orbit_el || orbit_d)
         update_camera();
 
     glUseProgram(default_shader);
+    /* camera */
     glUniformMatrix4fv(loc_pm, 1, GL_FALSE, (float*)pm);
     glUniformMatrix4fv(loc_vm, 1, GL_FALSE, (float*)vm);
-    model_draw(model_cube);
+
+    /* base */
+    model_draw(base);
+
+    /* cells */
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            float cX = (CELL_PITCH * (float)x) - (CELL_PITCH*(float)(size - 1)/2.0);
+            float cZ = (CELL_PITCH * (float)y) - (CELL_PITCH*(float)(size - 1)/2.0);
+
+            /* If clear, count surrounding cells and print n of mines */
+            if (CHECK_CLEAR(BOARDXY(x, y))) {
+                
+            }
+            /* If not clear, check flag and draw it */
+            else if (CHECK_FLAG(BOARDXY(x, y))) {
+                
+            }
+            /* Otherwise just a tile */
+            else {
+                glm_vec3_copy((vec3){cX, 1, cZ}, cell->pos);
+                //glm_vec3_copy((vec3){(float)x/(float)size, 1, (float)y/(float)size}, cell->color);
+                model_draw(cell);
+                printf("%f,%f\n", cX, cZ);
+            }
+        }
+    }
+
+    printf("\n");
+
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -198,6 +235,7 @@ gl3d_start(const int *lboard, int lsize) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST);
 
     /* Compile shaders */
     default_shader = shader_new(GL3D_SHADER_PATH "default.vs", NULL,
@@ -209,11 +247,20 @@ gl3d_start(const int *lboard, int lsize) {
     loc_vm = glGetUniformLocation(default_shader, "vm");
     loc_light_dir = glGetUniformLocation(default_shader, "light_dir");
 
-    init_camera();
-    glm_vec3_normalize_to((vec3){-1, -1, 0}, light_dir);
+    glUseProgram(default_shader);
 
-    model_cube = model_new(cube, cube_size / sizeof(vec3),
-        (mat4)GLM_MAT4_IDENTITY_INIT, (vec3){1.0f, 1.0f, 1.0f}, default_shader);
+    init_camera();
+    glm_vec3_normalize_to((vec3){1, 1, 1}, light_dir);
+    glUniform3fv(loc_light_dir, 1, light_dir);
+
+    base = model_new(cube, cube_size / sizeof(vec3),
+        (vec3){(float)size/2.0 + 1.0, 0.5, (float)size/2.0 + 1.0},
+        (vec3){0, -1, 0},
+        (vec3){0.75f, 0.75f, 0.75f}, default_shader);
+
+    cell = model_new(cube, cube_size / sizeof(vec3),
+        (vec3){0.5, 0.5, 0.5}, GLM_VEC3_ZERO,
+        (vec3){1.0f, 1.0f, 1.0f}, default_shader);
 
 
     /* Enter the infinite event-processing loop */
