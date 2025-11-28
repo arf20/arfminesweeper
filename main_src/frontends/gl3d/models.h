@@ -29,5 +29,8 @@ extern size_t cube_size;
 extern vec3 wirecube[];
 extern size_t wirecube_size;
 
+extern vec3 flag[];
+extern size_t flag_size;
+
 #endif /* _MODELS_H */
 

@@ -47,6 +47,7 @@
 
 #define CELL_PITCH  1.1
 
+#define BASE_COLOR      { 0.75, 0.75, 0.75 }
 #define CELL_COLOR      { 1, 1, 1 }
 #define CURSOR_COLOR    { 0.2, 0.2, 1 }
 #define FLAG_COLOR      { 1, 0, 0 }
@@ -66,7 +67,7 @@ static float az = 0/* M_PI / 4.0*/, el = M_PI / 4.0, d = 10;
 static mat4 pm = { 0 }, vm = { 0 };
 static vec3 light_dir = { 0 };
 
-static model_t *base = NULL, *cell = NULL, *axis = NULL, *cursor = NULL;
+static model_t *base = NULL, *cell = NULL, *cursor = NULL, *m_flag = NULL;
 
 static int curx = 0, cury = 0;
 
@@ -130,6 +131,8 @@ render(GLFWwindow *window) {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
+                glm_vec3_copy((vec3){cX, 1, cZ}, m_flag->pos);
+                model_draw(m_flag);
                 model_draw(cell);
             }
             /* Otherwise just a tile */
@@ -143,24 +146,11 @@ render(GLFWwindow *window) {
     glUniformMatrix4fv(default_loc_pm, 1, GL_FALSE, (float*)pm);
     glUniformMatrix4fv(default_loc_vm, 1, GL_FALSE, (float*)vm);
 
-    for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size; x++) {
-            float cX = (CELL_PITCH * (float)x) - (CELL_PITCH*(float)(size - 1)/2.0);
-            float cZ = (CELL_PITCH * (float)y) - (CELL_PITCH*(float)(size - 1)/2.0);
-
-            if (x == curx && y == cury) {
-                glm_vec3_copy((vec3)CURSOR_COLOR, cursor->color);
-                glm_vec3_copy((vec3){cX, 0, cZ}, cursor->pos);
-                model_draw(cursor);
-            }
-
-            if (CHECK_FLAG(BOARDXY(x, y))) {
-                glm_vec3_copy((vec3)FLAG_COLOR, cursor->color);
-                glm_vec3_copy((vec3){cX, 0, cZ}, cursor->pos);
-                model_draw(cursor);
-            }
-        }
-    }
+    float cX = (CELL_PITCH * (float)curx) - (CELL_PITCH*(float)(size - 1)/2.0);
+    float cZ = (CELL_PITCH * (float)cury) - (CELL_PITCH*(float)(size - 1)/2.0);
+    glm_vec3_copy((vec3)CURSOR_COLOR, cursor->color);
+    glm_vec3_copy((vec3){cX, 0, cZ}, cursor->pos);
+    model_draw(cursor);
 }
 
 static void
@@ -315,15 +305,15 @@ gl3d_start(const int *lboard, int lsize) {
     base = model_new(cube, cube_size / sizeof(vec3),
         (vec3){(float)size/2.0 + 1.0, 0.5, (float)size/2.0 + 1.0},
         (vec3){0, -1, 0},
-        (vec3){0.75f, 0.75f, 0.75f}, shaded_shader, GL_TRIANGLES);
+        (vec3)BASE_COLOR, shaded_shader, GL_TRIANGLES);
 
     cell = model_new(cube, cube_size / sizeof(vec3),
         (vec3){0.5, 0.5, 0.5}, GLM_VEC3_ZERO,
-        (vec3){1.0f, 1.0f, 1.0f}, shaded_shader, GL_TRIANGLES);
+        (vec3)CELL_COLOR, shaded_shader, GL_TRIANGLES);
 
-    axis = model_new(cube, cube_size / sizeof(vec3),
-        GLM_VEC3_ZERO, GLM_VEC3_ZERO,
-        GLM_VEC3_ZERO, shaded_shader, GL_TRIANGLES);
+    m_flag = model_new(flag, flag_size / sizeof(vec3),
+        (vec3){0.5, 0.5, 0.5}, GLM_VEC3_ZERO,
+        (vec3)FLAG_COLOR, shaded_shader, GL_TRIANGLES);
 
     cursor = model_new(wirecube, wirecube_size / sizeof(vec3),
         (vec3){0.55, 0.55, 0.55}, GLM_VEC3_ZERO,
