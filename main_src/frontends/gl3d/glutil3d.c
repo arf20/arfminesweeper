@@ -39,7 +39,9 @@ compute_normals(vec3 *verts, vec3 *normals, size_t n) {
 }
 
 model_t *
-model_new(vec3 *verts, size_t n, vec3 scale, vec3 pos, vec3 color, GLint shader) {
+model_new(vec3 *verts, size_t n, vec3 scale, vec3 pos, vec3 color, GLint shader,
+    GLenum mode)
+{
     model_t *m = malloc(sizeof(model_t));
 
     m->n = n;
@@ -81,20 +83,23 @@ model_new(vec3 *verts, size_t n, vec3 scale, vec3 pos, vec3 color, GLint shader)
     m->loc_color = glGetUniformLocation(shader, "color");
 
     m->shader = shader;
+    m->mode = mode;
 
     return m;
 }
 
 model_t *
 model_draw(model_t *m) {
+    /* transforms are applied in reverse order */
     mat4 mm = GLM_MAT4_IDENTITY_INIT;
-    glm_scale(mm, m->scale);
     glm_translate(mm, m->pos);
+    glm_scale(mm, m->scale);
+
     glUniformMatrix4fv(m->loc_mm, 1, GL_FALSE, (float*)mm);
     glUniform3fv(m->loc_color, 1, m->color);
 
     glBindVertexArray(m->vao);
-    glDrawArrays(GL_TRIANGLES, 0, m->n);
+    glDrawArrays(m->mode, 0, m->n);
     glBindVertexArray(0);
 }
 

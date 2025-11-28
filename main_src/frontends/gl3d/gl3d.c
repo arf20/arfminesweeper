@@ -45,7 +45,11 @@
 #define C_DCYAN  0.0f, 0.54f, 0.54f
 #define C_DGREY  0.66f, 0.66f, 0.66f
 
-#define CELL_PITCH  2.1
+#define CELL_PITCH  1.1
+
+#define CELL_COLOR      { 1, 1, 1 }
+#define CURSOR_COLOR    { 0.2, 0.2, 1 }
+#define FLAG_COLOR      { 1, 0, 0 }
 
 static const int *board = NULL;
 static int size = 0;
@@ -53,16 +57,18 @@ static int size = 0;
 static int wWidth, wHeight;
 static GLFWwindow *window = NULL;
 
-static GLuint default_shader = -1;
-static GLuint loc_pm = -1, loc_vm = -1, loc_light_dir = -1;
+static GLuint default_shader = -1, shaded_shader = -1;
+static GLuint default_loc_pm = -1, default_loc_vm = -1, 
+    shaded_loc_pm = -1, shaded_loc_vm = -1, shaded_loc_light_dir = -1;
 
 static int orbit_az = 0, orbit_el = 0, orbit_d = 0;
-static float az = M_PI / 4.0, el = M_PI / 4.0, d = -10;
+static float az = 0/* M_PI / 4.0*/, el = M_PI / 4.0, d = 10;
 static mat4 pm = { 0 }, vm = { 0 };
 static vec3 light_dir = { 0 };
 
-static model_t *base = NULL, *cell = NULL;
+static model_t *base = NULL, *cell = NULL, *axis = NULL, *cursor = NULL;
 
+static int curx = 0, cury = 0;
 
 
 static void
@@ -70,7 +76,7 @@ update_camera() {
     glViewport(0, 0, wWidth, wHeight);
 
     vec3 obs = { 0, 0, d };
-    glm_vec3_rotate(obs, el, (vec3){1, 0, 0});
+    glm_vec3_rotate(obs, -el, (vec3){1, 0, 0});
     glm_vec3_rotate(obs, az, (vec3){0, 1, 0});
     vec3 vrp = { 0, 0, 0 };
     vec3 up = { 0, 1, 0 };
@@ -101,19 +107,22 @@ render(GLFWwindow *window) {
     if (orbit_az || orbit_el || orbit_d)
         update_camera();
 
-    glUseProgram(default_shader);
+    glUseProgram(shaded_shader);
     /* camera */
-    glUniformMatrix4fv(loc_pm, 1, GL_FALSE, (float*)pm);
-    glUniformMatrix4fv(loc_vm, 1, GL_FALSE, (float*)vm);
+    glUniformMatrix4fv(shaded_loc_pm, 1, GL_FALSE, (float*)pm);
+    glUniformMatrix4fv(shaded_loc_vm, 1, GL_FALSE, (float*)vm);
 
     /* base */
     model_draw(base);
 
+    glm_vec3_copy((vec3)CELL_COLOR, cell->color);
     /* cells */
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
             float cX = (CELL_PITCH * (float)x) - (CELL_PITCH*(float)(size - 1)/2.0);
             float cZ = (CELL_PITCH * (float)y) - (CELL_PITCH*(float)(size - 1)/2.0);
+
+            glm_vec3_copy((vec3){cX, 0, cZ}, cell->pos);
 
             /* If clear, count surrounding cells and print n of mines */
             if (CHECK_CLEAR(BOARDXY(x, y))) {
@@ -121,22 +130,37 @@ render(GLFWwindow *window) {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                
+                model_draw(cell);
             }
             /* Otherwise just a tile */
             else {
-                glm_vec3_copy((vec3){cX, 1, cZ}, cell->pos);
-                //glm_vec3_copy((vec3){(float)x/(float)size, 1, (float)y/(float)size}, cell->color);
                 model_draw(cell);
-                printf("%f,%f\n", cX, cZ);
             }
         }
     }
 
-    printf("\n");
+    glUseProgram(default_shader);
+    glUniformMatrix4fv(default_loc_pm, 1, GL_FALSE, (float*)pm);
+    glUniformMatrix4fv(default_loc_vm, 1, GL_FALSE, (float*)vm);
 
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            float cX = (CELL_PITCH * (float)x) - (CELL_PITCH*(float)(size - 1)/2.0);
+            float cZ = (CELL_PITCH * (float)y) - (CELL_PITCH*(float)(size - 1)/2.0);
+
+            if (x == curx && y == cury) {
+                glm_vec3_copy((vec3)CURSOR_COLOR, cursor->color);
+                glm_vec3_copy((vec3){cX, 0, cZ}, cursor->pos);
+                model_draw(cursor);
+            }
+
+            if (CHECK_FLAG(BOARDXY(x, y))) {
+                glm_vec3_copy((vec3)FLAG_COLOR, cursor->color);
+                glm_vec3_copy((vec3){cX, 0, cZ}, cursor->pos);
+                model_draw(cursor);
+            }
+        }
+    }
 }
 
 static void
@@ -157,6 +181,7 @@ keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
         orbit_az++;
     else if (key == GLFW_KEY_D && action == GLFW_RELEASE)
         orbit_az--;
+
     /* orbit el */
     else if (key == GLFW_KEY_S && action == GLFW_PRESS)
         orbit_el--;
@@ -166,6 +191,7 @@ keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
         orbit_el++;
     else if (key == GLFW_KEY_W && action == GLFW_RELEASE)
         orbit_el--;
+
     /* orbit el */
     else if (key == GLFW_KEY_E && action == GLFW_PRESS)
         orbit_d--;
@@ -175,6 +201,30 @@ keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
         orbit_d++;
     else if (key == GLFW_KEY_Q && action == GLFW_RELEASE)
         orbit_d--;
+
+    /* cursor */
+    else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+        curx++;
+    else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+        curx--;
+    else if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+        cury--;
+    else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+        cury++;
+
+    else if (key == GLFW_KEY_C && action == GLFW_RELEASE)
+        gameClearCell(curx, cury);
+    else if (key == GLFW_KEY_F && action == GLFW_RELEASE)
+        gameFlagCell(curx, cury);
+
+    if (curx >= size)
+        curx = 0;
+    if (curx < 0)
+        curx = size - 1;
+    if (cury >= size)
+        cury = 0;
+    if (cury < 0)
+        cury = size - 1;
 }
 
 static void
@@ -240,27 +290,44 @@ gl3d_start(const int *lboard, int lsize) {
     /* Compile shaders */
     default_shader = shader_new(GL3D_SHADER_PATH "default.vs", NULL,
         GL3D_SHADER_PATH "default.fs");
-    if (default_shader < 0) {
+    if (shaded_shader < 0) {
         return -1;
     }
-    loc_pm = glGetUniformLocation(default_shader, "pm");
-    loc_vm = glGetUniformLocation(default_shader, "vm");
-    loc_light_dir = glGetUniformLocation(default_shader, "light_dir");
+    default_loc_pm = glGetUniformLocation(default_shader, "pm");
+    default_loc_vm = glGetUniformLocation(default_shader, "vm");
+    
+    shaded_shader = shader_new(GL3D_SHADER_PATH "shaded.vs", NULL,
+        GL3D_SHADER_PATH "default.fs");
+    if (shaded_shader < 0) {
+        return -1;
+    }
+    
+    shaded_loc_pm = glGetUniformLocation(shaded_shader, "pm");
+    shaded_loc_vm = glGetUniformLocation(shaded_shader, "vm");
+    shaded_loc_light_dir = glGetUniformLocation(shaded_shader, "light_dir");
 
-    glUseProgram(default_shader);
+    glUseProgram(shaded_shader);
 
     init_camera();
-    glm_vec3_normalize_to((vec3){1, 1, 1}, light_dir);
-    glUniform3fv(loc_light_dir, 1, light_dir);
+    glm_vec3_normalize_to((vec3){ 1,  1,  1}, light_dir);
+    glUniform3fv(shaded_loc_light_dir, 1, light_dir);
 
     base = model_new(cube, cube_size / sizeof(vec3),
         (vec3){(float)size/2.0 + 1.0, 0.5, (float)size/2.0 + 1.0},
         (vec3){0, -1, 0},
-        (vec3){0.75f, 0.75f, 0.75f}, default_shader);
+        (vec3){0.75f, 0.75f, 0.75f}, shaded_shader, GL_TRIANGLES);
 
     cell = model_new(cube, cube_size / sizeof(vec3),
         (vec3){0.5, 0.5, 0.5}, GLM_VEC3_ZERO,
-        (vec3){1.0f, 1.0f, 1.0f}, default_shader);
+        (vec3){1.0f, 1.0f, 1.0f}, shaded_shader, GL_TRIANGLES);
+
+    axis = model_new(cube, cube_size / sizeof(vec3),
+        GLM_VEC3_ZERO, GLM_VEC3_ZERO,
+        GLM_VEC3_ZERO, shaded_shader, GL_TRIANGLES);
+
+    cursor = model_new(wirecube, wirecube_size / sizeof(vec3),
+        (vec3){0.55, 0.55, 0.55}, GLM_VEC3_ZERO,
+        (vec3)CURSOR_COLOR, default_shader, GL_LINES);
 
 
     /* Enter the infinite event-processing loop */

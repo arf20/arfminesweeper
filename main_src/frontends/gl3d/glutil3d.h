@@ -32,10 +32,11 @@ typedef struct {
                         GLuint  loc_mm;
     vec3    color;      GLuint loc_color;
     GLint   shader;
+    GLenum  mode;
 } model_t;
 
 model_t *model_new(vec3 *verts, size_t n, vec3 scale, vec3 pos, vec3 color,
-    GLint shader);
+    GLint shader, GLenum mode);
 model_t *model_draw(model_t *m);
 
 #endif /* _GLUTIL3D_H */
