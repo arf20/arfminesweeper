@@ -63,6 +63,35 @@ target_compile_definitions(arfminesweeper PUBLIC ARFMINESWEEPER_NUM_COMMIT="${AR
 
 include_directories(arfminesweeper PUBLIC "${PROJECT_SOURCE_DIR}/" "frontends/")
 
+# base package
+set(CPACK_PACKAGE_NAME arfminesweeper)
+set(CPACK_GENERATOR "TGZ;DEB")
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+#set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} client data)
+
+set(CPACK_DEBIAN_PACKAGE_NAME "arfminesweeper")
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Minesweeper, but in every way possible")
+set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+set(CPACK_DEBIAN_PACKAGE_VERSION ${GITVERSIONDETECT_VERSION})
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "arf20 <arf20@arf20.com>")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6")
+
+if (NO_STATIC)
+    set(CPACK_DEBIAN_main_PACKAGE_DEPENDS
+        "arfminesweeper-data")
+else()
+    set(CPACK_DEBIAN_main_PACKAGE_DEPENDS
+        "libdrm2, libx11-6, libforms2, libgtk-3-0, libxcb1, libxm4, libxt6, libxaw7,
+        libforms2, libgtk-3-0, libglib2.0-0, libglib2.0-0, libqt5widgets5, 
+        libqt5gui5, libqt5core5a, 
+        libsdl2-2.0-0, libsdl2-ttf-2.0-0, libsdl2-image-2.0-0, libsdl1.2debian,
+        libgl1, libglut3.12, libglfw3, libvulkan1, libwayland-client0,
+        libstdc++6, libgcc-s1, arfminesweeper-data")
+endif()
+
 # module dir
 set(MODULE_DIR "${CMAKE_BINARY_DIR}/main_src/modules/")
 set(BINDINGS_DIR "${CMAKE_BINARY_DIR}/main_src/bindings/")
@@ -76,27 +105,10 @@ set_property(TARGET arfminesweeper PROPERTY VERSION ${ARFMINESWEEPER_VERSION})
 target_link_libraries(arfminesweeper dl)
 
 # target install
-install(TARGETS arfminesweeper RUNTIME DESTINATION bin)
+install(TARGETS arfminesweeper RUNTIME DESTINATION bin COMPONENT client)
+install(DIRECTORY ../assets DESTINATION share/arfminesweeper/assets/ COMPONENT data)
 
-# base package
-set(CPACK_PACKAGE_NAME arfminesweeper)
-set(CPACK_DEBIAN_PACKAGE_VERSION ${GITVERSIONDETECT_VERSION})
-set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "arf20 <arf20@arf20.com>")
-if (NOT NO_STATIC)
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS
-        "libdrm2, libx11-6, libforms2, libgtk-3-0, libxcb1, libxm4, libxt6, libxaw7,
-        libforms2, libgtk-3-0, libglib2.0-0, libglib2.0-0, libqt5widgets5, 
-        libqt5gui5, libqt5core5a, 
-        libsdl2-2.0-0, libsdl2-ttf-2.0-0, libsdl2-image-2.0-0, libsdl1.2debian,
-        libgl1, libglut3.12, libglfw3, libvulkan1, libwayland-client0,
-        libstdc++6, libc6, libgcc-s1")
-else()
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS
-        "libc6")
-endif()
-set(CPACK_DEBIAN_PACKAGE_NAME "arfminesweeper")
-set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+
 
 include(CPack)
 

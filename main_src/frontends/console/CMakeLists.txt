@@ -4,6 +4,11 @@ if (MODULE_CONSOLE)
     add_custom_target(symlink_arfminesweeper-console ALL
         COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
         DEPENDS arfminesweeper-console module_dir)
+
+    #list(APPEND CPACK_DEBIAN_PACKAGE_DEPENDS )
+    install(TARGETS arfminesweeper-console LIBRARY
+        COMPONENT console
+        DESTINATION lib/x86_64-linux-gnu/arfminesweeper/modules/)
     message(STATUS "Building with module console")
 else()
     message(STATUS "Not building with module console")
