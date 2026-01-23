@@ -1,7 +1,7 @@
 /*
 
     arfminesweeper: Cross-plataform multi-frontend game
-    Copyright (C) 2023 arf20 (Ángel Ruiz Fernandez)
+    Copyright (C) 2025 arf20 (Ángel Ruiz Fernandez)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,17 +16,19 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    sdl2.c: SDL2 frontend
+    sdl3.c: SDL2 frontend
 
 */
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <common/frontconf.h>
-#include "sdl2.h"
+#include "sdl3.h"
 #include <common/game.h>
+
+#include <stdio.h>
 
 
 static const int *board = NULL;
@@ -72,32 +74,34 @@ static void
 renderText(const char *str, TTF_Font* f, int x, int y, unsigned int flags,
     SDL_Color c)
 {
-    SDL_Surface* surfaceText = TTF_RenderText_Blended(f, str, c);
+    SDL_Surface* surfaceText = TTF_RenderText_Blended(f, str, strlen(str), c);
     SDL_Texture* textureText = SDL_CreateTextureFromSurface(r, surfaceText);
 
-    SDL_Rect rectText;  // create a rect
-    rectText.x = x;     // controls the rect's x coordinate 
-    rectText.y = y;     // controls the rect's y coordinte
-    rectText.w = 0;     // controls the width of the rect
-    rectText.h = 0;     // controls the height of the rect
+    SDL_Rect rectText = { x, y, 0, 0 };
+    rectText.x = x;
+    rectText.y = y;
+    rectText.w = 0;
+    rectText.h = 0;
 
-    TTF_SizeText(f, str, &rectText.w, &rectText.h);
+    TTF_GetStringSize(f, str, strlen(str), &rectText.w, &rectText.h);
 
     if (flags & TEXT_CENTERX) rectText.x -= rectText.w / 2;
     if (flags & TEXT_CENTERY) rectText.y -= rectText.h / 2;
 
-    SDL_RenderCopy(r, textureText, NULL, &rectText);
+    SDL_FRect frectText = { 0 };
+    SDL_RectToFRect(&rectText, &frectText);
+    SDL_RenderTexture(r, textureText, NULL, &frectText);
 
     // I had to run valgrind to find this, I'm such a terrible programmer
-    SDL_FreeSurface(surfaceText);
+    SDL_DestroySurface(surfaceText);
     SDL_DestroyTexture(textureText);
 }
 
 static void
 renderTexture(SDL_Texture *t, int w, int h, int x, int y) {
-    SDL_Rect rect;
+    SDL_FRect rect;
     rect.h = h; rect.w = w; rect.x = x; rect.y = y;
-    SDL_RenderCopy(r, t, NULL, &rect);
+    SDL_RenderTexture(r, t, NULL, &rect);
 }
 
 static void
@@ -156,14 +160,14 @@ render() {
             }
             /* If not clear, check flag and draw it */
             else if (CHECK_FLAG(BOARDXY(x, y))) {
-                SDL_Rect cellRect = {cX, cY, CELL_SIZE, CELL_SIZE};
+                SDL_FRect cellRect = {cX, cY, CELL_SIZE, CELL_SIZE};
                 SDL_SetRenderDrawColor(r, C_WHITE);
                 SDL_RenderFillRect(r, &cellRect);
                 renderTexture(flag, CELL_SIZE, CELL_SIZE, cX, cY);
             }
             /* Otherwise just a tile */
             else {
-                SDL_Rect cellRect = {cX, cY, CELL_SIZE, CELL_SIZE};
+                SDL_FRect cellRect = {cX, cY, CELL_SIZE, CELL_SIZE};
                 SDL_SetRenderDrawColor(r, C_WHITE);
                 SDL_RenderFillRect(r, &cellRect);
             }
@@ -174,7 +178,7 @@ render() {
 }
 
 int
-sdl2_start(const int *lboard, int lsize) {
+sdl3_start(const int *lboard, int lsize) {
     board = lboard;
     size = lsize;
 
@@ -184,30 +188,38 @@ sdl2_start(const int *lboard, int lsize) {
         ((size - 1) * CELL_MARGIN);
 
     /* Initialise SDL2 */
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
+        return -1;
+    }
 
-    if (TTF_Init() < 0)
-        printf("TTF_Init failed: %s\n", TTF_GetError());
-
-    int imgFlags = IMG_INIT_PNG;
-    if(!(IMG_Init(imgFlags) & imgFlags))
-        printf("IMG_Init failed: %s\n", IMG_GetError());
+    if (TTF_Init() < 0) {
+        printf("TTF_Init failed: %s\n", SDL_GetError());
+        return -1;
+    }
 
     /* Create stuff */
-    if ((w = SDL_CreateWindow(TXT_TITLE, SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, wWidth, wHeight,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN)) == NULL)
+    if ((w = SDL_CreateWindow(TXT_TITLE, wWidth, wHeight, 0))
+        == NULL)
+    {
         printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+        return -1;
+    }
 
-    if ((r = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED)) == NULL)
+    if ((r = SDL_CreateRenderer(w, NULL)) == NULL) {
         printf("SDL_CreateRenderer failed: %s\n", SDL_GetError());
+        return -1;
+    }
 
-    if (!(font = TTF_OpenFont(FONT_TTF_PATH, 16)))
-        printf("Error opening font: %s\n", TTF_GetError());
+    if (!(font = TTF_OpenFont(FONT_TTF_PATH, 16))) {
+        printf("Error opening font: %s\n", SDL_GetError());
+        return -1;
+    }
 
-    if (!(flag = IMG_LoadTexture(r, FLAG_PNG_PATH)))
-        printf("Error loading texture: %s\n", IMG_GetError());
+    if (!(flag = IMG_LoadTexture(r, FLAG_PNG_PATH))) {
+        printf("Error loading texture: %s\n", SDL_GetError());
+        return -1;
+    }
 
     /* SDL event loop */
     SDL_Event e;
@@ -215,10 +227,7 @@ sdl2_start(const int *lboard, int lsize) {
         render();
         while (SDL_PollEvent(&e)) {
             switch (e.type) {
-                case SDL_KEYDOWN: {
-                    //event.key.keysym.sym
-                } break;
-                case SDL_MOUSEBUTTONDOWN: {
+                case SDL_EVENT_MOUSE_BUTTON_DOWN: {
                     /* Coordinates */
                     int ix = (e.button.x - W_MARGIN) /
                     (CELL_SIZE + CELL_MARGIN);
@@ -235,7 +244,7 @@ sdl2_start(const int *lboard, int lsize) {
                         } break;
                     }
                 } break;
-                case SDL_QUIT: {
+                case SDL_EVENT_QUIT: {
                     run = 0;
                 } break;
             }
@@ -244,7 +253,7 @@ sdl2_start(const int *lboard, int lsize) {
 }
 
 void
-sdl2_destroy() {
+sdl3_destroy() {
     SDL_DestroyRenderer(r);
     SDL_DestroyWindow(w);
     TTF_Quit();
@@ -252,7 +261,7 @@ sdl2_destroy() {
 }
 
 const char *
-sdl2_name() {
-    return "sdl2";
+sdl3_name() {
+    return "sdl3";
 }
 

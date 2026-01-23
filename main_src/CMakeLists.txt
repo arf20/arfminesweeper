@@ -46,6 +46,9 @@ find_program(JAVAC javac)
 find_package(FLTK)
 find_package(wxWidgets COMPONENTS core base)
 pkg_check_modules(CGLM cglm)
+pkg_check_modules(SDL3 sdl3)
+pkg_check_modules(SDL3_image sdl3-image)
+pkg_check_modules(SDL3_ttf sdl3-ttf)
 
 
 file(GLOB SRC

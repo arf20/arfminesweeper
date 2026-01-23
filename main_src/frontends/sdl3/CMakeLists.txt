@@ -1,0 +1,25 @@
+if (SDL3_FOUND AND SDL3_ttf_FOUND AND SDL3_image_FOUND)
+    if (MODULE_SDL3)
+        add_library(arfminesweeper-sdl3 MODULE "sdl3.c")
+        target_compile_definitions(arfminesweeper-sdl3 PUBLIC _MODULE_)
+        target_link_libraries(arfminesweeper-sdl3 ${SDL3_LIBRARIES} ${SDL3_ttf_LIBRARIES} ${SDL3_image_LIBRARIES})
+        add_custom_target(arfminesweeper-symlink_sdl3 ALL
+            COMMAND ln -fs "${CMAKE_CURRENT_BINARY_DIR}/*.so" ${MODULE_DIR}
+            DEPENDS arfminesweeper-sdl3 module_dir)
+        message(STATUS "Building with module sdl3")
+    else()
+        message(STATUS "Not building with module sdl3")
+    endif()
+
+    if (STATIC_SDL3)
+        target_sources(arfminesweeper PRIVATE "sdl3.c")
+        target_link_libraries(arfminesweeper ${SDL3_LIBRARIES} ${SDL3_ttf_LIBRARIES} ${SDL3_image_LIBRARIES})
+        target_compile_definitions(arfminesweeper PUBLIC FRONTEND_SDL3)
+        message(STATUS "Building with static sdl3")
+    else()
+        message(STATUS "Not building with static sdl3")
+    endif()
+else()
+    message(STATUS "No SDL3 found (SDL3, SDL3_ttf, SDL3_image)")
+endif()
+

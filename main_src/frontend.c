@@ -60,6 +60,7 @@
 #include <wxwidgets/wxwidgets.hpp>
 #include <swing/swing.h>
 #include <gl3d/gl3d.h>
+#include <sdl3/sdl3.h>
 
 typedef const char *(name_func_t)();
 
@@ -169,6 +170,9 @@ frontend_load_static() {
     #endif
     #ifdef FRONTEND_GL3D
     frontend_insert(&(frontend_t){ TYPE_STATIC, gl3d_name(), gl3d_start, gl3d_destroy });
+    #endif
+    #ifdef FRONTEND_SDL3
+    frontend_insert(&(frontend_t){ TYPE_STATIC, sdl3_name(), sdl3_start, sdl3_destroy });
     #endif
 
 }

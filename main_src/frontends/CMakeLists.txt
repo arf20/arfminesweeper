@@ -28,6 +28,7 @@ if (MODULE_ALL)
     set(MODULE_XCB BOOL TRUE)
     set(MODULE_XFORMS BOOL TRUE)
     set(MODULE_XLIB BOOL TRUE)
+    set(MODULE_SDL3 BOOL TRUE)
 endif()
 
 if (NOT NO_STATIC)
@@ -60,6 +61,12 @@ if (NOT NO_STATIC)
     set(STATIC_XCB BOOL TRUE)
     set(STATIC_XFORMS BOOL TRUE)
     set(STATIC_XLIB BOOL TRUE)
+    set(STATIC_SDL3 BOOL TRUE)
+endif()
+
+# check conflicts
+if ((STATIC_SDL2 AND STATIC_SDL3) OR (STATIC_SDL1 AND STATIC_SDL3) OR (STATIC_SDL1 AND STATIC_SD2))
+    message(FATAL_ERROR "SDLs are mutually exclusive on static builds")
 endif()
 
 # common targets
@@ -94,4 +101,5 @@ add_subdirectory("httpd")
 add_subdirectory("drmfb")
 add_subdirectory("wxwidgets")
 add_subdirectory("swing")
+add_subdirectory("sdl3")
 

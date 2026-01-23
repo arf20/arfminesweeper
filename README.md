@@ -33,6 +33,7 @@ motif:      libmotif-dev
 qt5:        qtbase5-dev qttools5-dev qttools5-dev-tools
 sdl1:       libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev
 sdl2:       libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
+sdl3:       libsdl3-dev libsdl3-image-dev libsdl3-ttf-dev
 vulkan:     libvulkan-dev
 wayland:    libwayland-dev
 wxwidgets:  libwxgtk3.2-dev
@@ -85,7 +86,7 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   X Toolkit (Xt)           |           |      |X    |X  |   |    |
 |   Tcl/Tk                   |           |      |X    |X  |   |X   |
 |   raylib                   |           |      |X    |X  |X  |X   |
-|   SDL3                     |           |      |X    |X  |X  |X   |
+|   SDL3                     | sdl3      | DONE |X    |X  |X  |X   |
 |   SDL2                     | sdl2      | DONE |X    |X  |X  |X   |
 |   SDL1.2                   | sdl1      | DONE |X    |X  |X  |X   |
 |   DRI DRM fb               | drmfb     | WIP  |X    |   |   |    |
@@ -118,9 +119,9 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   Objective-C ?            |           |      |     |   |X  |    |
 |   Swift ?                  |           |      |     |   |X  |    |
 
- - DONE 17/48 (35%)
+ - DONE 18/48 (37%)
  - WIP  10/48 (20%)
- - unattempted 20/48 (41%)
+ - unattempted 19/48 (39%)
 
 ### LINUX MODULE TARGET
 
