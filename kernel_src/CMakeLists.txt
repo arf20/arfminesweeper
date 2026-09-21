@@ -106,7 +106,15 @@ add_custom_command(
 )
 
 add_custom_target(image ALL DEPENDS ${IMAGE_BIN})
-add_custom_target(iso ALL DEPENDS ${IMAGE_ISO})
+
+find_program(MKRESCUE grub-mkrescue)
+find_program(XORRISO xorriso)
+
+if (MKRESCUE AND XORRISO)
+    add_custom_target(iso ALL DEPENDS ${IMAGE_ISO})
+else()
+    message(STATUS "Not generating BIOS kernel ISO")
+endif()
 
 message(STATUS "Building BIOS kernel image")
 

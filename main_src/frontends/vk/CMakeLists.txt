@@ -1,3 +1,5 @@
+find_program(GLSLC NAMES glslc)
+
 add_custom_command(
     OUTPUT "${PROJECT_SOURCE_DIR}/assets/msboard4vs.spv"
     COMMAND "glslc"
@@ -14,7 +16,7 @@ add_custom_command(
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-if (Vulkan_FOUND AND glfw3_FOUND)
+if (Vulkan_FOUND AND glfw3_FOUND AND GLSLC)
     if (MODULE_VK)
         add_library(arfminesweeper-vk MODULE "vk.c" "../common/glad/glad.c")
         target_compile_definitions(arfminesweeper-vk PUBLIC _MODULE_)
@@ -43,6 +45,6 @@ if (Vulkan_FOUND AND glfw3_FOUND)
         message(STATUS "Not building with static vk")
     endif()
 else()
-    message(STATUS "No Vulkan/GLFW3 found")
+    message(STATUS "No Vulkan/GLFW3 or glslc found")
 endif()
 

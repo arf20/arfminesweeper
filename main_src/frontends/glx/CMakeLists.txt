@@ -1,4 +1,4 @@
-if (OpenGL_OpenGL_FOUND AND X11_FOUND)
+if (OpenGL_OpenGL_FOUND AND OPENGL_GLU_FOUND AND X11_FOUND)
     if (MODULE_GLX)
         add_library(arfminesweeper-glx MODULE "glx.c" "../common/gl_ffp.c")
         target_compile_definitions(arfminesweeper-glx PUBLIC _MODULE_)

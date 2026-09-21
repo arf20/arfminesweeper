@@ -26,7 +26,8 @@ drmfb:      libdrm-dev
 fltk:       libfltk1.4-dev
 gl11:       libgl-dev freeglut3-dev
 gl33:       libgl-dev libglfw3-dev
-glx:        libgl-dev libx11-dev
+gl3d:       libgl-dev libglfw3-dev libcglm-dev
+glx:        libgl-dev libx11-dev libglu1-mesa-dev
 gtk3:       libgtk-3-dev
 java:       openjdk-17-jdk-headless
 motif:      libmotif-dev
@@ -34,7 +35,7 @@ qt5:        qtbase5-dev qttools5-dev qttools5-dev-tools
 sdl1:       libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev
 sdl2:       libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 sdl3:       libsdl3-dev libsdl3-image-dev libsdl3-ttf-dev
-vulkan:     libvulkan-dev
+vk:         libvulkan-dev glslc
 wayland:    libwayland-dev
 wxwidgets:  libwxgtk3.2-dev
 xaw:        libxaw7-dev
@@ -45,7 +46,7 @@ xlib:       libx11-dev
 
 Dependencies for kernel module: `linux-headers-amd64`
 
-Dependencies for BIOS kernel: `nasm`
+Dependencies for BIOS kernel: `nasm xorriso`
 
 Dependencies for UEFI application: `gnu-efi binutils-mingw-w64 gcc-mingw-w64 xorriso`
 
@@ -119,7 +120,7 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   Objective-C ?            |           |      |     |   |X  |    |
 |   Swift ?                  |           |      |     |   |X  |    |
 
- - DONE 18/48 (37%)
+ - DONE 17/48 (37%)
  - WIP  10/48 (20%)
  - unattempted 19/48 (39%)
 
@@ -152,6 +153,8 @@ WIP
 ### HARDWARE TARGET
 
 The only one that doesnt compile against game.c
+
+The main program acts as a client that talks with a UART interface of the hardware
 
  - SystemVerilog
  - VHDL
