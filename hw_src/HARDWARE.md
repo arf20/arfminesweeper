@@ -114,12 +114,31 @@ Response: `ok<lf>` or `cleared<lf>` if cell is already cleared
 Systolic array of Processing Elements (PE) synthetised from the recursive clearing
 function implemented in `game.c`.
 
+### Processing Element
+
 Each processing elements corresponds with a cell. The PEs will each have the cell control
 signals of set_mine, set_flag and set_signal. These are addressed with the XY cell address bus.
 Being a ff block, they will implicitely also have a clock.
 
 They will have a mine output and a clear output, directly connected to each of the 8 surrounding
 mines.
+
+#### Inputs
+
+- set_mine
+- set_flag
+- set_clear
+- surr_mine[8]:   wether each of the 8 surrounding cells have a mine
+- surr_clear[8]:  wether each of the 8 surrounding cells are cleared
+
+#### Outputs
+
+- mine:           informs the 8 surrounding mines
+- clear:          informs the 8 surrounding mines
+- num[4]:         4-bit number of surrounding mines
+- ready:          low when state has changed, high otherwise
+
+#### Processing
 
 So, with this information, each mine can compute if it should be clear according to its
 surroundings each clock cycle with a simple function.
@@ -129,4 +148,17 @@ using the state of the inputs, and the end is signaled when the systolic array
 has propagated the function and has reached a stable state with the ready signal
 going high. This is determined by having a bit bus across all the PEs that is set
 whenever a cell is cleared.
+
+##### Function
+
+For a PE that receives a clear signal: if the cell itself is mined and not flagged,
+game is automatically lost. If the cell is not mined and not flagged, it is cleared.
+
+Now this changed state information must be propagated to the surrounding PEs,
+which should determine wether or not they should clear next.
+
+They should clear next if the following condition is fulfilled: cell is not
+mined, and it is not surrounded by other mines.
+
+If their state changes from not cleared to cleared, the ready signal is set to low.
 
