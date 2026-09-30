@@ -4,7 +4,7 @@ Minesweeper acceleration implementation in hardware
 
 The hardware will be either FPGA or a tiny tapeout ASIC.
 
-It should support at least 100x100 boards.
+It should support at least 100x100 square boards.
 
 ## Top-level interface specification
 
@@ -45,7 +45,7 @@ with a serial UART to interface with the host client computer.
 
 The UART serial interface will be text command based, as follows
 
-#### b<size><lf>
+#### `b<size><lf>`
 
 resets board, sets size (decimal), follows a board character map specified below
 
@@ -69,14 +69,14 @@ Example:
 
 Response: `ok<lf>`
 
-#### br<size>,<mines><lf>
+#### `br<size>,<mines><lf>`
 
 resets board, sets size (decimal) and generates a random board on the MCU with its seed
 with the specified number of mines (decimal)
 
 Response: `ok<lf>`
 
-#### c<x>,<y><lf>
+#### `c<x>,<y><lf>`
 
 attempt to clear cell
 
@@ -103,7 +103,7 @@ Example:
 2#####3#<lf>
 ```
 
-#### f<y>,<y><lf>
+#### `f<y>,<y><lf>`
 
 flag uncleared cell
 
