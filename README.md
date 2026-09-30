@@ -96,10 +96,13 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   OpenGL 2.2 FFP/FreeGLUT  | gl11      | DONE |X    |X  |X  |X   |
 |   OpenGL 3.3/GLFW/GLAD 2D  | gl33      | WIP  |X    |X  |X  |X   |
 |   OpenGL 3.3/GLFW/GLAD 3D  | gl3d      | WIP  |X    |X  |X  |X   |
+|   EGL                      |           |      |X    |X  |X  |X   |
+|   OpenGL ES                |           |      |X    |X  |X  |X   |
 |   Vulkan/GLFW              | vulkan    | WIP  |X    |X  |X  |X   |
 |   ImGui                    |           |      |X    |X  |X  |X   |
 |   Gtk2                     |           |      |X    |X  |X  |X   |
 |   Gtk3                     | gtk3      | DONE |X    |X  |X  |X   |
+|   Gtk4                     |           |      |X    |X  |X  |X   |
 |   Gtk4 + libadwaita        |           |      |X    |X  |X  |X   |
 |   Qt4                      |           |      |X    |X  |X  |X   |
 |   Qt5                      | qt5       | DONE |X    |X  |X  |X   |
@@ -120,9 +123,9 @@ Use -DNO\_STATIC to disable all static frontends, -DSTATIC\_\<frontend> to build
 |   Objective-C ?            |           |      |     |   |X  |    |
 |   Swift ?                  |           |      |     |   |X  |    |
 
- - DONE 17/48 (37%)
- - WIP  10/48 (20%)
- - unattempted 19/48 (39%)
+ - DONE 18/52 (34%)
+ - WIP  11/52 (21%)
+ - unattempted 23/52 (36%)
 
 ### LINUX MODULE TARGET
 

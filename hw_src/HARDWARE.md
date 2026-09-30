@@ -128,14 +128,19 @@ mines.
 - set_mine
 - set_flag
 - set_clear
+- reset:          clear all (mine, flag, clear)
 - surr_mine[8]:   wether each of the 8 surrounding cells have a mine
 - surr_clear[8]:  wether each of the 8 surrounding cells are cleared
+- valid
+- clk
 
 #### Outputs
 
 - mine:           informs the 8 surrounding mines
+- flag:           signals that the cell was flagged
 - clear:          informs the 8 surrounding mines
-- num[4]:         4-bit number of surrounding mines
+- win:            signals that as far as this cell is concerned, conditions for winning are met
+- lost:           signals that a mined was cleared
 - ready:          low when state has changed, high otherwise
 
 #### Processing
@@ -157,7 +162,9 @@ game is automatically lost. If the cell is not mined and not flagged, it is clea
 Now this changed state information must be propagated to the surrounding PEs,
 which should determine wether or not they should clear next.
 
-They should clear next if the following condition is fulfilled: cell is not
+The surrounding mines know they should consider clearing next because
+they sense a surrounding cell is clear via `surr_clear`.
+They then check for the following the following condition: cell is not
 mined, and it is not surrounded by other mines.
 
 If their state changes from not cleared to cleared, the ready signal is set to low.
