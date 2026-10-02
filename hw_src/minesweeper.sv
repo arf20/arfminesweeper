@@ -1,8 +1,11 @@
-module minesweeper #(parameter cap=128)(
+module minesweeper #(
+    parameter order = 4,
+    cap = 2**order
+)(
     // cell
     //   address
-    input logic [6:0] x,
-    input logic [6:0] y,
+    input logic [order-1:0] x,
+    input logic [order-1:0] y,
     //   control
     input logic write_enable,
     //   input
@@ -32,7 +35,7 @@ module minesweeper #(parameter cap=128)(
 );
 
     // registers
-    logic [6:0] size;
+    logic [order-1:0] size;
 
     struct {
         logic won;
@@ -76,25 +79,25 @@ module minesweeper #(parameter cap=128)(
                     // PE interconnects
                     //   mines
                     .surr_mine({
-                        ((gx>1     && gy>1    ) ? pe_mines[gx-1][gy-1] : 0),
-                        ((            gy>1    ) ? pe_mines[gx  ][gy-1] : 0),
-                        ((gx<cap-1 && gy>1    ) ? pe_mines[gx-1][gy-1] : 0),
-                        ((gx>1                ) ? pe_mines[gx-1][gy  ] : 0),
-                        ((gx<cap-1            ) ? pe_mines[gx+1][gy  ] : 0),
-                        ((gx>1     && gy<cap-1) ? pe_mines[gx-1][gy+1] : 0),
-                        ((            gy<cap-1) ? pe_mines[gx  ][gy+1] : 0),
-                        ((gx<cap-1 && gy<cap-1) ? pe_mines[gx+1][gy+1] : 0)
+                        ((gx>1     && gy>1    ) ? pe_mines[gx-1][gy-1] : 1'b0),
+                        ((            gy>1    ) ? pe_mines[gx  ][gy-1] : 1'b0),
+                        ((gx<cap-1 && gy>1    ) ? pe_mines[gx-1][gy-1] : 1'b0),
+                        ((gx>1                ) ? pe_mines[gx-1][gy  ] : 1'b0),
+                        ((gx<cap-1            ) ? pe_mines[gx+1][gy  ] : 1'b0),
+                        ((gx>1     && gy<cap-1) ? pe_mines[gx-1][gy+1] : 1'b0),
+                        ((            gy<cap-1) ? pe_mines[gx  ][gy+1] : 1'b0),
+                        ((gx<cap-1 && gy<cap-1) ? pe_mines[gx+1][gy+1] : 1'b0)
                     }),
                     //   clears
                     .surr_clear({
-                        ((gx>1     && gy>1    ) ? pe_clears[gx-1][gy-1] : 0),
-                        ((            gy>1    ) ? pe_clears[gx  ][gy-1] : 0),
-                        ((gx<cap-1 && gy>1    ) ? pe_clears[gx-1][gy-1] : 0),
-                        ((gx>1                ) ? pe_clears[gx-1][gy  ] : 0),
-                        ((gx<cap-1            ) ? pe_clears[gx+1][gy  ] : 0),
-                        ((gx>1     && gy<cap-1) ? pe_clears[gx-1][gy+1] : 0),
-                        ((            gy<cap-1) ? pe_clears[gx  ][gy+1] : 0),
-                        ((gx<cap-1 && gy<cap-1) ? pe_clears[gx+1][gy+1] : 0)
+                        ((gx>1     && gy>1    ) ? pe_clears[gx-1][gy-1] : 1'b0),
+                        ((            gy>1    ) ? pe_clears[gx  ][gy-1] : 1'b0),
+                        ((gx<cap-1 && gy>1    ) ? pe_clears[gx-1][gy-1] : 1'b0),
+                        ((gx>1                ) ? pe_clears[gx-1][gy  ] : 1'b0),
+                        ((gx<cap-1            ) ? pe_clears[gx+1][gy  ] : 1'b0),
+                        ((gx>1     && gy<cap-1) ? pe_clears[gx-1][gy+1] : 1'b0),
+                        ((            gy<cap-1) ? pe_clears[gx  ][gy+1] : 1'b0),
+                        ((gx<cap-1 && gy<cap-1) ? pe_clears[gx+1][gy+1] : 1'b0)
                     }),
 
                     // PE inputs
@@ -160,14 +163,14 @@ module minesweeper #(parameter cap=128)(
         clear = pe_clears[x][y];
         // number function exists once
         num =
-            ((x>1         && y>1        ) ?  4'(pe_mines[x-1][y-1]) : 4'b0) +
-            ((               y>1        ) ?  4'(pe_mines[x  ][y-1]) : 4'b0) +
-            ((x<7'(cap-1) && y>1        ) ?  4'(pe_mines[x+1][y-1]) : 4'b0) +
-            ((x>1                       ) ?  4'(pe_mines[x-1][y  ]) : 4'b0) +
-            ((x<7'(cap-1)               ) ?  4'(pe_mines[x+1][y  ]) : 4'b0) +
-            ((x>1         && y<7'(cap-1)) ?  4'(pe_mines[x-1][y+1]) : 4'b0) +
-            ((               y<7'(cap-1)) ?  4'(pe_mines[x  ][y+1]) : 4'b0) +
-            ((x<7'(cap-1) && y<7'(cap-1)) ?  4'(pe_mines[x+1][y+1]) : 4'b0);
+            ((x>1             && y>1            ) ?  4'(pe_mines[x-1][y-1]) : 4'b0) +
+            ((                   y>1            ) ?  4'(pe_mines[x  ][y-1]) : 4'b0) +
+            ((x<order'(cap-1) && y>1            ) ?  4'(pe_mines[x+1][y-1]) : 4'b0) +
+            ((x>1                               ) ?  4'(pe_mines[x-1][y  ]) : 4'b0) +
+            ((x<order'(cap-1)                   ) ?  4'(pe_mines[x+1][y  ]) : 4'b0) +
+            ((x>1             && y<order'(cap-1)) ?  4'(pe_mines[x-1][y+1]) : 4'b0) +
+            ((                   y<order'(cap-1)) ?  4'(pe_mines[x  ][y+1]) : 4'b0) +
+            ((x<order'(cap-1) && y<order'(cap-1)) ?  4'(pe_mines[x+1][y+1]) : 4'b0);
 
         game_won  = game_state.won;
         game_lost = game_state.lost;

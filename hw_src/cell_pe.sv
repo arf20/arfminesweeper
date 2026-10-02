@@ -12,8 +12,8 @@ module cell_pe (
     output logic flag,
 
     // PE interconnects
-    input logic surr_mine[0:7],
-    input logic surr_clear[0:7],
+    input logic [7:0] surr_mine,
+    input logic [7:0] surr_clear,
 
     // PE
     //   inputs
