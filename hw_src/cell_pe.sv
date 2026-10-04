@@ -46,22 +46,21 @@ module cell_pe (
         end
 
         if (valid) begin
-            new_state <= ~mined & ~&surr_mine & &surr_clear;
+            new_state <= ~mined & ~&surr_mine & |surr_clear;
             ready <= new_state == cleared;
             cleared <= cleared | new_state;
         end
     end
 
     always_comb begin
+        mine = mined;
+        clear = cleared;
+
         // PE bus
         if (pe_select) begin
-            mine = mined;
             flag = flagged;
-            clear = cleared;
         end else begin
-            mine = 1'bx;
             flag = 1'bx;
-            clear = 1'bx;
         end
 
         won = (mined & flagged) | (~mined & cleared);

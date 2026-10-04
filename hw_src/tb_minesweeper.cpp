@@ -40,6 +40,8 @@ int inputPrompt(Vminesweeper *ms) {
 
         if (cmd == "x")
             ms->x = val;
+        if (cmd == "y")
+            ms->y = val;
         else if (cmd == "we")
             ms->write_enable = val;
         else if (cmd == "set_mine")
@@ -75,8 +77,12 @@ int main(int argc, char **argv, char **env) {
         // cycle
         ms->clk ^= 1;
         ms->eval();
+        m_trace->dump(sim_time);
+        sim_time++;
         ms->clk ^= 1;
         ms->eval();
+        m_trace->dump(sim_time);
+        sim_time++;
 
         printf(" mine >= %d\n flag >= %d\n clear >= %d\n num >= %d\n won >= %d\n"
             " lost >= %d\n ready >= %d\n\n\n",
@@ -88,8 +94,6 @@ int main(int argc, char **argv, char **env) {
             ms->game_lost,
             ms->ready);
 
-        m_trace->dump(sim_time);
-        sim_time++;
     }
 
     m_trace->close();

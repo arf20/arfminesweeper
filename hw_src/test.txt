@@ -1,0 +1,69 @@
+x 10
+set_size 1
+step
+step
+x 0
+set_size 0
+step
+step
+
+reset 1
+step
+step
+reset 0
+step
+
+set_mine 1
+we 1
+step
+step
+set_mine 0
+we 0
+step
+step
+
+x 9
+y 9
+set_clear 1
+we 1
+step
+step
+step
+x 0
+y 0
+set_clear 0
+we 0
+step
+valid 1
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+step
+
+set_flag 1
+step
+step
+set_flag 0
+step
+step
+step
+step
+
+
+exit
+
