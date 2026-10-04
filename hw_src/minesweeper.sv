@@ -121,26 +121,10 @@ module minesweeper #(
     always_ff @(posedge clk) begin
         if (set_size) size <= x;
 
-        // submatrix reduction (expensive)
-        all_won <= 1'b1;
-        for (int i = 0; i < size; i++) begin
-            for (int j = 0; j < size; j++) begin
-                all_won <= all_won & pe_won[i][j];
-            end
-        end
-        // again
-        one_lost <= 1'b0;
-        for (int i = 0; i < size; i++) begin
-            for (int j = 0; j < size; j++) begin
-                one_lost <= one_lost | pe_lost[i][j];
-            end
-        end
-
         if (all_won)    game_state.won  <= 1'b1;
         if (one_lost)   game_state.lost <= 1'b1;
 
-        if (clear) begin
-            size <= 0;
+        if (reset) begin
             game_state.won <= 0;
             game_state.lost <= 0;
         end
@@ -171,6 +155,21 @@ module minesweeper #(
             ((x>1             && y<order'(cap-1)) ?  4'(pe_mines[x-1][y+1]) : 4'b0) +
             ((                   y<order'(cap-1)) ?  4'(pe_mines[x  ][y+1]) : 4'b0) +
             ((x<order'(cap-1) && y<order'(cap-1)) ?  4'(pe_mines[x+1][y+1]) : 4'b0);
+
+        // submatrix reduction (expensive)
+        all_won = 1'b1;
+        for (int i = 0; i < size; i++) begin
+            for (int j = 0; j < size; j++) begin
+                all_won &= pe_won[i][j];
+            end
+        end
+        // again
+        one_lost = 1'b0;
+        for (int i = 0; i < size; i++) begin
+            for (int j = 0; j < size; j++) begin
+                one_lost |= pe_lost[i][j];
+            end
+        end
 
         game_won  = game_state.won;
         game_lost = game_state.lost;
