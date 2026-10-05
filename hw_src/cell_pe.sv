@@ -31,7 +31,9 @@ module cell_pe (
     logic mined;
     logic flagged;
     logic cleared;
-    logic new_state;
+
+    logic new_state_next;
+    logic cleared_next;
 
     always_ff @(posedge clk) begin
         if (reset) mined <= flagged <= cleared <= 1'b0;
@@ -46,9 +48,7 @@ module cell_pe (
         end
 
         if (valid) begin
-            new_state <= ~mined & ~&surr_mine & |surr_clear;
-            ready <= new_state == cleared;
-            cleared <= cleared | new_state;
+            cleared <= cleared_next;
         end
     end
 
@@ -62,6 +62,10 @@ module cell_pe (
         end else begin
             flag = 1'bx;
         end
+
+        new_state_next = ~mined & ~&surr_mine & |surr_clear;
+        cleared_next = cleared | new_state_next;
+        ready = cleared_next == cleared;
 
         won = (mined & flagged) | (~mined & cleared);
         lost = mined & cleared;

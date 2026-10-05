@@ -1,4 +1,4 @@
-x 10
+x 16
 set_size 1
 step
 step
@@ -22,8 +22,8 @@ we 0
 step
 step
 
-x 9
-y 9
+x 15
+y 15
 set_clear 1
 we 1
 step

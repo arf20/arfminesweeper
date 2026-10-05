@@ -51,7 +51,7 @@ module minesweeper #(
     logic pe_clears[0:cap-1][0:cap-1];
     logic [cap-1:0][cap-1:0] pe_won;
     logic [cap-1:0][cap-1:0] pe_lost;
-    logic [(cap*cap)-1:0] pe_ready;
+    logic [cap-1:0][cap-1:0] pe_ready;
 
     // PE addressed bus
     logic pe_bus_set_mine;
@@ -109,7 +109,7 @@ module minesweeper #(
                     .clear(pe_clears[gx][gy]),
                     .won(pe_won[gx][gy]),
                     .lost(pe_lost[gx][gy]),
-                    .ready(pe_ready[(cap*gy)+gx])
+                    .ready(pe_ready[gx][gy])
                 );
             end
         end
@@ -117,6 +117,7 @@ module minesweeper #(
 
     logic all_won;
     logic one_lost;
+    logic all_ready;
 
     always_ff @(posedge clk) begin
         if (set_size) size <= x;
@@ -129,7 +130,7 @@ module minesweeper #(
             game_state.lost <= 0;
         end
 
-        ready <= &pe_ready;
+        ready <= all_ready;
     end
 
     always_comb begin
@@ -156,18 +157,25 @@ module minesweeper #(
             ((                   y<order'(cap-1)) ?  4'(pe_mines[x  ][y+1]) : 4'b0) +
             ((x<order'(cap-1) && y<order'(cap-1)) ?  4'(pe_mines[x+1][y+1]) : 4'b0);
 
-        // submatrix reduction (expensive)
+        // submatrix reduction for won (expensive)
         all_won = 1'b1;
         for (int i = 0; i < size; i++) begin
             for (int j = 0; j < size; j++) begin
                 all_won &= pe_won[i][j];
             end
         end
-        // again
+        // submatrix reduction for lost
         one_lost = 1'b0;
         for (int i = 0; i < size; i++) begin
             for (int j = 0; j < size; j++) begin
                 one_lost |= pe_lost[i][j];
+            end
+        end
+        // submatrix reduction for ready
+        all_ready = 1'b1;
+        for (int i = 0; i < size; i++) begin
+            for (int j = 0; j < size; j++) begin
+                all_ready &= pe_ready[i][j];
             end
         end
 
