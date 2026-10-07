@@ -41,10 +41,10 @@ module cell_pe (
         if (pe_select & pe_write_enable) begin
             if (set_mine) mined <= 1'b1;
 
-            if (set_flag) flagged <= 1'b1;
+            if (set_flag & ~cleared) flagged <= 1'b1;
             else if (reset_flag) flagged <= 1'b0;
 
-            if (set_clear) cleared <= 1'b1;
+            if (set_clear & ~flagged) cleared <= 1'b1;
         end
 
         if (valid) begin

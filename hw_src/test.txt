@@ -56,9 +56,11 @@ step
 step
 
 set_flag 1
+we 1
 step
 step
 set_flag 0
+we 0
 step
 step
 step
